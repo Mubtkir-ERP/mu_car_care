@@ -1,0 +1,73 @@
+Vehicle Reception,استلام وفحص سيارة
+Vehicle Information,معلومات السيارة
+Vehicle Details,معلومات السيارة
+Vehicle Make,نوع السيارة
+Vehicle Model,موديل السيارة
+Vehicle Model / Year,موديل وسنة الصنع
+Plate Number,رقم اللوحة
+Vehicle Color,لون السيارة
+Chassis No (VIN),رقم الهيكل (VIN)
+Odometer (KM),قراءة العداد (كم)
+Odometer Reading (KM),قراءة العداد (كم)
+Fuel Level,مستوى الوقود
+Inspection & Vehicle Status,الفحص وحالة السيارة
+Personal Belongings Inside Vehicle,المتعلقات الشخصية داخل السيارة
+Pre-existing Scratches / Dents,الخدوش والضربات المسبقة
+Requested Services & Documents,الخدمات المطلوبة والمستندات
+Requested Services & Specifications,الخدمات والمواصفات المطلوبة
+General Notes,ملاحظات عامة
+Vehicle Reception Ref,مرجع استلام السيارة
+Maintenance Schedule,جدول الصيانة
+Schedule Configuration,إعدادات جدول الصيانة
+Maintenance Start Date,بداية الصيانة
+Duration (Months),المدة (بالأشهر)
+Distribution Method,طريقة التوزيع
+Monthly,شهري
+Quarterly,ربع سنوي
+Semi-Annual,نصف سنوي
+Annual,سنوي
+Generate Schedule,توليد الجدول
+Maintenance Visits Schedule,جدول زيارات الصيانة
+Maintenance Visits,زيارات الصيانة
+Vehicle Maintenance Schedule Item,بند جدول صيانة السيارة
+Scheduled Visit Date,تاريخ الزيارة المجدول
+Actual Visit Date,تاريخ الزيارة الفعلي
+Visit Status,حالة الزيارة
+Scheduled,مجدولة
+Completed,تمت الصيانة
+Cancelled,ملغاة
+No Show,لم يحضر
+Technician,الفني المنفذ
+Notes,ملاحظات
+Record Maintenance Visit,تسجيل زيارة صيانة
+Select Due Visit,اختر الزيارة المستحقة
+Current Odometer (KM),قراءة العداد الحالية (كم)
+Technician Name,اسم الفني المنفذ
+Inspection & Service Notes,ملاحظات الفحص والخدمة
+Confirm Visit Completed,تأكيد إتمام الزيارة
+Generating maintenance schedule...,جاري توليد جدول الصيانة...
+Updating maintenance record...,جاري تحديث سجل الصيانة...
+All scheduled maintenance visits have been completed or none are scheduled.,تم استكمال كافة زيارات الصيانة المجدولة أو لا توجد زيارات مجدولة.
+Generated {0} maintenance visits.,تم توليد {0} زيارة صيانة بنجاح.
+Maintenance visit #{0} updated to Completed successfully.,تم تحديث موعد الصيانة رقم {0} إلى تمت الصيانة بنجاح.
+Create Sales Invoice,إنشاء فاتورة مبيعات
+Create Quotation,إنشاء عرض سعر
+Start Work,بدء العمل
+Mark Completed,تم إنجاز العمل
+Deliver Vehicle,تسليم السيارة للعميل
+Received,تم الاستلام
+In Progress,قيد التنفيذ
+Work Completed,تم إنجاز العمل
+Delivered,تم التسليم
+Draft,مسودة
+Empty,فارغ
+Full,ممتلئ
+1/4,ربع
+1/2,نصف
+3/4,ثلاثة أرباع
+Customer Name,اسم العميل
+Posting Date,تاريخ القيد
+Posting Time,وقت القيد
+Mobile No,رقم الجوال
+Status,الحالة
+Naming Series,تسلسل الترقيم

@@ -1,0 +1,247 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2026-10-26 11:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "customer",
+  "customer_name",
+  "contact_mobile",
+  "posting_date",
+  "posting_time",
+  "status",
+  "col_break_1",
+  "plate_number",
+  "vehicle_make",
+  "vehicle_model",
+  "vehicle_color",
+  "chassis_no",
+  "sec_break_inspection",
+  "odometer_km",
+  "fuel_level",
+  "col_break_inspection",
+  "personal_belongings",
+  "external_condition_notes",
+  "sec_break_services",
+  "requested_services",
+  "col_break_billing",
+  "sales_invoice",
+  "sales_order",
+  "quotation",
+  "notes"
+ ],
+ "fields": [
+  {
+   "default": "REC-.YY.-.MM.-###",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "no_copy": 1,
+   "options": "REC-.YY.-.MM.-###\n",
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Customer",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "customer.customer_name",
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Customer Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "customer.mobile_no",
+   "fieldname": "contact_mobile",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Mobile No"
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "default": "Now",
+   "fieldname": "posting_time",
+   "fieldtype": "Time",
+   "label": "Posting Time"
+  },
+  {
+   "default": "Received",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Draft\nReceived\nIn Progress\nWork Completed\nDelivered\nCancelled",
+   "reqd": 1
+  },
+  {
+   "fieldname": "col_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "plate_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Plate Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "vehicle_make",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Vehicle Make"
+  },
+  {
+   "fieldname": "vehicle_model",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Vehicle Model / Year"
+  },
+  {
+   "fieldname": "vehicle_color",
+   "fieldtype": "Data",
+   "label": "Vehicle Color"
+  },
+  {
+   "fieldname": "chassis_no",
+   "fieldtype": "Data",
+   "label": "Chassis No (VIN)"
+  },
+  {
+   "fieldname": "sec_break_inspection",
+   "fieldtype": "Section Break",
+   "label": "Inspection & Vehicle Status"
+  },
+  {
+   "fieldname": "odometer_km",
+   "fieldtype": "Int",
+   "label": "Odometer (KM)"
+  },
+  {
+   "fieldname": "fuel_level",
+   "fieldtype": "Select",
+   "label": "Fuel Level",
+   "options": "\nEmpty\n1/4\n1/2\n3/4\nFull"
+  },
+  {
+   "fieldname": "col_break_inspection",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "personal_belongings",
+   "fieldtype": "Small Text",
+   "label": "Personal Belongings Inside Vehicle"
+  },
+  {
+   "fieldname": "external_condition_notes",
+   "fieldtype": "Small Text",
+   "label": "Pre-existing Scratches / Dents"
+  },
+  {
+   "fieldname": "sec_break_services",
+   "fieldtype": "Section Break",
+   "label": "Requested Services & Documents"
+  },
+  {
+   "fieldname": "requested_services",
+   "fieldtype": "Small Text",
+   "label": "Requested Services & Specifications"
+  },
+  {
+   "fieldname": "col_break_billing",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sales_invoice",
+   "fieldtype": "Link",
+   "label": "Sales Invoice",
+   "options": "Sales Invoice"
+  },
+  {
+   "fieldname": "sales_order",
+   "fieldtype": "Link",
+   "label": "Sales Order",
+   "options": "Sales Order"
+  },
+  {
+   "fieldname": "quotation",
+   "fieldtype": "Link",
+   "label": "Quotation",
+   "options": "Quotation"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "General Notes"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-10-26 11:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Mu Car Care",
+ "name": "Vehicle Reception",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sales User",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "plate_number",
+ "track_changes": 1
+}

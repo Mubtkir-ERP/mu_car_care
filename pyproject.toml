@@ -1,0 +1,15 @@
+[project]
+name = "mu_car_care"
+version = "1.0.0"
+authors = [
+    { name = "Mubtkir", email = "apps@mubtkir.com" }
+]
+description = "Mubtkir ERP Car Care, Protection, Thermal Tinting & Maintenance Management"
+requires-python = ">=3.10"
+readme = "README.md"
+license = { text = "MIT" }
+dependencies = []
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
