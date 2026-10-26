@@ -51,6 +51,7 @@ Updating maintenance record...,جاري تحديث سجل الصيانة...
 All scheduled maintenance visits have been completed or none are scheduled.,تم استكمال كافة زيارات الصيانة المجدولة أو لا توجد زيارات مجدولة.
 Generated {0} maintenance visits.,تم توليد {0} زيارة صيانة بنجاح.
 Maintenance visit #{0} updated to Completed successfully.,تم تحديث موعد الصيانة رقم {0} إلى تمت الصيانة بنجاح.
+Please select a valid visit from the list.,يرجى اختيار زيارة صيانة صالحة من القائمة.
 Create Sales Invoice,إنشاء فاتورة مبيعات
 Create Quotation,إنشاء عرض سعر
 Start Work,بدء العمل
