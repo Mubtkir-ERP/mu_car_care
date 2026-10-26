@@ -17,51 +17,46 @@ mu_car_care.setup_transaction = function (frm) {
 };
 
 mu_car_care.generate_schedule = function (frm) {
-	if (!frm.doc.custom_has_maintenance_schedule) return;
-
-	const start_date_str =
+	const start_date =
 		frm.doc.custom_maintenance_start_date ||
 		frm.doc.posting_date ||
 		frm.doc.transaction_date ||
-		frappe.datetime.nowdate();
+		frappe.datetime.get_today();
 
 	const duration_years = cint(frm.doc.custom_maintenance_duration_years) || 1;
 	const method = frm.doc.custom_distribution_method || "Annual";
 
-	const step_map = {
-		"Monthly": 1,
-		"Quarterly": 3,
-		"Semi-Annual": 6,
-		"Annual": 12,
-	};
-	const step = step_map[method] || 12;
-	const total_months = duration_years * 12;
-
-	frm.clear_table("custom_maintenance_schedule");
-
-	let current_month = step;
-	let count = 0;
-	while (current_month <= total_months) {
-		const visit_date = frappe.datetime.add_months(start_date_str, current_month);
-		const period_label =
-			current_month % 12 === 0
-				? __("Year {0}").format(current_month / 12)
-				: __("Month {0}").format(current_month);
-
-		const row = frm.add_child("custom_maintenance_schedule");
-		row.visit_date = visit_date;
-		row.visit_status = "Scheduled";
-		row.notes = __("Scheduled Maintenance Visit ({0})").format(period_label);
-
-		current_month += step;
-		count++;
-	}
-
-	frm.refresh_field("custom_maintenance_schedule");
-
-	frappe.show_alert({
-		message: __("Generated {0} maintenance visits.").format(count),
-		indicator: "green",
+	frappe.call({
+		method: "mu_car_care.api.calculate_maintenance_schedule",
+		args: {
+			start_date: start_date,
+			duration_years: duration_years,
+			distribution_method: method,
+		},
+		freeze: true,
+		freeze_message: __("Generating maintenance schedule..."),
+		callback: function (r) {
+			if (r.message && Array.isArray(r.message)) {
+				frm.clear_table("custom_maintenance_schedule");
+				r.message.forEach(function (item) {
+					const row = frm.add_child("custom_maintenance_schedule");
+					row.visit_date = item.visit_date;
+					row.visit_status = item.visit_status;
+					row.notes = item.notes;
+				});
+				frm.refresh_field("custom_maintenance_schedule");
+				frappe.show_alert({
+					message: __("Generated {0} maintenance visits.").format(r.message.length),
+					indicator: "green",
+				});
+			} else {
+				frappe.msgprint({
+					title: __("Maintenance Schedule"),
+					message: __("No visits were generated. Please check the duration and start date."),
+					indicator: "orange",
+				});
+			}
+		},
 	});
 };
 
@@ -100,7 +95,7 @@ mu_car_care.open_maintenance_dialog = function (frm) {
 				fieldtype: "Date",
 				fieldname: "actual_visit_date",
 				label: __("Actual Visit Date"),
-				default: frappe.datetime.nowdate(),
+				default: frappe.datetime.get_today(),
 				reqd: 1,
 			},
 			{
@@ -163,6 +158,21 @@ mu_car_care.open_maintenance_dialog = function (frm) {
 const transaction_events = {
 	refresh: function (frm) {
 		mu_car_care.setup_transaction(frm);
+
+		// Double-bind the button to guarantee click response across all Frappe versions
+		if (frm.fields_dict && frm.fields_dict.custom_generate_schedule_btn) {
+			const btn = frm.fields_dict.custom_generate_schedule_btn;
+			if (btn.$input) {
+				btn.$input.off("click").on("click", function () {
+					mu_car_care.generate_schedule(frm);
+				});
+			}
+			if (btn.$wrapper) {
+				btn.$wrapper.find("button").off("click").on("click", function () {
+					mu_car_care.generate_schedule(frm);
+				});
+			}
+		}
 	},
 
 	custom_has_maintenance_schedule: function (frm) {
@@ -170,7 +180,7 @@ const transaction_events = {
 			if (!frm.doc.custom_maintenance_start_date) {
 				frm.set_value(
 					"custom_maintenance_start_date",
-					frm.doc.posting_date || frm.doc.transaction_date || frappe.datetime.nowdate()
+					frm.doc.posting_date || frm.doc.transaction_date || frappe.datetime.get_today()
 				);
 			}
 			if (!frm.doc.custom_maintenance_duration_years) {

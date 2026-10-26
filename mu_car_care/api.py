@@ -32,9 +32,13 @@ def calculate_maintenance_schedule(start_date=None, duration_years=None, distrib
 
 	step_map = {
 		"Monthly": 1,
+		"شهري": 1,
 		"Quarterly": 3,
+		"ربع سنوي": 3,
 		"Semi-Annual": 6,
+		"نصف سنوي": 6,
 		"Annual": 12,
+		"سنوي": 12,
 	}
 
 	step = step_map.get(method, 12)
