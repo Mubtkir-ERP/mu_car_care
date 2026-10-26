@@ -10,13 +10,6 @@ app_email = "apps@mubtkir.com"
 app_license = "mit"
 required_apps = ["erpnext"]
 
-# Includes in <head>
-# ------------------
-
-# include js, css files in header of desk.html
-# app_include_css = "/assets/mu_car_care/css/mu_car_care.css"
-# app_include_js = "/assets/mu_car_care/js/mu_car_care.js"
-
 # Client Scripts attached to standard DocTypes
 doctype_js = {
 	"Sales Invoice": "public/js/car_care_transaction.js",
@@ -31,3 +24,6 @@ fixtures = [
 		"filters": [["module", "=", "Mu Car Care"]],
 	}
 ]
+
+# Mubtkir ERP Master Guidelines (Rule 5): Auto-sync Workspaces and Desk Cache
+after_migrate = "mu_car_care.setup.after_migrate"
