@@ -24,14 +24,14 @@ mu_car_care.generate_schedule = function (frm) {
 		frm.doc.posting_date ||
 		frm.doc.transaction_date ||
 		frappe.datetime.nowdate();
-	const duration = cint(frm.doc.custom_maintenance_duration_months) || 12;
-	const method = frm.doc.custom_distribution_method || "Quarterly";
+	const duration_years = cint(frm.doc.custom_maintenance_duration_years) || 1;
+	const method = frm.doc.custom_distribution_method || "Annual";
 
 	frappe.call({
 		method: "mu_car_care.api.calculate_maintenance_schedule",
 		args: {
 			start_date: start_date,
-			duration_months: duration,
+			duration_years: duration_years,
 			distribution_method: method,
 		},
 		freeze: true,
@@ -157,11 +157,11 @@ const transaction_events = {
 					frm.doc.posting_date || frm.doc.transaction_date || frappe.datetime.nowdate()
 				);
 			}
-			if (!frm.doc.custom_maintenance_duration_months) {
-				frm.set_value("custom_maintenance_duration_months", 12);
+			if (!frm.doc.custom_maintenance_duration_years) {
+				frm.set_value("custom_maintenance_duration_years", 1);
 			}
 			if (!frm.doc.custom_distribution_method) {
-				frm.set_value("custom_distribution_method", "Quarterly");
+				frm.set_value("custom_distribution_method", "Annual");
 			}
 
 			// Automatically generate schedule if table is empty
@@ -171,7 +171,7 @@ const transaction_events = {
 		}
 	},
 
-	custom_maintenance_duration_months: function (frm) {
+	custom_maintenance_duration_years: function (frm) {
 		if (frm.doc.docstatus === 0 && frm.doc.custom_has_maintenance_schedule) {
 			mu_car_care.generate_schedule(frm);
 		}

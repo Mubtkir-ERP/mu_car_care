@@ -9,16 +9,26 @@ from frappe.utils import add_months, cint, getdate, nowdate
 
 
 @frappe.whitelist()
-def calculate_maintenance_schedule(start_date=None, duration_months=None, distribution_method=None):
+def calculate_maintenance_schedule(start_date=None, duration_years=None, distribution_method=None, duration_months=None):
 	"""
-	Calculate maintenance schedule visit dates based on duration and frequency.
+	Calculate maintenance schedule visit dates based on warranty duration in years and frequency.
 	"""
 	if not start_date:
 		start_date = nowdate()
 
 	start_date = getdate(start_date)
-	duration_months = cint(duration_months) or 12
-	method = (distribution_method or "Quarterly").strip()
+
+	if duration_years:
+		total_months = cint(duration_years) * 12
+	elif duration_months:
+		total_months = cint(duration_months)
+	else:
+		total_months = 12
+
+	if total_months <= 0:
+		total_months = 12
+
+	method = (distribution_method or "Annual").strip()
 
 	step_map = {
 		"Monthly": 1,
@@ -27,16 +37,21 @@ def calculate_maintenance_schedule(start_date=None, duration_months=None, distri
 		"Annual": 12,
 	}
 
-	step = step_map.get(method, 3)
+	step = step_map.get(method, 12)
 	visits = []
 
 	current_month_offset = step
-	while current_month_offset <= duration_months:
+	while current_month_offset <= total_months:
 		visit_date = add_months(start_date, current_month_offset)
+		if current_month_offset % 12 == 0:
+			period_label = _("Year {0}").format(current_month_offset // 12)
+		else:
+			period_label = _("Month {0}").format(current_month_offset)
+
 		visits.append({
 			"visit_date": str(visit_date),
 			"visit_status": "Scheduled",
-			"notes": _("Scheduled Maintenance Visit ({0} months)").format(current_month_offset),
+			"notes": _("Scheduled Maintenance Visit ({0})").format(period_label),
 		})
 		current_month_offset += step
 
