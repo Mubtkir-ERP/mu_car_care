@@ -1,1 +1,2 @@
 mu_car_care.patches.v1_0.fix_custom_fields_order
+mu_car_care.patches.v1_0.reset_form_layouts
