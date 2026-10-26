@@ -179,29 +179,6 @@ const transaction_events = {
 			if (!frm.doc.custom_distribution_method) {
 				frm.set_value("custom_distribution_method", "Annual");
 			}
-
-			// Auto-generate if schedule is empty
-			if (!frm.doc.custom_maintenance_schedule || frm.doc.custom_maintenance_schedule.length === 0) {
-				mu_car_care.generate_schedule(frm);
-			}
-		}
-	},
-
-	custom_maintenance_duration_years: function (frm) {
-		if (frm.doc.custom_has_maintenance_schedule) {
-			mu_car_care.generate_schedule(frm);
-		}
-	},
-
-	custom_distribution_method: function (frm) {
-		if (frm.doc.custom_has_maintenance_schedule) {
-			mu_car_care.generate_schedule(frm);
-		}
-	},
-
-	custom_maintenance_start_date: function (frm) {
-		if (frm.doc.custom_has_maintenance_schedule) {
-			mu_car_care.generate_schedule(frm);
 		}
 	},
 
