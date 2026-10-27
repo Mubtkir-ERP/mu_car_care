@@ -159,6 +159,11 @@ const transaction_events = {
 	refresh: function (frm) {
 		mu_car_care.setup_transaction(frm);
 
+		// Ensure schedule and warranty sections are collapsible
+		frm.set_df_property("custom_schedule_config_section", "collapsible", 1);
+		frm.set_df_property("custom_schedule_visits_section", "collapsible", 1);
+		frm.set_df_property("custom_warranty_section", "collapsible", 1);
+
 		// Double-bind the button to guarantee click response across all Frappe versions
 		if (frm.fields_dict && frm.fields_dict.custom_generate_schedule_btn) {
 			const btn = frm.fields_dict.custom_generate_schedule_btn;
