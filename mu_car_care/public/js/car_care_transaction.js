@@ -159,9 +159,45 @@ const transaction_events = {
 	refresh: function (frm) {
 		mu_car_care.setup_transaction(frm);
 
-		// Ensure schedule and warranty sections are collapsible
+		// Ensure schedule and warranty sections are collapsible, and hide old config section
 		frm.set_df_property("custom_schedule_visits_section", "collapsible", 1);
 		frm.set_df_property("custom_warranty_section", "collapsible", 1);
+		frm.set_df_property("custom_schedule_config_section", "hidden", 1);
+
+		// Place maintenance settings toolbar directly above table inside custom_schedule_visits_section
+		if (frm.fields_dict.custom_schedule_visits_section && frm.fields_dict.custom_maintenance_schedule) {
+			const $sec = frm.fields_dict.custom_schedule_visits_section.wrapper;
+			const $secBody = $sec ? $sec.find(".section-body") : null;
+			const setting_fields = [
+				"custom_maintenance_start_date",
+				"custom_maintenance_duration_years",
+				"custom_distribution_method",
+				"custom_generate_schedule_btn",
+			];
+
+			if ($secBody && $secBody.length && !$sec.find(".car-care-settings-row").length) {
+				const $settingsRow = $(
+					"<div class='car-care-settings-row mx-0 mb-3 p-2' style='background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; display: flex; align-items: flex-end; gap: 12px; width: 100%;'></div>"
+				);
+
+				setting_fields.forEach(function (fname) {
+					if (frm.fields_dict[fname] && frm.fields_dict[fname].$wrapper) {
+						const $fw = frm.fields_dict[fname].$wrapper;
+						$fw.css({ "flex": "1", "min-width": "140px", "margin": "0" });
+						$settingsRow.append($fw);
+					}
+				});
+
+				$secBody.prepend($settingsRow);
+			}
+
+			// Ensure maintenance table is full-width inside the section
+			const $tableWrapper = frm.fields_dict.custom_maintenance_schedule.$wrapper;
+			if ($secBody && $secBody.length && $tableWrapper && $tableWrapper.length && !$tableWrapper.parent().is($secBody)) {
+				$tableWrapper.appendTo($secBody);
+				$tableWrapper.css({ "width": "100%", "margin-top": "6px" });
+			}
+		}
 
 		// Automatically add default first row in warranty table if empty on new doc
 		if (frm.is_new() && (!frm.doc.custom_warranty_details || frm.doc.custom_warranty_details.length === 0)) {
