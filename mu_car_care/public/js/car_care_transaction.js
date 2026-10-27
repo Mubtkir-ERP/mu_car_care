@@ -5,8 +5,8 @@
 frappe.provide("mu_car_care");
 
 mu_car_care.setup_transaction = function (frm) {
-	// Add Quick Action button whenever maintenance schedule is active
-	if (frm.doc.custom_has_maintenance_schedule && !frm.is_new()) {
+	// Add Quick Action button only when maintenance schedule is active and document is submitted/approved (docstatus === 1)
+	if (frm.doc.custom_has_maintenance_schedule && frm.doc.docstatus === 1) {
 		const btn = frm.add_custom_button(
 			__("زيارة صيانة"),
 			function () {
