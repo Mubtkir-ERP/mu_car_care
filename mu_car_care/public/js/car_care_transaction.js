@@ -227,6 +227,19 @@ const transaction_events = {
 					width: 100% !important; \
 					text-align: center !important; \
 				} \
+				/* Force cell values in RTL to align right, overriding Frappe numeric flip */ \
+				[dir='rtl'] [data-fieldname='custom_warranty_details'] .grid-body .grid-static-col, \
+				[dir='rtl'] [data-fieldname='custom_warranty_details'] .grid-body .static-area, \
+				[dir='rtl'] [data-fieldname='custom_warranty_details'] .grid-body input, \
+				[dir='rtl'] [data-fieldname='custom_warranty_details'] [data-fieldname='warranty_period'], \
+				[dir='rtl'] [data-fieldname='custom_warranty_details'] [data-fieldname='warranty_period'] .static-area, \
+				[dir='rtl'] [data-fieldname='custom_warranty_details'] [data-fieldname='warranty_period'] input, \
+				[dir='rtl'] [data-fieldname='custom_maintenance_schedule'] .grid-body .grid-static-col, \
+				[dir='rtl'] [data-fieldname='custom_maintenance_schedule'] .grid-body .static-area, \
+				[dir='rtl'] [data-fieldname='custom_maintenance_schedule'] .grid-body input { \
+					text-align: right !important; \
+					direction: rtl !important; \
+				} \
 				.form-column:has([data-fieldname='custom_maintenance_schedule']) { \
 					flex: 0 0 100% !important; \
 					max-width: 100% !important; \
