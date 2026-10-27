@@ -24,10 +24,6 @@ fixtures = [
 		"filters": [["module", "=", "Mu Car Care"]],
 	},
 	{
-		"dt": "Property Setter",
-		"filters": [["module", "=", "Mu Car Care"]],
-	},
-	{
 		"dt": "Print Format",
 		"filters": [["name", "=", "Car Care Tax Invoice"]],
 	},

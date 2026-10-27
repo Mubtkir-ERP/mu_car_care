@@ -3,3 +3,4 @@ mu_car_care.patches.v1_0.reset_form_layouts
 mu_car_care.patches.v1_0.migrate_old_car_data
 mu_car_care.patches.v1_0.cleanup_and_rebuild_custom_fields
 mu_car_care.patches.v1_0.v1_0_5_five_columns_and_quick_action
+mu_car_care.patches.v1_1.setup_car_care_print_format_and_details_layout
