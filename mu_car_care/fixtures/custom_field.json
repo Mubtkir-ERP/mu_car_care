@@ -199,7 +199,7 @@
   "dt": "Sales Invoice",
   "fieldname": "custom_warranty_notes",
   "fieldtype": "Small Text",
-  "insert_after": "custom_warranty_details",
+  "insert_after": "customer_name",
   "label": "Notes",
   "module": "Mu Car Care"
  },
@@ -403,7 +403,7 @@
   "dt": "Sales Order",
   "fieldname": "custom_warranty_notes",
   "fieldtype": "Small Text",
-  "insert_after": "custom_warranty_details",
+  "insert_after": "customer_name",
   "label": "Notes",
   "module": "Mu Car Care"
  },
@@ -607,7 +607,7 @@
   "dt": "Quotation",
   "fieldname": "custom_warranty_notes",
   "fieldtype": "Small Text",
-  "insert_after": "custom_warranty_details",
+  "insert_after": "customer_name",
   "label": "Notes",
   "module": "Mu Car Care"
  },

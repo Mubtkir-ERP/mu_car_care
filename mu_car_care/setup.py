@@ -61,6 +61,14 @@ def after_migrate():
 			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
 			"""
 		)
+		frappe.db.sql(
+			"""
+			UPDATE `tabCustom Field`
+			SET insert_after = 'customer_name'
+			WHERE fieldname = 'custom_warranty_notes'
+			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
+			"""
+		)
 		# Clear auto-generated notes from database
 		frappe.db.sql(
 			"""
