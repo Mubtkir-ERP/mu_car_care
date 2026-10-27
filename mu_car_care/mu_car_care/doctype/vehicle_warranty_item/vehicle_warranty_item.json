@@ -9,8 +9,7 @@
   "warranty_period",
   "start_date",
   "end_date",
-  "terms",
-  "summary_terms"
+  "terms"
  ],
  "fields": [
   {
@@ -54,12 +53,6 @@
    "in_list_view": 1,
    "label": "Terms & Conditions",
    "options": "Terms and Conditions"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "summary_terms",
-   "fieldtype": "Small Text",
-   "label": "Summary Terms"
   }
  ],
  "index_web_pages_for_search": 1,

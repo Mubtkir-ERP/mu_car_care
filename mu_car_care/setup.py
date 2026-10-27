@@ -84,10 +84,10 @@ def sync_print_formats():
 			pf.disabled = 0
 			pf.default_print_language = "ar"
 			pf.font_size = 13
-			pf.margin_top = 8.0
-			pf.margin_bottom = 8.0
-			pf.margin_left = 8.0
-			pf.margin_right = 8.0
+			pf.margin_top = 5.0
+			pf.margin_bottom = 5.0
+			pf.margin_left = 5.0
+			pf.margin_right = 5.0
 			pf.save(ignore_permissions=True)
 			frappe.db.commit()
 	except Exception:

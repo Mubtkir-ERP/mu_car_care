@@ -5,10 +5,8 @@
 
 {# ===================== LOAD PHASE 2 DETAILS SAFELY ===================== #}
 {% if doc.docstatus == 1 %}
-    {# Invoice is submitted → try loading Phase 2 details #}
     {% set details = get_phase_2_print_format_details(doc) if get_phase_2_print_format_details is defined else None %}
 {% else %}
-    {# Draft invoice → do not load details, but DO NOT show any error #}
     {% set details = None %}
 {% endif %}
 
@@ -50,7 +48,7 @@
 
     @page {
         size: A4 portrait;
-        margin: 5mm 7mm 5mm 7mm;
+        margin: 5mm;
     }
 
     * {
@@ -87,34 +85,37 @@
     }
 
     /* =======================================================
-       UNIFIED GRID & MARGIN ALIGNMENT
+       PERFECT ALIGNED GRID SYSTEM (100% WIDTH ON BOTH SIDES)
     ======================================================= */
-    .unified-table {
+    .grid-table {
         width: 100%;
         border-collapse: collapse;
         table-layout: fixed;
-        margin: 0 0 7px 0;
+        margin: 0 0 6px 0;
         padding: 0;
     }
 
-    /* =======================================================
-       HEADER SECTION (Row 1): Right Logo | Center Title | Left Car
-    ======================================================= */
+    /* Row 1: Header (Right Logo, Center Title, Left Car) */
     .header-logo-cell {
-        width: 32%;
+        width: 30%;
         text-align: right;
         vertical-align: middle;
+        padding: 0;
     }
 
     .logo-container {
+        border: 1px dashed #cbd5e1;
+        border-radius: 6px;
+        padding: 3px;
         display: inline-block;
-        min-height: 50px;
-        text-align: right;
+        min-height: 52px;
+        min-width: 130px;
+        text-align: center;
     }
 
     .company-logo-img {
-        max-height: 55px;
-        max-width: 140px;
+        max-height: 50px;
+        max-width: 130px;
         object-fit: contain;
     }
 
@@ -122,11 +123,11 @@
         width: 44%;
         text-align: center;
         vertical-align: middle;
-        padding: 0 4px !important;
+        padding: 0 4px;
     }
 
     .header-main-title {
-        font-size: 25px;
+        font-size: 24px;
         font-weight: 800;
         color: #162438;
         margin: 0 0 2px 0;
@@ -155,34 +156,33 @@
     }
 
     .header-car-cell {
-        width: 24%;
+        width: 26%;
         text-align: left;
         vertical-align: top;
+        padding: 0;
     }
 
     .header-car-img {
-        height: 80px;
+        height: 75px;
         width: auto;
         max-width: 100%;
         object-fit: contain;
         display: inline-block;
     }
 
-    /* =======================================================
-       ROW 2: Right Company Info | Center Metadata | Left QR
-    ======================================================= */
+    /* Row 2: Company Details, Metadata Box, QR */
     .row2-company-cell {
-        width: 33%;
+        width: 35%;
         text-align: right;
         vertical-align: top;
-        padding-left: 6px;
+        padding: 0 0 0 6px;
     }
 
     .company-name-bold {
-        font-size: 15px;
+        font-size: 14.5px;
         font-weight: 800;
         color: #0f172a;
-        margin-bottom: 3px;
+        margin-bottom: 2px;
         line-height: 1.2;
     }
 
@@ -200,7 +200,7 @@
     }
 
     .row2-meta-cell {
-        width: 45%;
+        width: 47%;
         vertical-align: top;
         padding: 0 4px;
     }
@@ -208,23 +208,29 @@
     .meta-box {
         background: #f8fafc;
         border: 1px solid #cbd5e1;
-        border-radius: 7px;
-        padding: 7px 10px;
+        border-radius: 6px;
+        padding: 6px 10px;
     }
 
     .natural-meta-line {
-        font-size: 11px;
-        margin-bottom: 3px;
+        font-size: 10.5px;
+        margin-bottom: 2.5px;
         text-align: right;
         direction: rtl;
-        line-height: 1.4;
+        line-height: 1.35;
     }
 
     .natural-meta-label {
         color: #475569;
         font-weight: 600;
         display: inline-block;
-        margin-left: 5px;
+        width: 95px;
+    }
+
+    .natural-meta-colon {
+        display: inline-block;
+        margin-left: 6px;
+        color: #64748b;
     }
 
     .natural-meta-value {
@@ -234,33 +240,31 @@
     }
 
     .row2-qr-cell {
-        width: 22%;
+        width: 18%;
         text-align: left;
         vertical-align: top;
+        padding: 0;
     }
 
     .qr-card-box {
         display: inline-block;
         background: #f8fafc;
-        border: 1px solid #cbd5e1;
-        border-radius: 7px;
-        padding: 4px;
+        border: 1px dashed #cbd5e1;
+        border-radius: 6px;
+        padding: 3px;
         text-align: center;
     }
 
     .qr-card-img {
-        width: 90px;
-        height: 90px;
+        width: 82px;
+        height: 82px;
         display: block;
         margin: 0 auto;
     }
 
     .qr-placeholder-clean {
-        width: 90px;
-        height: 90px;
-        border: 1px dashed #cbd5e1;
-        border-radius: 4px;
-        background: #ffffff;
+        width: 82px;
+        height: 82px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -268,47 +272,51 @@
         font-size: 10px;
     }
 
-    /* =======================================================
-       ROW 3: Two Cards (Right: Customer 58% | Left: Vehicle 42%)
-    ======================================================= */
-    .customer-card-cell {
-        width: 58%;
+    /* Row 3: The 3 Cards (Right: Customer 38% | Middle: Vehicle 42% | Left: Invoice 20%) */
+    .card-col-customer {
+        width: 38%;
         vertical-align: top;
-        padding-left: 4px;
+        padding: 0 0 0 4px;
     }
 
-    .vehicle-card-cell {
+    .card-col-vehicle {
         width: 42%;
         vertical-align: top;
-        padding-right: 4px;
+        padding: 0 4px;
+    }
+
+    .card-col-invoice {
+        width: 20%;
+        vertical-align: top;
+        padding: 0 4px 0 0;
     }
 
     .info-card {
         border: 1px solid #cbd5e1;
-        border-radius: 7px;
+        border-radius: 6px;
         overflow: hidden;
         background: #ffffff;
-        min-height: 84px;
+        min-height: 82px;
     }
 
     .info-card-header {
         background: #1b2a4a;
         color: #ffffff;
-        padding: 4.5px 10px;
-        font-size: 11.5px;
+        padding: 4px 8px;
+        font-size: 11px;
         font-weight: 700;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
     }
 
     .info-card-body {
-        padding: 6px 10px;
-        font-size: 10.5px;
+        padding: 5px 8px;
+        font-size: 10px;
     }
 
     .card-line {
-        margin-bottom: 3.5px;
+        margin-bottom: 2.5px;
         line-height: 1.35;
         text-align: right;
         direction: rtl;
@@ -317,34 +325,40 @@
     .card-line-label {
         color: #475569;
         font-weight: 600;
-        margin-left: 5px;
+        display: inline-block;
+        min-width: 65px;
+    }
+
+    .card-line-colon {
+        display: inline-block;
+        margin-left: 4px;
+        color: #64748b;
     }
 
     .card-line-val {
         color: #0f172a;
         font-weight: 700;
+        display: inline-block;
     }
 
-    /* =======================================================
-       ROW 4: Main Data Tables
-    ======================================================= */
+    /* Row 4: Main Data Tables */
     .main-table-container {
         width: 100%;
         border: 1px solid #cbd5e1;
-        border-radius: 7px;
+        border-radius: 6px;
         overflow: hidden;
-        margin-bottom: 7px;
+        margin-bottom: 6px;
     }
 
     .main-table-header-bar {
         background: #1b2a4a;
         color: #ffffff;
-        padding: 4.5px 10px;
-        font-size: 11.5px;
+        padding: 4px 8px;
+        font-size: 11px;
         font-weight: 700;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
     }
 
     .data-table {
@@ -355,8 +369,8 @@
     }
 
     .data-table th {
-        background: #f1f5f9;
-        color: #1e293b;
+        background: #1b2a4a;
+        color: #ffffff;
         font-weight: 700;
         border: 1px solid #cbd5e1;
         padding: 5px 6px;
@@ -364,14 +378,14 @@
     }
 
     .data-table td {
-        border: 1px solid #e2e8f0;
-        padding: 5px 6px;
+        border: 1px solid #cbd5e1;
+        padding: 4.5px 6px;
         color: #1e293b;
         text-align: center;
     }
 
     .data-table tbody tr:nth-child(even) {
-        background-color: #fafbfc;
+        background-color: #f8fafc;
     }
 
     .data-table td.text-right {
@@ -383,36 +397,34 @@
         direction: ltr;
     }
 
-    /* =======================================================
-       ROW 5: Split Bottom Layout
-    ======================================================= */
+    /* Row 5: Split Bottom Layout */
     .bottom-cell-right {
-        width: 54%;
+        width: 58%;
         vertical-align: top;
-        padding-left: 4px;
+        padding: 0 0 0 4px;
     }
 
     .bottom-cell-left {
-        width: 46%;
+        width: 42%;
         vertical-align: top;
-        padding-right: 4px;
+        padding: 0 4px 0 0;
     }
 
     .bottom-cell-half-right {
         width: 50%;
         vertical-align: top;
-        padding-left: 4px;
+        padding: 0 0 0 4px;
     }
 
     .bottom-cell-half-left {
         width: 50%;
         vertical-align: top;
-        padding-right: 4px;
+        padding: 0 4px 0 0;
     }
 
     .section-box {
         border: 1px solid #cbd5e1;
-        border-radius: 7px;
+        border-radius: 6px;
         overflow: hidden;
         background: #ffffff;
         margin-bottom: 6px;
@@ -421,8 +433,8 @@
     .section-box-header {
         background: #1b2a4a;
         color: #ffffff;
-        padding: 4.5px 8px;
-        font-size: 11.5px;
+        padding: 4px 8px;
+        font-size: 11px;
         font-weight: 700;
         display: flex;
         align-items: center;
@@ -430,19 +442,20 @@
     }
 
     .section-box-body {
-        padding: 8px 10px;
+        padding: 7px 9px;
     }
 
+    /* Fixed Terms List on Page 1 (Never overridden by doc.terms) */
     .terms-ol {
         margin: 0;
-        padding-right: 20px;
-        font-size: 11px;
+        padding-right: 18px;
+        font-size: 10.5px;
         color: #1e293b;
-        line-height: 1.55;
+        line-height: 1.5;
     }
 
     .terms-ol li {
-        margin-bottom: 4px;
+        margin-bottom: 3.5px;
         text-align: justify;
     }
 
@@ -450,12 +463,12 @@
     .totals-table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 11px;
+        font-size: 10.5px;
     }
 
     .totals-table td {
-        border: 1px solid #e2e8f0;
-        padding: 5.5px 8px;
+        border: 1px solid #cbd5e1;
+        padding: 5px 8px;
         vertical-align: middle;
     }
 
@@ -481,7 +494,7 @@
     .grand-total-row td {
         color: #1e3a8a !important;
         font-weight: 800 !important;
-        font-size: 12px;
+        font-size: 11.5px;
     }
 
     .paid-row {
@@ -511,8 +524,8 @@
     }
 
     .warranty-table th {
-        background: #f1f5f9;
-        color: #1e293b;
+        background: #1b2a4a;
+        color: #ffffff;
         font-weight: 700;
         border: 1px solid #cbd5e1;
         padding: 4px 5px;
@@ -523,11 +536,11 @@
         border: 1px solid #cbd5e1;
         padding: 4px 5px;
         text-align: center;
-        color: #334155;
+        color: #1e293b;
     }
 
     .dotted-notes-area {
-        min-height: 42px;
+        min-height: 40px;
         background-image: linear-gradient(to bottom, transparent 18px, #cbd5e1 19px);
         background-size: 100% 19px;
         line-height: 19px;
@@ -537,14 +550,15 @@
     }
 
     /* =======================================================
-       FOOTER SECTION: Exact Match to Instruction
+       FOOTER SECTION: Exact Match to Reference Design
+       Thin gray divider line across 100% width
        Line 1: Car Silhouette on RIGHT | Slogan on LEFT
        Line 2: Powered by MUBTKIR ERP on lower left corner on a line by itself
     ======================================================= */
     .footer-container {
         width: 100%;
-        margin-top: 8px;
-        padding-top: 5px;
+        margin-top: 6px;
+        padding-top: 4px;
         border-top: 1.5px solid #cbd5e1;
     }
 
@@ -566,7 +580,7 @@
     }
 
     .footer-car-img {
-        height: 25px;
+        height: 24px;
         width: auto;
         display: inline-block;
     }
@@ -595,7 +609,7 @@
         font-weight: 700;
         color: #64748b;
         letter-spacing: 0.5px;
-        margin-top: 3px;
+        margin-top: 2px;
         padding-left: 2px;
     }
 
@@ -613,28 +627,30 @@
 <div class="print-page">
 
     <!-- Row 1: Header (Right Logo, Center Title, Left Car) -->
-    <table class="unified-table">
+    <table class="grid-table">
         <tr>
-            <!-- Right: Logo Box (Clean, reads company logo, empty if none) -->
+            <!-- Right: Logo Box -->
             <td class="header-logo-cell">
                 <div class="logo-container">
                     {% if company_logo %}
                         <img src="{{ company_logo }}" class="company-logo-img" alt="{{ company_name }}">
+                    {% else %}
+                        <div style="font-size: 11.5px; font-weight: 700; color: #1b2a4a; line-height: 48px;">{{ company_name }}</div>
                     {% endif %}
                 </div>
             </td>
 
             <!-- Center: Title -->
             <td class="header-title-cell">
-                <h1 class="header-main-title {% if doc.docstatus == 0 %}is-draft{% endif %}">
+                <div class="header-main-title {% if doc.docstatus == 0 %}is-draft{% endif %}">
                     {% if doc.docstatus == 0 %}
                         مسودة فاتورة مبيعات ضريبية
                     {% else %}
                         فاتورة مبيعات ضريبية
                     {% endif %}
-                </h1>
+                </div>
                 <div class="title-bronze-line"></div>
-                <p class="header-sub-title">خدمات حماية الطلاء (PPF) والعزل الحراري للسيارات</p>
+                <div class="header-sub-title">خدمات حماية الطلاء (PPF) والعزل الحراري للسيارات</div>
             </td>
 
             <!-- Left: Silver Sports Car -->
@@ -644,10 +660,10 @@
         </tr>
     </table>
 
-    <!-- Row 2: Company Details, Metadata, QR -->
-    <table class="unified-table">
+    <!-- Row 2: Company Details, Metadata Box, QR -->
+    <table class="grid-table">
         <tr>
-            <!-- Right: Company Details (Never deleted or empty) -->
+            <!-- Right: Company Details -->
             <td class="row2-company-cell">
                 <div class="company-name-bold">{{ company_name }}</div>
                 <div class="company-meta-line">سجل تجاري رقم : <strong>{{ company_cr }}</strong></div>
@@ -656,28 +672,28 @@
                 <div class="company-meta-line"><span style="color:#dc2626;">📍</span> {{ company_city }}</div>
             </td>
 
-            <!-- Center: Invoice Metadata Box (Natural Arabic flow) -->
+            <!-- Center: Invoice Metadata Box -->
             <td class="row2-meta-cell">
                 <div class="meta-box">
                     <div class="natural-meta-line">
                         <span class="natural-meta-label">رقم الفاتورة:</span>
+                        <span class="natural-meta-colon">:</span>
                         <span class="natural-meta-value" style="direction: ltr;">{{ doc.name }}</span>
                     </div>
                     <div class="natural-meta-line">
                         <span class="natural-meta-label">تاريخ الفاتورة:</span>
+                        <span class="natural-meta-colon">:</span>
                         <span class="natural-meta-value">{{ doc.get_formatted("posting_date") or doc.posting_date }}</span>
                     </div>
                     <div class="natural-meta-line">
                         <span class="natural-meta-label">مندوب المبيعات:</span>
+                        <span class="natural-meta-colon">:</span>
                         <span class="natural-meta-value">{{ sales_person_name }}</span>
                     </div>
                     <div class="natural-meta-line">
                         <span class="natural-meta-label">طريقة الدفع:</span>
+                        <span class="natural-meta-colon">:</span>
                         <span class="natural-meta-value">{{ pay_method }}</span>
-                    </div>
-                    <div class="natural-meta-line">
-                        <span class="natural-meta-label">عدد الصفحات:</span>
-                        <span class="natural-meta-value">صفحة 1 من 2</span>
                     </div>
                 </div>
             </td>
@@ -697,11 +713,11 @@
         </tr>
     </table>
 
-    <!-- Row 3: Two Cards (Right: Customer 58% | Left: Vehicle 42%) -->
-    <table class="unified-table">
+    <!-- Row 3: The 3 Cards (Right: Customer 38% | Middle: Vehicle 42% | Left: Invoice 20%) -->
+    <table class="grid-table">
         <tr>
-            <!-- Right Card: Customer Details (Wider) -->
-            <td class="customer-card-cell">
+            <!-- Card 1 (Right): Customer Details -->
+            <td class="card-col-customer">
                 <div class="info-card">
                     <div class="info-card-header">
                         <span>👤</span>
@@ -710,15 +726,18 @@
                     <div class="info-card-body">
                         <div class="card-line">
                             <span class="card-line-label">اسم العميل:</span>
+                            <span class="card-line-colon">:</span>
                             <span class="card-line-val">{{ doc.customer_name }}</span>
                         </div>
                         <div class="card-line">
                             <span class="card-line-label">رقم الجوال:</span>
+                            <span class="card-line-colon">:</span>
                             <span class="card-line-val" style="direction: ltr;">{{ cust_mobile }}</span>
                         </div>
                         {% if doc.tax_id %}
                         <div class="card-line">
                             <span class="card-line-label">الرقم الضريبي:</span>
+                            <span class="card-line-colon">:</span>
                             <span class="card-line-val">{{ doc.tax_id }}</span>
                         </div>
                         {% endif %}
@@ -726,8 +745,8 @@
                 </div>
             </td>
 
-            <!-- Left Card: Vehicle Details (From System Fields) -->
-            <td class="vehicle-card-cell">
+            <!-- Card 2 (Middle): Vehicle Details -->
+            <td class="card-col-vehicle">
                 <div class="info-card">
                     <div class="info-card-header">
                         <span>🚗</span>
@@ -735,17 +754,41 @@
                     </div>
                     <div class="info-card-body">
                         <div class="card-line">
-                            <span class="card-line-label">نوع وموديل السيارة:</span>
+                            <span class="card-line-label">نوع السيارة:</span>
+                            <span class="card-line-colon">:</span>
                             <span class="card-line-val">{{ doc.custom_vehicle_make or '' }} {{ doc.custom_vehicle_model or '' }}</span>
                         </div>
                         <div class="card-line">
-                            <span class="card-line-label">رقم اللوحة:</span>
-                            <span class="card-line-val">{{ doc.custom_plate_number or '—' }}</span>
+                            <span class="card-line-label">الموديل:</span>
+                            <span class="card-line-colon">:</span>
+                            <span class="card-line-val">{{ doc.custom_vehicle_model or '—' }}</span>
                         </div>
                         <div class="card-line">
-                            <span class="card-line-label">لون السيارة / الهيكل:</span>
-                            <span class="card-line-val">{{ doc.custom_vehicle_color or '—' }} {% if doc.custom_chassis_no %}({{ doc.custom_chassis_no }}){% endif %}</span>
+                            <span class="card-line-label">رقم اللوحة:</span>
+                            <span class="card-line-colon">:</span>
+                            <span class="card-line-val">{{ doc.custom_plate_number or '—' }}</span>
                         </div>
+                        {% if doc.custom_vehicle_color or doc.custom_chassis_no %}
+                        <div class="card-line">
+                            <span class="card-line-label">اللون / الهيكل:</span>
+                            <span class="card-line-colon">:</span>
+                            <span class="card-line-val">{{ doc.custom_vehicle_color or '' }} {% if doc.custom_chassis_no %}({{ doc.custom_chassis_no }}){% endif %}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </td>
+
+            <!-- Card 3 (Left): Invoice Box -->
+            <td class="card-col-invoice">
+                <div class="info-card" style="text-align: center;">
+                    <div class="info-card-header" style="justify-content: center;">
+                        <span>📄</span>
+                        <span>رقم الفاتورة</span>
+                    </div>
+                    <div class="info-card-body" style="padding-top: 10px;">
+                        <div style="font-size: 12.5px; font-weight: 800; color: #1b2a4a; direction: ltr;">{{ doc.name }}</div>
+                        <div style="font-size: 10.5px; color: #64748b; margin-top: 5px; font-weight: 600;">صفحة 1 من 2</div>
                     </div>
                 </div>
             </td>
@@ -789,37 +832,33 @@
         </table>
     </div>
 
-    <!-- Row 5: Bottom (Right: Terms & Conditions | Left: Financial Summary) -->
-    <table class="unified-table">
+    <!-- Row 5: Bottom (Right: Fixed Terms & Conditions | Left: Financial Summary) -->
+    <table class="grid-table">
         <tr>
-            <!-- Right: Terms and Conditions (Larger Font Size) -->
+            <!-- Right: Fixed General Terms (Always exactly the 7 terms from the reference) -->
             <td class="bottom-cell-right">
-                <div class="section-box" style="min-height: 165px;">
+                <div class="section-box" style="min-height: 160px;">
                     <div class="section-box-header">
-                        <span>📄</span>
+                        <span>📜</span>
                         <span>الشروط والأحكام</span>
                     </div>
                     <div class="section-box-body">
-                        {% if doc.terms %}
-                            <div style="font-size: 11px; line-height: 1.55; color: #1e293b;">{{ doc.terms|safe }}</div>
-                        {% else %}
-                            <ol class="terms-ol">
-                                <li>تخضع هذه الفاتورة لشروط وأحكام المؤسسة المعتمدة.</li>
-                                <li>الضمان على منتجات وخدمات الحماية والعزل الحراري حسب سياسة الضمان.</li>
-                                <li>لا يشمل الضمان الأضرار الناتجة عن سوء الاستخدام أو الحوادث.</li>
-                                <li>يلتزم العميل بالمحافظة على السيارة بعد التركيب وفق الإرشادات المقدمة.</li>
-                                <li>في حال إلغاء الخدمة بعد البدء في التنفيذ، قد يتم تطبيق رسوم إضافية.</li>
-                                <li>جميع الأسعار بالريال السعودي وتشمل ضريبة القيمة المضافة بنسبة 15%.</li>
-                                <li>يعد سداد قيمة الفاتورة موافقة من العميل على جميع الشروط والأحكام.</li>
-                            </ol>
-                        {% endif %}
+                        <ol class="terms-ol">
+                            <li>تخضع هذه الفاتورة لشروط وأحكام المؤسسة المعتمدة.</li>
+                            <li>الضمان على منتجات وخدمات الحماية والعزل الحراري حسب سياسة الضمان المعتمدة.</li>
+                            <li>لا يشمل الضمان الأضرار الناتجة عن سوء الاستخدام أو الحوادث أو الإهمال.</li>
+                            <li>يلتزم العميل بالمحافظة على السيارة بعد التركيب وفق الإرشادات والتعليمات المقدمة.</li>
+                            <li>في حال إلغاء الخدمة بعد البدء في التنفيذ، قد يتم تطبيق رسوم إضافية لتغطية التكاليف.</li>
+                            <li>جميع الأسعار بالريال السعودي وتشمل ضريبة القيمة المضافة بنسبة 15%.</li>
+                            <li>يعد سداد قيمة الفاتورة موافقة صريحة من العميل على جميع الشروط والأحكام.</li>
+                        </ol>
                     </div>
                 </div>
             </td>
 
-            <!-- Left: Financial Totals Summary (Exact 5 rows & colors) -->
+            <!-- Left: Financial Totals Summary -->
             <td class="bottom-cell-left">
-                <div class="section-box" style="min-height: 165px;">
+                <div class="section-box" style="min-height: 160px;">
                     <div class="section-box-header">
                         <span>💳</span>
                         <span>ملخص الحساب</span>
@@ -834,16 +873,16 @@
                             <td class="totals-val">{{ doc.get_formatted("total_taxes_and_charges") }}</td>
                         </tr>
                         <tr class="grand-total-row">
-                            <td class="totals-label" style="font-weight: 800; color: #1e3a8a;">الإجمالي شامل الضريبة</td>
-                            <td class="totals-val" style="font-weight: 800; color: #1e3a8a;">{{ doc.get_formatted("grand_total") }}</td>
+                            <td class="totals-label">الإجمالي شامل الضريبة</td>
+                            <td class="totals-val">{{ doc.get_formatted("grand_total") }}</td>
                         </tr>
                         <tr class="paid-row">
-                            <td class="totals-label" style="color: #166534;">المبلغ المدفوع</td>
-                            <td class="totals-val" style="color: #166534;">{{ doc.get_formatted("paid_amount") }}</td>
+                            <td class="totals-label">المبلغ المدفوع</td>
+                            <td class="totals-val">{{ doc.get_formatted("paid_amount") }}</td>
                         </tr>
                         <tr class="outstanding-row">
-                            <td class="totals-label" style="color: #dc2626;">المبلغ المتبقي</td>
-                            <td class="totals-val" style="color: #dc2626;">{{ doc.get_formatted("outstanding_amount") }}</td>
+                            <td class="totals-label">المبلغ المتبقي</td>
+                            <td class="totals-val">{{ doc.get_formatted("outstanding_amount") }}</td>
                         </tr>
                     </table>
                 </div>
@@ -878,24 +917,26 @@
 <div class="print-page page-break">
 
     <!-- Row 1: Header (Right Logo, Center Title, Left Car) -->
-    <table class="unified-table">
+    <table class="grid-table">
         <tr>
             <!-- Right: Logo Box -->
             <td class="header-logo-cell">
                 <div class="logo-container">
                     {% if company_logo %}
                         <img src="{{ company_logo }}" class="company-logo-img" alt="{{ company_name }}">
+                    {% else %}
+                        <div style="font-size: 11.5px; font-weight: 700; color: #1b2a4a; line-height: 48px;">{{ company_name }}</div>
                     {% endif %}
                 </div>
             </td>
 
             <!-- Center: Title -->
             <td class="header-title-cell">
-                <h1 class="header-main-title {% if doc.docstatus == 0 %}is-draft{% endif %}">
+                <div class="header-main-title {% if doc.docstatus == 0 %}is-draft{% endif %}">
                     جدول الصيانة والمتابعة
-                </h1>
+                </div>
                 <div class="title-bronze-line"></div>
-                <p class="header-sub-title">متابعة الصيانة بعد تركيب حماية الطلاء (PPF) والعزل الحراري للسيارات</p>
+                <div class="header-sub-title">متابعة الصيانة بعد تركيب حماية الطلاء (PPF) والعزل الحراري للسيارات</div>
             </td>
 
             <!-- Left: Silver Sports Car -->
@@ -905,8 +946,8 @@
         </tr>
     </table>
 
-    <!-- Row 2: Company Details, Metadata, QR -->
-    <table class="unified-table">
+    <!-- Row 2: Company Details, Metadata Box, QR -->
+    <table class="grid-table">
         <tr>
             <!-- Right: Company Details -->
             <td class="row2-company-cell">
@@ -922,23 +963,23 @@
                 <div class="meta-box">
                     <div class="natural-meta-line">
                         <span class="natural-meta-label">رقم الفاتورة:</span>
+                        <span class="natural-meta-colon">:</span>
                         <span class="natural-meta-value" style="direction: ltr;">{{ doc.name }}</span>
                     </div>
                     <div class="natural-meta-line">
                         <span class="natural-meta-label">تاريخ الفاتورة:</span>
+                        <span class="natural-meta-colon">:</span>
                         <span class="natural-meta-value">{{ doc.get_formatted("posting_date") or doc.posting_date }}</span>
                     </div>
                     <div class="natural-meta-line">
                         <span class="natural-meta-label">مندوب المبيعات:</span>
+                        <span class="natural-meta-colon">:</span>
                         <span class="natural-meta-value">{{ sales_person_name }}</span>
                     </div>
                     <div class="natural-meta-line">
                         <span class="natural-meta-label">طريقة الدفع:</span>
+                        <span class="natural-meta-colon">:</span>
                         <span class="natural-meta-value">{{ pay_method }}</span>
-                    </div>
-                    <div class="natural-meta-line">
-                        <span class="natural-meta-label">عدد الصفحات:</span>
-                        <span class="natural-meta-value">صفحة 2 من 2</span>
                     </div>
                 </div>
             </td>
@@ -958,11 +999,11 @@
         </tr>
     </table>
 
-    <!-- Row 3: Two Cards (Right: Customer 58% | Left: Vehicle 42%) -->
-    <table class="unified-table">
+    <!-- Row 3: The 3 Cards (Right: Customer 38% | Middle: Vehicle 42% | Left: Invoice 20%) -->
+    <table class="grid-table">
         <tr>
-            <!-- Right Card: Customer Details (Wider) -->
-            <td class="customer-card-cell">
+            <!-- Card 1 (Right): Customer Details -->
+            <td class="card-col-customer">
                 <div class="info-card">
                     <div class="info-card-header">
                         <span>👤</span>
@@ -971,15 +1012,18 @@
                     <div class="info-card-body">
                         <div class="card-line">
                             <span class="card-line-label">اسم العميل:</span>
+                            <span class="card-line-colon">:</span>
                             <span class="card-line-val">{{ doc.customer_name }}</span>
                         </div>
                         <div class="card-line">
                             <span class="card-line-label">رقم الجوال:</span>
+                            <span class="card-line-colon">:</span>
                             <span class="card-line-val" style="direction: ltr;">{{ cust_mobile }}</span>
                         </div>
                         {% if doc.tax_id %}
                         <div class="card-line">
                             <span class="card-line-label">الرقم الضريبي:</span>
+                            <span class="card-line-colon">:</span>
                             <span class="card-line-val">{{ doc.tax_id }}</span>
                         </div>
                         {% endif %}
@@ -987,8 +1031,8 @@
                 </div>
             </td>
 
-            <!-- Left Card: Vehicle Details (From System Fields) -->
-            <td class="vehicle-card-cell">
+            <!-- Card 2 (Middle): Vehicle Details -->
+            <td class="card-col-vehicle">
                 <div class="info-card">
                     <div class="info-card-header">
                         <span>🚗</span>
@@ -996,24 +1040,48 @@
                     </div>
                     <div class="info-card-body">
                         <div class="card-line">
-                            <span class="card-line-label">نوع وموديل السيارة:</span>
+                            <span class="card-line-label">نوع السيارة:</span>
+                            <span class="card-line-colon">:</span>
                             <span class="card-line-val">{{ doc.custom_vehicle_make or '' }} {{ doc.custom_vehicle_model or '' }}</span>
                         </div>
                         <div class="card-line">
-                            <span class="card-line-label">رقم اللوحة:</span>
-                            <span class="card-line-val">{{ doc.custom_plate_number or '—' }}</span>
+                            <span class="card-line-label">الموديل:</span>
+                            <span class="card-line-colon">:</span>
+                            <span class="card-line-val">{{ doc.custom_vehicle_model or '—' }}</span>
                         </div>
                         <div class="card-line">
-                            <span class="card-line-label">لون السيارة / الهيكل:</span>
-                            <span class="card-line-val">{{ doc.custom_vehicle_color or '—' }} {% if doc.custom_chassis_no %}({{ doc.custom_chassis_no }}){% endif %}</span>
+                            <span class="card-line-label">رقم اللوحة:</span>
+                            <span class="card-line-colon">:</span>
+                            <span class="card-line-val">{{ doc.custom_plate_number or '—' }}</span>
                         </div>
+                        {% if doc.custom_vehicle_color or doc.custom_chassis_no %}
+                        <div class="card-line">
+                            <span class="card-line-label">اللون / الهيكل:</span>
+                            <span class="card-line-colon">:</span>
+                            <span class="card-line-val">{{ doc.custom_vehicle_color or '' }} {% if doc.custom_chassis_no %}({{ doc.custom_chassis_no }}){% endif %}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </td>
+
+            <!-- Card 3 (Left): Invoice Box -->
+            <td class="card-col-invoice">
+                <div class="info-card" style="text-align: center;">
+                    <div class="info-card-header" style="justify-content: center;">
+                        <span>📄</span>
+                        <span>رقم الفاتورة</span>
+                    </div>
+                    <div class="info-card-body" style="padding-top: 10px;">
+                        <div style="font-size: 12.5px; font-weight: 800; color: #1b2a4a; direction: ltr;">{{ doc.name }}</div>
+                        <div style="font-size: 10.5px; color: #64748b; margin-top: 5px; font-weight: 600;">صفحة 2 من 2</div>
                     </div>
                 </div>
             </td>
         </tr>
     </table>
 
-    <!-- Row 4: Maintenance Schedule Table (Exact program column names & data) -->
+    <!-- Row 4: Maintenance Schedule Table -->
     <div class="main-table-container">
         <div class="main-table-header-bar">
             <span>📅</span>
@@ -1022,13 +1090,13 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th style="width: 4%;">م</th>
-                    <th style="width: 14%;">موعد الزيارة</th>
-                    <th style="width: 14%;">نوع الزيارة</th>
-                    <th style="width: 14%;">حالة الزيارة</th>
-                    <th style="width: 14%;">قراءة العداد (كم)</th>
-                    <th style="width: 26%;">ملاحظات</th>
-                    <th style="width: 14%;">توقيع العميل</th>
+                    <th style="width: 5%;">م</th>
+                    <th style="width: 15%;">التاريخ</th>
+                    <th style="width: 14%;">العداد (كم)</th>
+                    <th style="width: 15%;">نوع الزيارة</th>
+                    <th style="width: 25%;">ملاحظات</th>
+                    <th style="width: 13%;">الفني</th>
+                    <th style="width: 13%;">توقيع العميل</th>
                 </tr>
             </thead>
             <tbody>
@@ -1039,21 +1107,11 @@
                         <tr>
                             <td>{{ i + 1 }}</td>
                             <td>{{ v.visit_date or v.actual_visit_date or '' }}</td>
-                            <td>{{ v.visit_type or '' }}</td>
-                            <td>
-                                {% if v.visit_status == "Completed" %}
-                                    <span style="color: #166534; font-weight: 700;">تمت الصيانة</span>
-                                {% elif v.visit_status == "Cancelled" %}
-                                    <span style="color: #dc2626; font-weight: 700;">ملغاة</span>
-                                {% elif v.visit_status == "No Show" %}
-                                    <span style="color: #b45309; font-weight: 700;">لم يحضر</span>
-                                {% else %}
-                                    <span>مجدولة</span>
-                                {% endif %}
-                            </td>
                             <td>{{ v.odometer_km or '' }}</td>
+                            <td>{{ v.visit_type or 'صيانة دورية' }}</td>
                             <td class="text-right">{{ v.notes or '' }}</td>
-                            <td style="height: 22px;"></td>
+                            <td>{{ v.technician or '' }}</td>
+                            <td style="height: 20px;"></td>
                         </tr>
                     {% else %}
                         <tr>
@@ -1063,7 +1121,7 @@
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td style="height: 22px;"></td>
+                            <td style="height: 20px;"></td>
                         </tr>
                     {% endif %}
                 {% endfor %}
@@ -1072,7 +1130,7 @@
     </div>
 
     <!-- Row 5: Split Bottom (Right: Warranty Details 4 columns & Notes | Left: شروط الخدمة from Program) -->
-    <table class="unified-table">
+    <table class="grid-table">
         <tr>
             <!-- Right Column: Warranty Details (Only 4 columns) & Additional Notes -->
             <td class="bottom-cell-half-right">
@@ -1135,7 +1193,7 @@
                         {% set terms_rows = warranty_list | selectattr("terms") | list %}
                         {% if terms_rows %}
                             {% for w in terms_rows %}
-                                {% set term_content = frappe.db.get_value("Terms and Conditions", w.terms, "terms") or w.summary_terms %}
+                                {% set term_content = frappe.db.get_value("Terms and Conditions", w.terms, "terms") %}
                                 {% if term_content %}
                                     <div style="margin-bottom: 8px;">
                                         {% if terms_rows|length > 1 %}
@@ -1148,31 +1206,16 @@
                                 {% endif %}
                             {% endfor %}
                         {% else %}
-                            {# Check summary_terms if terms link was empty #}
-                            {% set summary_rows = warranty_list | selectattr("summary_terms") | list %}
-                            {% if summary_rows %}
-                                {% for w in summary_rows %}
-                                    <div style="margin-bottom: 8px;">
-                                        {% if summary_rows|length > 1 %}
-                                            <div style="font-weight: 700; color: #1b2a4a; margin-bottom: 3px; font-size: 11px;">شروط خدمة {{ w.service_type }}:</div>
-                                        {% endif %}
-                                        <div style="font-size: 11px; line-height: 1.6; color: #1e293b;">
-                                            {{ w.summary_terms|safe }}
-                                        </div>
-                                    </div>
-                                {% endfor %}
+                            {# Fallback to Sales Invoice level Terms and Conditions #}
+                            {% set fallback_terms = doc.terms or (frappe.db.get_value("Terms and Conditions", doc.tc_name, "terms") if doc.tc_name else None) %}
+                            {% if fallback_terms %}
+                                <div style="font-size: 11px; line-height: 1.6; color: #1e293b;">
+                                    {{ fallback_terms|safe }}
+                                </div>
                             {% else %}
-                                {# Fallback to Sales Invoice level Terms and Conditions #}
-                                {% set fallback_terms = doc.terms or (frappe.db.get_value("Terms and Conditions", doc.tc_name, "terms") if doc.tc_name else None) %}
-                                {% if fallback_terms %}
-                                    <div style="font-size: 11px; line-height: 1.6; color: #1e293b;">
-                                        {{ fallback_terms|safe }}
-                                    </div>
-                                {% else %}
-                                    <div style="font-size: 10px; color: #64748b; text-align: center; padding-top: 25px;">
-                                        لم يتم تحديد شروط للخدمة في جدول الضمان.
-                                    </div>
-                                {% endif %}
+                                <div style="font-size: 10px; color: #64748b; text-align: center; padding-top: 25px;">
+                                    تخضع خدمات الضمان للشروط والأحكام المعتمدة لدى المؤسسة.
+                                </div>
                             {% endif %}
                         {% endif %}
                     </div>
