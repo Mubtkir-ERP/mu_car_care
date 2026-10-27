@@ -6,13 +6,9 @@
  "engine": "InnoDB",
  "field_order": [
   "visit_date",
-  "visit_type",
-  "visit_status",
-  "odometer_km",
-  "notes",
-  "technician",
   "actual_visit_date",
-  "work_done"
+  "visit_status",
+  "notes"
  ],
  "fields": [
   {
@@ -26,10 +22,10 @@
   {
    "allow_on_submit": 1,
    "columns": 2,
-   "fieldname": "visit_type",
-   "fieldtype": "Data",
+   "fieldname": "actual_visit_date",
+   "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "Visit Type"
+   "label": "Actual Visit Date"
   },
   {
    "allow_on_submit": 1,
@@ -44,43 +40,17 @@
   },
   {
    "allow_on_submit": 1,
-   "columns": 2,
-   "fieldname": "odometer_km",
-   "fieldtype": "Int",
-   "in_list_view": 1,
-   "label": "Odometer (KM)"
-  },
-  {
-   "allow_on_submit": 1,
-   "columns": 3,
+   "columns": 5,
    "fieldname": "notes",
    "fieldtype": "Small Text",
    "in_list_view": 1,
    "label": "Notes"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "technician",
-   "fieldtype": "Data",
-   "label": "Technician"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "actual_visit_date",
-   "fieldtype": "Date",
-   "label": "Actual Visit Date"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "work_done",
-   "fieldtype": "Small Text",
-   "label": "Work Executed"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-10-27 14:50:00.000000",
+ "modified": "2026-10-27 17:50:00.000000",
  "modified_by": "Administrator",
  "module": "Mu Car Care",
  "name": "Vehicle Maintenance Schedule Item",

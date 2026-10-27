@@ -1090,13 +1090,11 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th style="width: 5%;">م</th>
-                    <th style="width: 15%;">التاريخ</th>
-                    <th style="width: 14%;">العداد (كم)</th>
-                    <th style="width: 15%;">نوع الزيارة</th>
-                    <th style="width: 25%;">ملاحظات</th>
-                    <th style="width: 13%;">الفني</th>
-                    <th style="width: 13%;">توقيع العميل</th>
+                    <th style="width: 6%; text-align: center;">مـ</th>
+                    <th style="width: 22%; text-align: center;">موعد الزيارة</th>
+                    <th style="width: 22%; text-align: center;">موعد الحضور</th>
+                    <th style="width: 18%; text-align: center;">حالة الزيارة</th>
+                    <th style="width: 32%; text-align: center;">ملاحظات</th>
                 </tr>
             </thead>
             <tbody>
@@ -1105,23 +1103,19 @@
                     {% if i < schedule_rows|length %}
                         {% set v = schedule_rows[i] %}
                         <tr>
-                            <td>{{ i + 1 }}</td>
-                            <td>{{ v.visit_date or v.actual_visit_date or '' }}</td>
-                            <td>{{ v.odometer_km or '' }}</td>
-                            <td>{{ v.visit_type or 'صيانة دورية' }}</td>
-                            <td class="text-right">{{ v.notes or '' }}</td>
-                            <td>{{ v.technician or '' }}</td>
-                            <td style="height: 20px;"></td>
+                            <td style="text-align: center;">{{ i + 1 }}</td>
+                            <td style="text-align: center;">{{ v.visit_date or '' }}</td>
+                            <td style="text-align: center;">{{ v.actual_visit_date or '' }}</td>
+                            <td style="text-align: center;">{{ v.visit_status or '' }}</td>
+                            <td style="text-align: center;">{{ v.notes or '' }}</td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td>{{ i + 1 }}</td>
+                            <td style="text-align: center;">{{ i + 1 }}</td>
                             <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td></td>
-                            <td style="height: 20px;"></td>
                         </tr>
                     {% endif %}
                 {% endfor %}
@@ -1145,20 +1139,22 @@
                         <table class="warranty-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 34%;">نوع الخدمة</th>
-                                    <th style="width: 22%;">مدة الضمان</th>
-                                    <th style="width: 22%;">تاريخ البداية</th>
-                                    <th style="width: 22%;">تاريخ النهاية</th>
+                                    <th style="width: 6%; text-align: center;">مـ</th>
+                                    <th style="width: 34%; text-align: center;">نوع الخدمة</th>
+                                    <th style="width: 20%; text-align: center;">مدة الضمان بالسنوات</th>
+                                    <th style="width: 20%; text-align: center;">تاريخ البداية</th>
+                                    <th style="width: 20%; text-align: center;">تاريخ النهاية</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% set w_items = doc.custom_warranty_details or doc.custom_warranty_items or [] %}
                                 {% for w in w_items %}
                                 <tr>
-                                    <td><strong>{{ w.service_type }}</strong></td>
-                                    <td>{{ w.warranty_period }} {% if w.warranty_period == 1 %}سنة{% elif w.warranty_period == 2 %}سنتان{% elif w.warranty_period > 2 and w.warranty_period < 11 %}سنوات{% else %}سنة{% endif %}</td>
-                                    <td>{{ w.start_date or '' }}</td>
-                                    <td>{{ w.end_date or '' }}</td>
+                                    <td style="text-align: center;">{{ loop.index }}</td>
+                                    <td style="text-align: center;"><strong>{{ w.service_type }}</strong></td>
+                                    <td style="text-align: center;">{{ w.warranty_period }} {% if w.warranty_period == 1 %}سنة{% elif w.warranty_period == 2 %}سنتان{% elif w.warranty_period > 2 and w.warranty_period < 11 %}سنوات{% else %}سنة{% endif %}</td>
+                                    <td style="text-align: center;">{{ w.start_date or '' }}</td>
+                                    <td style="text-align: center;">{{ w.end_date or '' }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

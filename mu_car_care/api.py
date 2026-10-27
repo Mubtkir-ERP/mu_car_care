@@ -90,6 +90,19 @@ def record_maintenance_visit(doctype, docname, row_idx, actual_visit_date=None, 
 
 		actual_date = actual_visit_date or nowdate()
 
+		# Format notes if technician or odometer provided
+		updated_notes = notes or target_row.notes or ""
+		extra_info = []
+		if technician:
+			extra_info.append(f"الفني: {technician}")
+		if odometer_km:
+			extra_info.append(f"العداد: {odometer_km} كم")
+		if extra_info:
+			if updated_notes:
+				updated_notes += " | " + " - ".join(extra_info)
+			else:
+				updated_notes = " - ".join(extra_info)
+
 		# Update the child row in the database directly
 		frappe.db.set_value(
 			"Vehicle Maintenance Schedule Item",
@@ -97,9 +110,7 @@ def record_maintenance_visit(doctype, docname, row_idx, actual_visit_date=None, 
 			{
 				"actual_visit_date": actual_date,
 				"visit_status": "Completed",
-				"odometer_km": cint(odometer_km) if odometer_km else target_row.odometer_km,
-				"technician": technician or target_row.technician,
-				"notes": notes or target_row.notes,
+				"notes": updated_notes,
 			},
 		)
 		frappe.db.commit()

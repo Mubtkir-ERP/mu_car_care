@@ -13,11 +13,12 @@
  ],
  "fields": [
   {
-   "columns": 2,
+   "columns": 3,
    "fieldname": "service_type",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Service Type",
+   "options": "Item",
    "reqd": 1
   },
   {
@@ -47,7 +48,7 @@
   },
   {
    "allow_on_submit": 1,
-   "columns": 3,
+   "columns": 2,
    "fieldname": "terms",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -58,7 +59,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-10-27 14:50:00.000000",
+ "modified": "2026-10-27 17:50:00.000000",
  "modified_by": "Administrator",
  "module": "Mu Car Care",
  "name": "Vehicle Warranty Item",

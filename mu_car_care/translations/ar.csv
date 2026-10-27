@@ -1,7 +1,7 @@
 1/2,نصف
 1/4,ربع
 3/4,ثلاثة أرباع
-Actual Visit Date,تاريخ الزيارة الفعلي
+Actual Visit Date,موعد الحضور
 All scheduled maintenance visits have been completed or none are scheduled.,تم استكمال كافة زيارات الصيانة المجدولة أو لا توجد زيارات مجدولة.
 Annual,سنوي
 Cancelled,ملغاة
@@ -19,10 +19,10 @@ Delivered,تم التسليم
 Distribution Method,طريقة التوزيع
 Draft,مسودة
 Duration (Months),المدة (بالأشهر)
-Duration (Years),مدة الضمان بالسنة
+Duration (Years),مدة الضمان بالسنوات
 Empty,فارغ
 Enable Maintenance Schedule,تفعيل جدول الصيانة
-End Date,تاريخ الانتهاء
+End Date,تاريخ النهاية
 Fuel Level,مستوى الوقود
 Full,ممتلئ
 General Notes,ملاحظات عامة
@@ -42,6 +42,7 @@ Mobile No,رقم الجوال
 Monthly,شهري
 Naming Series,تسلسل الترقيم
 No Show,لم يحضر
+No.,مـ
 Notes,ملاحظات
 Odometer (KM),قراءة العداد (كم)
 Odometer Reading (KM),قراءة العداد (كم)
@@ -62,13 +63,13 @@ Scheduled Visit Date,موعد الزيارة
 Select Due Visit,اختر الزيارة المستحقة
 Semi-Annual,نصف سنوي
 Service Type,نوع الخدمة
-Start Date,تاريخ البدء
+Start Date,تاريخ البداية
 Start Work,بدء العمل
 Status,الحالة
 Summary Terms,الشروط المختصرة
 Technician,الفني المنفذ
 Technician Name,اسم الفني المنفذ
-Terms & Conditions,الشروط والأحكام
+Terms & Conditions,الشروط والاحكام
 Terms and Conditions,الشروط والأحكام
 Updating maintenance record...,جاري تحديث سجل الصيانة...
 Vehicle Color,لون السيارة
@@ -86,8 +87,9 @@ Visit Date,موعد الزيارة
 Visit Status,حالة الزيارة
 Visit Type,نوع الزيارة
 Warranty Details,تفاصيل الضمان
-Warranty Duration (Years),مدة الضمان بالسنة
-Warranty Duration in Years,مدة الضمان بالسنة
+Warranty Duration (Years),مدة الضمان بالسنوات
+Warranty Duration in Years,مدة الضمان بالسنوات
 Warranty Period,مدة الضمان
 Work Completed,تم إنجاز العمل
 Work Executed,الأعمال المنفذة
+Warranty Terms & Conditions,الشروط والاحكام

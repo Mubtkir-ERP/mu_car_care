@@ -12,7 +12,7 @@ def after_migrate():
 	Auto-sync workspaces and clear Desk cache on every bench migrate.
 	Ensures Car Care Tax Invoice Print Format and collapsible custom fields are always active.
 	"""
-	# 1. Clean up obsolete sections and ensure collapsible = 1
+	# 1. Clean up obsolete sections and ensure collapsible = 1 and correct section placement
 	try:
 		frappe.db.sql(
 			"""
@@ -24,8 +24,16 @@ def after_migrate():
 		frappe.db.sql(
 			"""
 			UPDATE `tabCustom Field`
-			SET insert_after = 'custom_chassis_no'
+			SET insert_after = 'custom_vehicle_make'
 			WHERE fieldname = 'custom_has_maintenance_schedule'
+			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
+			"""
+		)
+		frappe.db.sql(
+			"""
+			UPDATE `tabCustom Field`
+			SET insert_after = 'items', collapsible = 1
+			WHERE fieldname = 'custom_schedule_config_section'
 			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
 			"""
 		)

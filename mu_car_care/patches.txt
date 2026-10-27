@@ -8,3 +8,4 @@ mu_car_care.patches.v1_1.v1_1_2_update_print_format_and_fields
 mu_car_care.patches.v1_1.v1_1_4_fix_print_format_and_collapsible
 mu_car_care.patches.v1_1.v1_1_5_warranty_and_footer_polish
 mu_car_care.patches.v1_1.v1_1_6_remove_summary_terms_and_align_print_format
+mu_car_care.patches.v1_1.v1_1_7_sections_and_columns_polish

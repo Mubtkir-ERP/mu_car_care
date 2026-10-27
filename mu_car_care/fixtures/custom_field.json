@@ -17,10 +17,21 @@
   "module": "Mu Car Care"
  },
  {
+  "allow_on_submit": 1,
+  "default": "0",
+  "dt": "Sales Invoice",
+  "fieldname": "custom_has_maintenance_schedule",
+  "fieldtype": "Check",
+  "in_list_view": 0,
+  "insert_after": "custom_vehicle_make",
+  "label": "Enable Maintenance Schedule",
+  "module": "Mu Car Care"
+ },
+ {
   "dt": "Sales Invoice",
   "fieldname": "custom_vehicle_col_2",
   "fieldtype": "Column Break",
-  "insert_after": "custom_vehicle_make",
+  "insert_after": "custom_has_maintenance_schedule",
   "module": "Mu Car Care"
  },
  {
@@ -81,23 +92,12 @@
   "module": "Mu Car Care"
  },
  {
-  "allow_on_submit": 1,
-  "default": "0",
-  "dt": "Sales Invoice",
-  "fieldname": "custom_has_maintenance_schedule",
-  "fieldtype": "Check",
-  "in_list_view": 0,
-  "insert_after": "custom_chassis_no",
-  "label": "Enable Maintenance Schedule",
-  "module": "Mu Car Care"
- },
- {
   "collapsible": 1,
   "depends_on": "eval:doc.custom_has_maintenance_schedule",
   "dt": "Sales Invoice",
   "fieldname": "custom_schedule_config_section",
   "fieldtype": "Section Break",
-  "insert_after": "custom_has_maintenance_schedule",
+  "insert_after": "items",
   "label": "Schedule Configuration",
   "module": "Mu Car Care"
  },
@@ -207,6 +207,220 @@
  {
   "allow_on_submit": 1,
   "dt": "Sales Invoice",
+  "fieldname": "custom_warranty_notes",
+  "fieldtype": "Small Text",
+  "insert_after": "custom_warranty_details",
+  "label": "Notes",
+  "module": "Mu Car Care"
+ },
+ {
+  "dt": "Sales Order",
+  "fieldname": "custom_vehicle_details_section",
+  "fieldtype": "Section Break",
+  "insert_after": "customer",
+  "label": "Vehicle Information",
+  "module": "Mu Car Care"
+ },
+ {
+  "dt": "Sales Order",
+  "fieldname": "custom_vehicle_make",
+  "fieldtype": "Data",
+  "in_list_view": 0,
+  "insert_after": "custom_vehicle_details_section",
+  "label": "Vehicle Make",
+  "module": "Mu Car Care"
+ },
+ {
+  "allow_on_submit": 1,
+  "default": "0",
+  "dt": "Sales Order",
+  "fieldname": "custom_has_maintenance_schedule",
+  "fieldtype": "Check",
+  "in_list_view": 0,
+  "insert_after": "custom_vehicle_make",
+  "label": "Enable Maintenance Schedule",
+  "module": "Mu Car Care"
+ },
+ {
+  "dt": "Sales Order",
+  "fieldname": "custom_vehicle_col_2",
+  "fieldtype": "Column Break",
+  "insert_after": "custom_has_maintenance_schedule",
+  "module": "Mu Car Care"
+ },
+ {
+  "dt": "Sales Order",
+  "fieldname": "custom_vehicle_model",
+  "fieldtype": "Data",
+  "in_list_view": 0,
+  "insert_after": "custom_vehicle_col_2",
+  "label": "Vehicle Model",
+  "module": "Mu Car Care"
+ },
+ {
+  "dt": "Sales Order",
+  "fieldname": "custom_vehicle_col_3",
+  "fieldtype": "Column Break",
+  "insert_after": "custom_vehicle_model",
+  "module": "Mu Car Care"
+ },
+ {
+  "dt": "Sales Order",
+  "fieldname": "custom_plate_number",
+  "fieldtype": "Data",
+  "in_list_view": 0,
+  "insert_after": "custom_vehicle_col_3",
+  "label": "Plate Number",
+  "module": "Mu Car Care"
+ },
+ {
+  "dt": "Sales Order",
+  "fieldname": "custom_vehicle_col_4",
+  "fieldtype": "Column Break",
+  "insert_after": "custom_plate_number",
+  "module": "Mu Car Care"
+ },
+ {
+  "dt": "Sales Order",
+  "fieldname": "custom_vehicle_color",
+  "fieldtype": "Data",
+  "in_list_view": 0,
+  "insert_after": "custom_vehicle_col_4",
+  "label": "Vehicle Color",
+  "module": "Mu Car Care"
+ },
+ {
+  "dt": "Sales Order",
+  "fieldname": "custom_vehicle_col_5",
+  "fieldtype": "Column Break",
+  "insert_after": "custom_vehicle_color",
+  "module": "Mu Car Care"
+ },
+ {
+  "dt": "Sales Order",
+  "fieldname": "custom_chassis_no",
+  "fieldtype": "Data",
+  "in_list_view": 0,
+  "insert_after": "custom_vehicle_col_5",
+  "label": "Chassis No (VIN)",
+  "module": "Mu Car Care"
+ },
+ {
+  "collapsible": 1,
+  "depends_on": "eval:doc.custom_has_maintenance_schedule",
+  "dt": "Sales Order",
+  "fieldname": "custom_schedule_config_section",
+  "fieldtype": "Section Break",
+  "insert_after": "items",
+  "label": "Schedule Configuration",
+  "module": "Mu Car Care"
+ },
+ {
+  "allow_on_submit": 1,
+  "depends_on": "eval:doc.custom_has_maintenance_schedule",
+  "dt": "Sales Order",
+  "fieldname": "custom_maintenance_start_date",
+  "fieldtype": "Date",
+  "insert_after": "custom_schedule_config_section",
+  "label": "Maintenance Start Date",
+  "module": "Mu Car Care"
+ },
+ {
+  "dt": "Sales Order",
+  "fieldname": "custom_schedule_col_1",
+  "fieldtype": "Column Break",
+  "insert_after": "custom_maintenance_start_date",
+  "module": "Mu Car Care"
+ },
+ {
+  "allow_on_submit": 1,
+  "default": "1",
+  "depends_on": "eval:doc.custom_has_maintenance_schedule",
+  "dt": "Sales Order",
+  "fieldname": "custom_maintenance_duration_years",
+  "fieldtype": "Int",
+  "insert_after": "custom_schedule_col_1",
+  "label": "Warranty Duration in Years",
+  "module": "Mu Car Care"
+ },
+ {
+  "dt": "Sales Order",
+  "fieldname": "custom_schedule_col_2",
+  "fieldtype": "Column Break",
+  "insert_after": "custom_maintenance_duration_years",
+  "module": "Mu Car Care"
+ },
+ {
+  "allow_on_submit": 1,
+  "default": "Annual",
+  "depends_on": "eval:doc.custom_has_maintenance_schedule",
+  "dt": "Sales Order",
+  "fieldname": "custom_distribution_method",
+  "fieldtype": "Select",
+  "insert_after": "custom_schedule_col_2",
+  "label": "Distribution Method",
+  "module": "Mu Car Care",
+  "options": "Annual\nSemi-Annual\nQuarterly\nMonthly"
+ },
+ {
+  "dt": "Sales Order",
+  "fieldname": "custom_schedule_col_3",
+  "fieldtype": "Column Break",
+  "insert_after": "custom_distribution_method",
+  "module": "Mu Car Care"
+ },
+ {
+  "depends_on": "eval:doc.custom_has_maintenance_schedule",
+  "dt": "Sales Order",
+  "fieldname": "custom_generate_schedule_btn",
+  "fieldtype": "Button",
+  "insert_after": "custom_schedule_col_3",
+  "label": "Generate Schedule",
+  "module": "Mu Car Care"
+ },
+ {
+  "collapsible": 1,
+  "depends_on": "eval:doc.custom_has_maintenance_schedule",
+  "dt": "Sales Order",
+  "fieldname": "custom_schedule_visits_section",
+  "fieldtype": "Section Break",
+  "insert_after": "custom_generate_schedule_btn",
+  "label": "Maintenance Visits Schedule",
+  "module": "Mu Car Care"
+ },
+ {
+  "allow_on_submit": 1,
+  "depends_on": "eval:doc.custom_has_maintenance_schedule",
+  "dt": "Sales Order",
+  "fieldname": "custom_maintenance_schedule",
+  "fieldtype": "Table",
+  "insert_after": "custom_schedule_visits_section",
+  "label": "Maintenance Visits",
+  "module": "Mu Car Care",
+  "options": "Vehicle Maintenance Schedule Item"
+ },
+ {
+  "collapsible": 1,
+  "dt": "Sales Order",
+  "fieldname": "custom_warranty_section",
+  "fieldtype": "Section Break",
+  "insert_after": "custom_maintenance_schedule",
+  "label": "Warranty Details",
+  "module": "Mu Car Care"
+ },
+ {
+  "allow_on_submit": 1,
+  "dt": "Sales Order",
+  "fieldname": "custom_warranty_details",
+  "fieldtype": "Table",
+  "insert_after": "custom_warranty_section",
+  "label": "Warranty Details",
+  "module": "Mu Car Care",
+  "options": "Vehicle Warranty Item"
+ },
+ {
+  "allow_on_submit": 1,
+  "dt": "Sales Order",
   "fieldname": "custom_warranty_notes",
   "fieldtype": "Small Text",
   "insert_after": "custom_warranty_details",
@@ -231,10 +445,21 @@
   "module": "Mu Car Care"
  },
  {
+  "allow_on_submit": 1,
+  "default": "0",
+  "dt": "Quotation",
+  "fieldname": "custom_has_maintenance_schedule",
+  "fieldtype": "Check",
+  "in_list_view": 0,
+  "insert_after": "custom_vehicle_make",
+  "label": "Enable Maintenance Schedule",
+  "module": "Mu Car Care"
+ },
+ {
   "dt": "Quotation",
   "fieldname": "custom_vehicle_col_2",
   "fieldtype": "Column Break",
-  "insert_after": "custom_vehicle_make",
+  "insert_after": "custom_has_maintenance_schedule",
   "module": "Mu Car Care"
  },
  {
@@ -295,23 +520,12 @@
   "module": "Mu Car Care"
  },
  {
-  "allow_on_submit": 1,
-  "default": "0",
-  "dt": "Quotation",
-  "fieldname": "custom_has_maintenance_schedule",
-  "fieldtype": "Check",
-  "in_list_view": 0,
-  "insert_after": "custom_chassis_no",
-  "label": "Enable Maintenance Schedule",
-  "module": "Mu Car Care"
- },
- {
   "collapsible": 1,
   "depends_on": "eval:doc.custom_has_maintenance_schedule",
   "dt": "Quotation",
   "fieldname": "custom_schedule_config_section",
   "fieldtype": "Section Break",
-  "insert_after": "custom_has_maintenance_schedule",
+  "insert_after": "items",
   "label": "Schedule Configuration",
   "module": "Mu Car Care"
  },
@@ -428,217 +642,21 @@
   "module": "Mu Car Care"
  },
  {
-  "dt": "Sales Order",
-  "fieldname": "custom_vehicle_details_section",
-  "fieldtype": "Section Break",
-  "insert_after": "delivery_date",
-  "label": "Vehicle Information",
-  "module": "Mu Car Care"
- },
- {
-  "dt": "Sales Order",
-  "fieldname": "custom_vehicle_make",
-  "fieldtype": "Data",
-  "in_list_view": 0,
-  "insert_after": "custom_vehicle_details_section",
-  "label": "Vehicle Make",
-  "module": "Mu Car Care"
- },
- {
-  "dt": "Sales Order",
-  "fieldname": "custom_vehicle_col_2",
-  "fieldtype": "Column Break",
-  "insert_after": "custom_vehicle_make",
-  "module": "Mu Car Care"
- },
- {
-  "dt": "Sales Order",
-  "fieldname": "custom_vehicle_model",
-  "fieldtype": "Data",
-  "in_list_view": 0,
-  "insert_after": "custom_vehicle_col_2",
-  "label": "Vehicle Model",
-  "module": "Mu Car Care"
- },
- {
-  "dt": "Sales Order",
-  "fieldname": "custom_vehicle_col_3",
-  "fieldtype": "Column Break",
-  "insert_after": "custom_vehicle_model",
-  "module": "Mu Car Care"
- },
- {
-  "dt": "Sales Order",
-  "fieldname": "custom_plate_number",
-  "fieldtype": "Data",
-  "in_list_view": 0,
-  "insert_after": "custom_vehicle_col_3",
-  "label": "Plate Number",
-  "module": "Mu Car Care"
- },
- {
-  "dt": "Sales Order",
-  "fieldname": "custom_vehicle_col_4",
-  "fieldtype": "Column Break",
-  "insert_after": "custom_plate_number",
-  "module": "Mu Car Care"
- },
- {
-  "dt": "Sales Order",
-  "fieldname": "custom_vehicle_color",
-  "fieldtype": "Data",
-  "in_list_view": 0,
-  "insert_after": "custom_vehicle_col_4",
-  "label": "Vehicle Color",
-  "module": "Mu Car Care"
- },
- {
-  "dt": "Sales Order",
-  "fieldname": "custom_vehicle_col_5",
-  "fieldtype": "Column Break",
-  "insert_after": "custom_vehicle_color",
-  "module": "Mu Car Care"
- },
- {
-  "dt": "Sales Order",
-  "fieldname": "custom_chassis_no",
-  "fieldtype": "Data",
-  "in_list_view": 0,
-  "insert_after": "custom_vehicle_col_5",
-  "label": "Chassis No (VIN)",
-  "module": "Mu Car Care"
- },
- {
-  "allow_on_submit": 1,
-  "default": "0",
-  "dt": "Sales Order",
-  "fieldname": "custom_has_maintenance_schedule",
-  "fieldtype": "Check",
-  "in_list_view": 0,
-  "insert_after": "custom_chassis_no",
-  "label": "Enable Maintenance Schedule",
-  "module": "Mu Car Care"
- },
- {
-  "collapsible": 1,
-  "depends_on": "eval:doc.custom_has_maintenance_schedule",
-  "dt": "Sales Order",
-  "fieldname": "custom_schedule_config_section",
-  "fieldtype": "Section Break",
-  "insert_after": "custom_has_maintenance_schedule",
-  "label": "Schedule Configuration",
-  "module": "Mu Car Care"
- },
- {
-  "allow_on_submit": 1,
-  "depends_on": "eval:doc.custom_has_maintenance_schedule",
-  "dt": "Sales Order",
-  "fieldname": "custom_maintenance_start_date",
-  "fieldtype": "Date",
-  "insert_after": "custom_schedule_config_section",
-  "label": "Maintenance Start Date",
-  "module": "Mu Car Care"
- },
- {
-  "dt": "Sales Order",
-  "fieldname": "custom_schedule_col_1",
-  "fieldtype": "Column Break",
-  "insert_after": "custom_maintenance_start_date",
-  "module": "Mu Car Care"
- },
- {
-  "allow_on_submit": 1,
-  "default": "1",
-  "depends_on": "eval:doc.custom_has_maintenance_schedule",
-  "dt": "Sales Order",
-  "fieldname": "custom_maintenance_duration_years",
+  "dt": "Item",
+  "fieldname": "custom_warranty_period",
   "fieldtype": "Int",
-  "insert_after": "custom_schedule_col_1",
+  "insert_after": "item_name",
   "label": "Warranty Duration in Years",
-  "module": "Mu Car Care"
- },
- {
-  "dt": "Sales Order",
-  "fieldname": "custom_schedule_col_2",
-  "fieldtype": "Column Break",
-  "insert_after": "custom_maintenance_duration_years",
-  "module": "Mu Car Care"
- },
- {
-  "allow_on_submit": 1,
-  "default": "Annual",
-  "depends_on": "eval:doc.custom_has_maintenance_schedule",
-  "dt": "Sales Order",
-  "fieldname": "custom_distribution_method",
-  "fieldtype": "Select",
-  "insert_after": "custom_schedule_col_2",
-  "label": "Distribution Method",
   "module": "Mu Car Care",
-  "options": "Annual\nSemi-Annual\nQuarterly\nMonthly"
+  "default": 1
  },
  {
-  "dt": "Sales Order",
-  "fieldname": "custom_schedule_col_3",
-  "fieldtype": "Column Break",
-  "insert_after": "custom_distribution_method",
-  "module": "Mu Car Care"
- },
- {
-  "depends_on": "eval:doc.custom_has_maintenance_schedule",
-  "dt": "Sales Order",
-  "fieldname": "custom_generate_schedule_btn",
-  "fieldtype": "Button",
-  "insert_after": "custom_schedule_col_3",
-  "label": "Generate Schedule",
-  "module": "Mu Car Care"
- },
- {
-  "collapsible": 1,
-  "depends_on": "eval:doc.custom_has_maintenance_schedule",
-  "dt": "Sales Order",
-  "fieldname": "custom_schedule_visits_section",
-  "fieldtype": "Section Break",
-  "insert_after": "custom_generate_schedule_btn",
-  "label": "Maintenance Visits Schedule",
-  "module": "Mu Car Care"
- },
- {
-  "allow_on_submit": 1,
-  "depends_on": "eval:doc.custom_has_maintenance_schedule",
-  "dt": "Sales Order",
-  "fieldname": "custom_maintenance_schedule",
-  "fieldtype": "Table",
-  "insert_after": "custom_schedule_visits_section",
-  "label": "Maintenance Visits",
+  "dt": "Item",
+  "fieldname": "custom_warranty_terms",
+  "fieldtype": "Link",
+  "insert_after": "custom_warranty_period",
+  "label": "Warranty Terms & Conditions",
   "module": "Mu Car Care",
-  "options": "Vehicle Maintenance Schedule Item"
- },
- {
-  "collapsible": 1,
-  "dt": "Sales Order",
-  "fieldname": "custom_warranty_section",
-  "fieldtype": "Section Break",
-  "insert_after": "custom_maintenance_schedule",
-  "label": "Warranty Details",
-  "module": "Mu Car Care"
- },
- {
-  "allow_on_submit": 1,
-  "dt": "Sales Order",
-  "fieldname": "custom_warranty_details",
-  "fieldtype": "Table",
-  "insert_after": "custom_warranty_section",
-  "label": "Warranty Details",
-  "module": "Mu Car Care",
-  "options": "Vehicle Warranty Item"
- },
- {
-  "allow_on_submit": 1,
-  "dt": "Sales Order",
-  "fieldname": "custom_warranty_notes",
-  "fieldtype": "Small Text",
-  "insert_after": "custom_warranty_details",
-  "label": "Notes",
-  "module": "Mu Car Care"
+  "options": "Terms and Conditions"
  }
 ]
