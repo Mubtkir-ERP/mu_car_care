@@ -216,10 +216,10 @@ frappe.ui.form.on("Vehicle Warranty Item", {
 	start_date: function (frm, cdt, cdn) {
 		mu_car_care.calculate_warranty_end_date(frm, cdt, cdn);
 	},
-	terms_template: function (frm, cdt, cdn) {
+	terms: function (frm, cdt, cdn) {
 		const row = locals[cdt][cdn];
-		if (row.terms_template) {
-			frappe.db.get_value("Terms and Conditions", row.terms_template, "terms", function (r) {
+		if (row.terms) {
+			frappe.db.get_value("Terms and Conditions", row.terms, "terms", function (r) {
 				if (r && r.terms) {
 					// Strip HTML tags for clean summary text
 					const tmp = document.createElement("div");
@@ -228,6 +228,8 @@ frappe.ui.form.on("Vehicle Warranty Item", {
 					frappe.model.set_value(cdt, cdn, "summary_terms", plainText);
 				}
 			});
+		} else {
+			frappe.model.set_value(cdt, cdn, "summary_terms", "");
 		}
 	},
 });

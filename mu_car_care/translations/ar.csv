@@ -58,7 +58,7 @@ Requested Services & Documents,الخدمات المطلوبة والمستند�
 Requested Services & Specifications,الخدمات والمواصفات المطلوبة
 Schedule Configuration,إعدادات جدول الصيانة
 Scheduled,مجدولة
-Scheduled Visit Date,تاريخ الزيارة المجدول
+Scheduled Visit Date,موعد الزيارة
 Select Due Visit,اختر الزيارة المستحقة
 Semi-Annual,نصف سنوي
 Service Type,نوع الخدمة
@@ -82,6 +82,7 @@ Vehicle Model / Year,موديل وسنة الصنع
 Vehicle Reception,استلام وفحص سيارة
 Vehicle Reception Ref,مرجع استلام السيارة
 Vehicle Warranty Item,بند تفاصيل الضمان
+Visit Date,موعد الزيارة
 Visit Status,حالة الزيارة
 Visit Type,نوع الزيارة
 Warranty Details,تفاصيل الضمان
