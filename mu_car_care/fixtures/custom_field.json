@@ -95,10 +95,10 @@
   "collapsible": 1,
   "depends_on": "eval:doc.custom_has_maintenance_schedule",
   "dt": "Sales Invoice",
-  "fieldname": "custom_schedule_config_section",
+  "fieldname": "custom_schedule_visits_section",
   "fieldtype": "Section Break",
   "insert_after": "items",
-  "label": "Schedule Configuration",
+  "label": "Maintenance Schedule",
   "module": "Mu Car Care"
  },
  {
@@ -107,7 +107,7 @@
   "dt": "Sales Invoice",
   "fieldname": "custom_maintenance_start_date",
   "fieldtype": "Date",
-  "insert_after": "custom_schedule_config_section",
+  "insert_after": "custom_schedule_visits_section",
   "label": "Maintenance Start Date",
   "module": "Mu Car Care"
  },
@@ -165,22 +165,12 @@
   "module": "Mu Car Care"
  },
  {
-  "collapsible": 1,
-  "depends_on": "eval:doc.custom_has_maintenance_schedule",
-  "dt": "Sales Invoice",
-  "fieldname": "custom_schedule_visits_section",
-  "fieldtype": "Section Break",
-  "insert_after": "custom_generate_schedule_btn",
-  "label": "Maintenance Visits Schedule",
-  "module": "Mu Car Care"
- },
- {
   "allow_on_submit": 1,
   "depends_on": "eval:doc.custom_has_maintenance_schedule",
   "dt": "Sales Invoice",
   "fieldname": "custom_maintenance_schedule",
   "fieldtype": "Table",
-  "insert_after": "custom_schedule_visits_section",
+  "insert_after": "custom_generate_schedule_btn",
   "label": "Maintenance Visits",
   "module": "Mu Car Care",
   "options": "Vehicle Maintenance Schedule Item"
@@ -309,10 +299,10 @@
   "collapsible": 1,
   "depends_on": "eval:doc.custom_has_maintenance_schedule",
   "dt": "Sales Order",
-  "fieldname": "custom_schedule_config_section",
+  "fieldname": "custom_schedule_visits_section",
   "fieldtype": "Section Break",
   "insert_after": "items",
-  "label": "Schedule Configuration",
+  "label": "Maintenance Schedule",
   "module": "Mu Car Care"
  },
  {
@@ -321,7 +311,7 @@
   "dt": "Sales Order",
   "fieldname": "custom_maintenance_start_date",
   "fieldtype": "Date",
-  "insert_after": "custom_schedule_config_section",
+  "insert_after": "custom_schedule_visits_section",
   "label": "Maintenance Start Date",
   "module": "Mu Car Care"
  },
@@ -379,22 +369,12 @@
   "module": "Mu Car Care"
  },
  {
-  "collapsible": 1,
-  "depends_on": "eval:doc.custom_has_maintenance_schedule",
-  "dt": "Sales Order",
-  "fieldname": "custom_schedule_visits_section",
-  "fieldtype": "Section Break",
-  "insert_after": "custom_generate_schedule_btn",
-  "label": "Maintenance Visits Schedule",
-  "module": "Mu Car Care"
- },
- {
   "allow_on_submit": 1,
   "depends_on": "eval:doc.custom_has_maintenance_schedule",
   "dt": "Sales Order",
   "fieldname": "custom_maintenance_schedule",
   "fieldtype": "Table",
-  "insert_after": "custom_schedule_visits_section",
+  "insert_after": "custom_generate_schedule_btn",
   "label": "Maintenance Visits",
   "module": "Mu Car Care",
   "options": "Vehicle Maintenance Schedule Item"
@@ -523,10 +503,10 @@
   "collapsible": 1,
   "depends_on": "eval:doc.custom_has_maintenance_schedule",
   "dt": "Quotation",
-  "fieldname": "custom_schedule_config_section",
+  "fieldname": "custom_schedule_visits_section",
   "fieldtype": "Section Break",
   "insert_after": "items",
-  "label": "Schedule Configuration",
+  "label": "Maintenance Schedule",
   "module": "Mu Car Care"
  },
  {
@@ -535,7 +515,7 @@
   "dt": "Quotation",
   "fieldname": "custom_maintenance_start_date",
   "fieldtype": "Date",
-  "insert_after": "custom_schedule_config_section",
+  "insert_after": "custom_schedule_visits_section",
   "label": "Maintenance Start Date",
   "module": "Mu Car Care"
  },
@@ -593,22 +573,12 @@
   "module": "Mu Car Care"
  },
  {
-  "collapsible": 1,
-  "depends_on": "eval:doc.custom_has_maintenance_schedule",
-  "dt": "Quotation",
-  "fieldname": "custom_schedule_visits_section",
-  "fieldtype": "Section Break",
-  "insert_after": "custom_generate_schedule_btn",
-  "label": "Maintenance Visits Schedule",
-  "module": "Mu Car Care"
- },
- {
   "allow_on_submit": 1,
   "depends_on": "eval:doc.custom_has_maintenance_schedule",
   "dt": "Quotation",
   "fieldname": "custom_maintenance_schedule",
   "fieldtype": "Table",
-  "insert_after": "custom_schedule_visits_section",
+  "insert_after": "custom_generate_schedule_btn",
   "label": "Maintenance Visits",
   "module": "Mu Car Care",
   "options": "Vehicle Maintenance Schedule Item"

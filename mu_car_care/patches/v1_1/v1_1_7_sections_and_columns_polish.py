@@ -45,8 +45,15 @@ def execute():
 	except Exception as e:
 		frappe.log_error(title="mu_car_care v1_1_7 drop columns error", message=str(e))
 
-	# 3. Update Custom Field positions and collapsibility
+	# 3. Update Custom Field positions, merge settings into schedule section, and set collapsibility
 	try:
+		frappe.db.sql(
+			"""
+			DELETE FROM `tabCustom Field`
+			WHERE fieldname IN ('custom_maintenance_section', 'custom_schedule_config_section')
+			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
+			"""
+		)
 		frappe.db.sql(
 			"""
 			UPDATE `tabCustom Field`
@@ -59,15 +66,31 @@ def execute():
 			"""
 			UPDATE `tabCustom Field`
 			SET insert_after = 'items', collapsible = 1
-			WHERE fieldname = 'custom_schedule_config_section'
+			WHERE fieldname = 'custom_schedule_visits_section'
 			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
 			"""
 		)
 		frappe.db.sql(
 			"""
 			UPDATE `tabCustom Field`
-			SET collapsible = 1
-			WHERE fieldname IN ('custom_schedule_config_section', 'custom_schedule_visits_section', 'custom_warranty_section')
+			SET insert_after = 'custom_schedule_visits_section'
+			WHERE fieldname = 'custom_maintenance_start_date'
+			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
+			"""
+		)
+		frappe.db.sql(
+			"""
+			UPDATE `tabCustom Field`
+			SET insert_after = 'custom_generate_schedule_btn'
+			WHERE fieldname = 'custom_maintenance_schedule'
+			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
+			"""
+		)
+		frappe.db.sql(
+			"""
+			UPDATE `tabCustom Field`
+			SET insert_after = 'custom_maintenance_schedule', collapsible = 1
+			WHERE fieldname = 'custom_warranty_section'
 			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
 			"""
 		)

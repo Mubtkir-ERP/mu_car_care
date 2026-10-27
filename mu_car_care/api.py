@@ -64,6 +64,59 @@ def calculate_maintenance_schedule(start_date=None, duration_years=None, distrib
 
 
 @frappe.whitelist()
+def get_item_warranty_details(item_code=None):
+	"""
+	Safely fetch warranty period and terms for a given Item without throwing
+	'Field not permitted in query' errors.
+	"""
+	if not item_code:
+		return {"warranty_period": 1, "terms": None}
+
+	data = {
+		"warranty_period": 1,
+		"terms": None,
+	}
+
+	try:
+		# Check if custom fields exist on tabItem safely via SQL metadata
+		item_cols = frappe.db.get_table_columns("Item")
+		fields = []
+		if "custom_warranty_period" in item_cols:
+			fields.append("custom_warranty_period")
+		if "custom_warranty_terms" in item_cols:
+			fields.append("custom_warranty_terms")
+
+		if fields and frappe.db.exists("Item", item_code):
+			res = frappe.db.get_value("Item", item_code, fields, as_dict=True)
+			if res:
+				if res.get("custom_warranty_period"):
+					data["warranty_period"] = cint(res.get("custom_warranty_period"))
+				if res.get("custom_warranty_terms"):
+					data["terms"] = res.get("custom_warranty_terms")
+	except Exception:
+		pass
+
+	# If terms not set from item custom field, search for matching Terms and Conditions
+	if not data["terms"]:
+		try:
+			item_name = frappe.db.get_value("Item", item_code, "item_name")
+			for candidate in [item_code, item_name]:
+				if candidate and frappe.db.exists("Terms and Conditions", candidate):
+					data["terms"] = candidate
+					break
+
+			if not data["terms"]:
+				# Match any Terms & Conditions with warranty / ضمان in title
+				default_terms = frappe.db.get_value("Terms and Conditions", {"name": ["like", "%ضمان%"]}, "name")
+				if default_terms:
+					data["terms"] = default_terms
+		except Exception:
+			pass
+
+	return data
+
+
+@frappe.whitelist()
 def record_maintenance_visit(doctype, docname, row_idx, actual_visit_date=None, odometer_km=None, technician=None, notes=None):
 	"""
 	Whitelisted API for Sales/Service staff to record a completed maintenance visit directly.

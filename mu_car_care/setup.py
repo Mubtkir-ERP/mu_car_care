@@ -17,7 +17,7 @@ def after_migrate():
 		frappe.db.sql(
 			"""
 			DELETE FROM `tabCustom Field`
-			WHERE fieldname = 'custom_maintenance_section'
+			WHERE fieldname IN ('custom_maintenance_section', 'custom_schedule_config_section')
 			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
 			"""
 		)
@@ -33,15 +33,31 @@ def after_migrate():
 			"""
 			UPDATE `tabCustom Field`
 			SET insert_after = 'items', collapsible = 1
-			WHERE fieldname = 'custom_schedule_config_section'
+			WHERE fieldname = 'custom_schedule_visits_section'
 			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
 			"""
 		)
 		frappe.db.sql(
 			"""
 			UPDATE `tabCustom Field`
-			SET collapsible = 1
-			WHERE fieldname IN ('custom_schedule_config_section', 'custom_schedule_visits_section', 'custom_warranty_section')
+			SET insert_after = 'custom_schedule_visits_section'
+			WHERE fieldname = 'custom_maintenance_start_date'
+			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
+			"""
+		)
+		frappe.db.sql(
+			"""
+			UPDATE `tabCustom Field`
+			SET insert_after = 'custom_generate_schedule_btn'
+			WHERE fieldname = 'custom_maintenance_schedule'
+			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
+			"""
+		)
+		frappe.db.sql(
+			"""
+			UPDATE `tabCustom Field`
+			SET insert_after = 'custom_maintenance_schedule', collapsible = 1
+			WHERE fieldname = 'custom_warranty_section'
 			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
 			"""
 		)
