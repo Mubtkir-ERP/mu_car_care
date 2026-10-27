@@ -7,9 +7,11 @@
  "field_order": [
   "visit_date",
   "actual_visit_date",
-  "visit_status",
+  "visit_type",
   "odometer_km",
+  "work_done",
   "technician",
+  "visit_status",
   "notes"
  ],
  "fields": [
@@ -32,13 +34,10 @@
   {
    "allow_on_submit": 1,
    "columns": 2,
-   "default": "Scheduled",
-   "fieldname": "visit_status",
-   "fieldtype": "Select",
+   "fieldname": "visit_type",
+   "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Visit Status",
-   "options": "Scheduled\nCompleted\nCancelled\nNo Show",
-   "reqd": 1
+   "label": "Visit Type"
   },
   {
    "allow_on_submit": 1,
@@ -51,10 +50,29 @@
   {
    "allow_on_submit": 1,
    "columns": 2,
+   "fieldname": "work_done",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Work Executed"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 2,
    "fieldname": "technician",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Technician"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 2,
+   "default": "Scheduled",
+   "fieldname": "visit_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Visit Status",
+   "options": "Scheduled\nCompleted\nCancelled\nNo Show",
+   "reqd": 1
   },
   {
    "allow_on_submit": 1,

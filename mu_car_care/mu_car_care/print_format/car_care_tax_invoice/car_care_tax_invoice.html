@@ -1,0 +1,1279 @@
+{# ========================================================================= #}
+{# مُبتكِر ERP - قالب طباعة فاتورة مبيعات ضريبية وجدول الصيانة والمتابعة     #}
+{# Car Care Tax Invoice & Maintenance Schedule - Mubtkir ERP                #}
+{# ========================================================================= #}
+
+{# ===================== LOAD PHASE 2 DETAILS SAFELY ===================== #}
+{% if doc.docstatus == 1 %}
+    {# Invoice is submitted → try loading Phase 2 details #}
+    {% set details = get_phase_2_print_format_details(doc) if get_phase_2_print_format_details is defined else None %}
+{% else %}
+    {# Draft invoice → do not load details, but DO NOT show any error #}
+    {% set details = None %}
+{% endif %}
+
+{% set company_doc = frappe.get_doc("Company", doc.company) if doc.company else None %}
+{% set company_logo = doc.company_logo or (company_doc.company_logo if company_doc else None) %}
+{% set company_cr = (company_doc.registration_details if company_doc and company_doc.registration_details else (company_doc.tax_id if company_doc else "1010101010")) %}
+{% set company_tax_id = doc.tax_id or (company_doc.tax_id if company_doc else "300000000000003") %}
+{% set company_phone = (company_doc.phone_no if company_doc and company_doc.phone_no else "+966 50 123 4567") %}
+{% set company_city = (company_doc.city if company_doc and company_doc.city else "الرياض، المملكة العربية السعودية") %}
+
+{# Safe QR Code Extraction #}
+{% set qr_image_src = None %}
+{% if details and details.siaf and details.siaf.qr_image_src %}
+    {% set qr_image_src = details.siaf.qr_image_src %}
+{% elif doc.qr_code %}
+    {% set qr_image_src = doc.qr_code %}
+{% elif doc.custom_qr_code %}
+    {% set qr_image_src = doc.custom_qr_code %}
+{% endif %}
+
+{# Customer Phone #}
+{% set cust_mobile = doc.contact_mobile or (frappe.db.get_value("Customer", doc.customer, "mobile_no") if doc.customer else None) or "—" %}
+
+{# Sales Person #}
+{% set sales_person_name = doc.custom_sales_person or doc.sales_partner or frappe.db.get_value("User", doc.owner, "full_name") or doc.owner %}
+
+{# Payment Method #}
+{% set pay_method = doc.mode_of_payment or (doc.payments[0].mode_of_payment if doc.payments and doc.payments|length > 0 else "تحويل بنكي / نقدي") %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap');
+
+    @page {
+        size: A4 portrait;
+        margin: 8mm 8mm 8mm 8mm;
+    }
+
+    * {
+        box-sizing: border-box;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        direction: rtl;
+        font-family: 'Cairo', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: #1a2332;
+        background-color: #ffffff;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+    .print-page {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 0;
+        position: relative;
+        background: #ffffff;
+    }
+
+    .page-break {
+        page-break-before: always;
+        break-before: page;
+        margin-top: 15px;
+    }
+
+    /* =======================================================
+       HEADER SECTION
+    ======================================================= */
+    .header-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 8px;
+    }
+
+    .header-table td {
+        vertical-align: top;
+        padding: 0;
+    }
+
+    .header-car-cell {
+        width: 28%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .header-car-banner {
+        position: relative;
+        width: 100%;
+        height: 105px;
+        background: linear-gradient(135deg, #18283f 0%, #293d59 100%);
+        border-radius: 0 0 45px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .header-car-banner svg {
+        width: 90%;
+        height: auto;
+        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    }
+
+    .header-title-cell {
+        width: 44%;
+        text-align: center;
+        padding: 6px 12px 0 12px !important;
+    }
+
+    .header-main-title {
+        font-size: 26px;
+        font-weight: 800;
+        color: #1a2a42;
+        margin: 0 0 2px 0;
+        letter-spacing: -0.5px;
+    }
+
+    .header-main-title.is-draft {
+        color: #8892a0;
+    }
+
+    .header-sub-title {
+        font-size: 11.5px;
+        color: #556987;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .header-company-cell {
+        width: 28%;
+        text-align: right;
+        padding-right: 8px !important;
+    }
+
+    .company-logo-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin-bottom: 4px;
+    }
+
+    .company-logo-img {
+        max-height: 48px;
+        max-width: 130px;
+        object-fit: contain;
+    }
+
+    .company-name {
+        font-size: 14px;
+        font-weight: 800;
+        color: #1a2a42;
+        margin: 2px 0;
+    }
+
+    .company-meta-item {
+        font-size: 10px;
+        color: #3b4b60;
+        margin: 1px 0;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .company-meta-item b {
+        color: #1a2a42;
+        font-weight: 700;
+    }
+
+    /* =======================================================
+       QR & INVOICE META ROW
+    ======================================================= */
+    .meta-qr-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 8px;
+        background: #fbfcfd;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .meta-qr-table td {
+        vertical-align: middle;
+        padding: 8px 12px;
+    }
+
+    .qr-box-cell {
+        width: 120px;
+        text-align: center;
+        border-left: 1px solid #edf2f7;
+    }
+
+    .qr-code-square {
+        width: 95px;
+        height: 95px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 3px;
+        background: #ffffff;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .qr-code-square img {
+        width: 87px;
+        height: 87px;
+        object-fit: contain;
+        display: block;
+    }
+
+    .qr-placeholder-svg {
+        width: 85px;
+        height: 85px;
+    }
+
+    .meta-data-cell {
+        padding: 6px 14px !important;
+    }
+
+    .meta-grid {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .meta-grid td {
+        padding: 3px 6px;
+        font-size: 11px;
+        border: none;
+    }
+
+    .meta-label {
+        color: #4a5568;
+        font-weight: 600;
+        width: 95px;
+        white-space: nowrap;
+    }
+
+    .meta-colon {
+        width: 10px;
+        color: #718096;
+        text-align: center;
+    }
+
+    .meta-val {
+        color: #1a202c;
+        font-weight: 700;
+    }
+
+    /* =======================================================
+       3-BOX STRIP (Customer, Vehicle, Invoice Info)
+    ======================================================= */
+    .strip-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 6px 0;
+        margin-bottom: 8px;
+    }
+
+    .strip-card {
+        vertical-align: top;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 7px;
+        overflow: hidden;
+        padding: 0;
+    }
+
+    .strip-header {
+        background: #1b2a4a;
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .strip-body {
+        padding: 5px 8px;
+        font-size: 10.5px;
+        background: #ffffff;
+    }
+
+    .strip-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 2px 0;
+    }
+
+    .strip-lbl {
+        color: #4a5568;
+        font-weight: 600;
+    }
+
+    .strip-data {
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    /* =======================================================
+       MAIN DATA TABLES
+    ======================================================= */
+    .data-table-container {
+        margin-bottom: 8px;
+        border: 1px solid #cbd5e1;
+        border-radius: 7px;
+        overflow: hidden;
+    }
+
+    .table-title-bar {
+        background: #1b2a4a;
+        color: #ffffff;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10.5px;
+    }
+
+    .invoice-table th {
+        background: #f1f5f9;
+        color: #1e293b;
+        font-weight: 700;
+        border: 1px solid #cbd5e1;
+        padding: 5px 6px;
+        text-align: center;
+    }
+
+    .invoice-table td {
+        border: 1px solid #e2e8f0;
+        padding: 5px 6px;
+        color: #1e293b;
+    }
+
+    .invoice-table tbody tr:nth-child(even) {
+        background-color: #fafbfc;
+    }
+
+    /* =======================================================
+       BOTTOM SECTIONS (Split Columns)
+    ======================================================= */
+    .bottom-layout-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 6px 0;
+        margin-bottom: 6px;
+    }
+
+    .bottom-col {
+        vertical-align: top;
+        padding: 0;
+    }
+
+    .section-box {
+        border: 1px solid #cbd5e1;
+        border-radius: 7px;
+        overflow: hidden;
+        background: #ffffff;
+        margin-bottom: 6px;
+    }
+
+    .section-box-header {
+        background: #1b2a4a;
+        color: #ffffff;
+        padding: 4px 8px;
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .section-box-body {
+        padding: 6px 8px;
+    }
+
+    /* Terms List */
+    .terms-list {
+        margin: 0;
+        padding-right: 18px;
+        font-size: 9.8px;
+        color: #334155;
+        line-height: 1.5;
+    }
+
+    .terms-list li {
+        margin-bottom: 3px;
+        text-align: justify;
+    }
+
+    /* Care instructions numbered circles */
+    .care-instructions-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .care-instruction-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        margin-bottom: 4px;
+        font-size: 9.8px;
+        color: #334155;
+    }
+
+    .circle-num {
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        color: #1b2a4a;
+        font-weight: 700;
+        font-size: 9.5px;
+        width: 17px;
+        height: 17px;
+        min-width: 17px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 1px;
+    }
+
+    /* Totals Box */
+    .totals-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+    }
+
+    .totals-table td {
+        padding: 5px 8px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .totals-label {
+        font-weight: 600;
+        color: #334155;
+        text-align: right;
+    }
+
+    .totals-value {
+        font-weight: 700;
+        color: #0f172a;
+        text-align: left;
+        direction: ltr;
+        white-space: nowrap;
+    }
+
+    .grand-total-row {
+        background: #f8fafc;
+        border-top: 2px solid #cbd5e1;
+        border-bottom: 2px solid #cbd5e1;
+    }
+
+    .grand-total-row td {
+        font-size: 12px;
+        font-weight: 800;
+        color: #1b2a4a;
+    }
+
+    .paid-row {
+        background-color: #f0fdf4;
+    }
+
+    .paid-row td {
+        color: #15803d;
+        font-weight: 700;
+    }
+
+    .outstanding-row {
+        background-color: #fef2f2;
+    }
+
+    .outstanding-row td {
+        color: #b91c1c;
+        font-weight: 800;
+    }
+
+    /* Warranty Sub-table */
+    .warranty-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9.8px;
+    }
+
+    .warranty-table th {
+        background: #f1f5f9;
+        color: #1e293b;
+        font-weight: 700;
+        border: 1px solid #cbd5e1;
+        padding: 4px 6px;
+        text-align: center;
+    }
+
+    .warranty-table td {
+        border: 1px solid #cbd5e1;
+        padding: 4px 6px;
+        text-align: center;
+        color: #334155;
+    }
+
+    /* Notes Dotted Lines */
+    .dotted-notes-area {
+        min-height: 40px;
+        background-image: linear-gradient(to bottom, transparent 17px, #cbd5e1 18px);
+        background-size: 100% 18px;
+        line-height: 18px;
+        padding: 0 4px;
+        font-size: 10px;
+        color: #475569;
+    }
+
+    /* Maintenance Table Signature Cell */
+    .sign-cell {
+        min-width: 65px;
+        height: 24px;
+    }
+
+    /* =======================================================
+       FOOTER SECTION (Slogan, Car Vector, MUBTKIR ERP)
+    ======================================================= */
+    .footer-container {
+        width: 100%;
+        margin-top: 10px;
+        padding-top: 6px;
+        border-top: 1.5px solid #e2e8f0;
+    }
+
+    .footer-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .footer-table td {
+        vertical-align: middle;
+        padding: 0;
+    }
+
+    .footer-slogan-cell {
+        width: 40%;
+        text-align: right;
+        font-size: 10.5px;
+        font-weight: 700;
+        color: #334155;
+        white-space: nowrap;
+    }
+
+    .footer-car-cell {
+        width: 35%;
+        text-align: center;
+        padding: 0 10px !important;
+    }
+
+    .footer-brand-cell {
+        width: 25%;
+        text-align: left;
+        direction: ltr;
+        font-size: 9.5px;
+        font-weight: 700;
+        color: #8892a0;
+        letter-spacing: 0.8px;
+        white-space: nowrap;
+    }
+
+    .footer-brand-cell span {
+        color: #1b2a4a;
+        font-weight: 800;
+    }
+</style>
+</head>
+<body>
+
+<!-- ####################################################################### -->
+<!-- PAGE 1: FATURA MABEEAT DAREEBEYA (TAX SALES INVOICE)                   -->
+<!-- ####################################################################### -->
+<div class="print-page">
+
+    <!-- Top Header -->
+    <table class="header-table">
+        <tr>
+            <!-- Left: Car Banner -->
+            <td class="header-car-cell">
+                <div class="header-car-banner">
+                    <!-- Clean Vector Luxury Car Silhouette -->
+                    <svg viewBox="0 0 280 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 78 C25 78 45 77 65 72 C80 68 115 54 135 48 C155 42 185 41 205 45 C220 48 245 58 260 67 C270 73 275 76 275 78 C275 80 268 83 252 84 C236 85 200 85 140 85 C80 85 30 84 12 80 Z" fill="#ffffff" fill-opacity="0.12"/>
+                        <path d="M22 75 C38 73 55 69 75 62 C95 55 125 43 148 40 C170 37 195 38 215 42 C230 45 250 54 262 62 C265 64 268 67 268 70 C268 72 260 74 245 75 C230 76 195 77 145 77 C95 77 45 77 22 75 Z" fill="#ffffff" fill-opacity="0.2"/>
+                        <path d="M40 70 Q90 58 130 42 Q170 38 200 42 Q235 47 255 60 C258 62 258 64 255 65 C250 67 220 69 170 69 C120 69 65 69 40 70 Z" fill="#ffffff" fill-opacity="0.85"/>
+                        <!-- Headlight Glow Accent -->
+                        <path d="M242 58 Q258 62 265 65 Q255 67 240 64 Z" fill="#60a5fa"/>
+                        <ellipse cx="68" cy="74" rx="14" ry="14" fill="#0f172a" stroke="#cbd5e1" stroke-width="2"/>
+                        <circle cx="68" cy="74" r="6" fill="#94a3b8"/>
+                        <ellipse cx="225" cy="74" rx="14" ry="14" fill="#0f172a" stroke="#cbd5e1" stroke-width="2"/>
+                        <circle cx="225" cy="74" r="6" fill="#94a3b8"/>
+                    </svg>
+                </div>
+            </td>
+
+            <!-- Center: Title -->
+            <td class="header-title-cell">
+                <h1 class="header-main-title {% if doc.docstatus == 0 %}is-draft{% endif %}">
+                    {% if doc.docstatus == 0 %}
+                        مسودة فاتورة مبيعات ضريبية
+                    {% else %}
+                        فاتورة مبيعات ضريبية
+                    {% endif %}
+                </h1>
+                <p class="header-sub-title">خدمات حماية الطلاء (PPF) والعزل الحراري للسيارات</p>
+            </td>
+
+            <!-- Right: Company Info -->
+            <td class="header-company-cell">
+                <div class="company-logo-container">
+                    {% if company_logo %}
+                        <img src="{{ company_logo }}" class="company-logo-img" alt="{{ doc.company }}">
+                    {% else %}
+                        <!-- Stylish Placeholder Logo -->
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                                <path d="M20 4L36 34H4L20 4Z" stroke="#1b2a4a" stroke-width="3" fill="#e2e8f0" fill-opacity="0.5"/>
+                                <path d="M20 14L30 32H10L20 14Z" fill="#1b2a4a"/>
+                            </svg>
+                            <span style="font-size: 11px; font-weight: 800; color: #1b2a4a;">شعار المؤسسة<br><small style="font-size: 8px; color: #64748b;">LOGO</small></span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="company-name">{{ doc.company }}</div>
+                <div class="company-meta-item">سجل تجاري رقم: <b>{{ company_cr }}</b></div>
+                <div class="company-meta-item">الرقم الضريبي: <b>{{ company_tax_id }}</b></div>
+                <div class="company-meta-item">هاتف: <b>{{ company_phone }}</b></div>
+                <div class="company-meta-item">{{ company_city }}</div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- QR Code & Invoice Metadata Strip -->
+    <table class="meta-qr-table">
+        <tr>
+            <!-- Right: Square QR Code -->
+            <td class="qr-box-cell">
+                <div class="qr-code-square">
+                    {% if qr_image_src %}
+                        <img src="{{ qr_image_src }}" alt="ZATCA QR Code">
+                    {% else %}
+                        <!-- Crisp Vector QR Placeholder -->
+                        <svg class="qr-placeholder-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="100" height="100" fill="#f8fafc" rx="4"/>
+                            <rect x="8" y="8" width="28" height="28" rx="3" stroke="#1b2a4a" stroke-width="4" fill="none"/>
+                            <rect x="15" y="15" width="14" height="14" fill="#1b2a4a"/>
+                            <rect x="64" y="8" width="28" height="28" rx="3" stroke="#1b2a4a" stroke-width="4" fill="none"/>
+                            <rect x="71" y="15" width="14" height="14" fill="#1b2a4a"/>
+                            <rect x="8" y="64" width="28" height="28" rx="3" stroke="#1b2a4a" stroke-width="4" fill="none"/>
+                            <rect x="15" y="71" width="14" height="14" fill="#1b2a4a"/>
+                            <rect x="42" y="14" width="6" height="6" fill="#1b2a4a"/>
+                            <rect x="52" y="14" width="6" height="6" fill="#1b2a4a"/>
+                            <rect x="42" y="24" width="6" height="6" fill="#1b2a4a"/>
+                            <rect x="42" y="42" width="16" height="16" fill="#1b2a4a"/>
+                            <rect x="64" y="42" width="6" height="6" fill="#1b2a4a"/>
+                            <rect x="76" y="42" width="16" height="6" fill="#1b2a4a"/>
+                            <rect x="64" y="54" width="10" height="6" fill="#1b2a4a"/>
+                            <rect x="80" y="54" width="12" height="10" fill="#1b2a4a"/>
+                            <rect x="14" y="44" width="16" height="6" fill="#1b2a4a"/>
+                            <rect x="42" y="64" width="8" height="18" fill="#1b2a4a"/>
+                            <rect x="56" y="64" width="6" height="6" fill="#1b2a4a"/>
+                            <rect x="70" y="70" width="22" height="6" fill="#1b2a4a"/>
+                            <rect x="64" y="82" width="28" height="10" fill="#1b2a4a"/>
+                        </svg>
+                    {% endif %}
+                </div>
+            </td>
+
+            <!-- Left: Metadata -->
+            <td class="meta-data-cell">
+                <table class="meta-grid">
+                    <tr>
+                        <td class="meta-label">رقم الفاتورة</td>
+                        <td class="meta-colon">:</td>
+                        <td class="meta-val">{{ doc.name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="meta-label">تاريخ الفاتورة</td>
+                        <td class="meta-colon">:</td>
+                        <td class="meta-val">{{ frappe.format_date(doc.posting_date) or doc.posting_date }}</td>
+                    </tr>
+                    <tr>
+                        <td class="meta-label">مندوب المبيعات</td>
+                        <td class="meta-colon">:</td>
+                        <td class="meta-val">{{ sales_person_name or "—" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="meta-label">طريقة الدفع</td>
+                        <td class="meta-colon">:</td>
+                        <td class="meta-val">{{ pay_method }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <!-- 3-Box Strip: Customer Info, Vehicle Info, Invoice/Page Info -->
+    <table class="strip-table">
+        <tr>
+            <!-- Box 1: Customer Details -->
+            <td class="strip-card" style="width: 38%;">
+                <div class="strip-header">
+                    <span>👤</span>
+                    <span>بيانات العميل</span>
+                </div>
+                <div class="strip-body">
+                    <div class="strip-row">
+                        <span class="strip-lbl">اسم العميل:</span>
+                        <span class="strip-data">{{ doc.customer_name or doc.customer }}</span>
+                    </div>
+                    <div class="strip-row">
+                        <span class="strip-lbl">رقم الجوال:</span>
+                        <span class="strip-data" style="direction: ltr;">{{ cust_mobile }}</span>
+                    </div>
+                </div>
+            </td>
+
+            <!-- Box 2: Vehicle Details -->
+            <td class="strip-card" style="width: 38%;">
+                <div class="strip-header">
+                    <span>🚗</span>
+                    <span>بيانات المركبة</span>
+                </div>
+                <div class="strip-body">
+                    <div class="strip-row">
+                        <span class="strip-lbl">نوع السيارة:</span>
+                        <span class="strip-data">{{ doc.custom_vehicle_make or "—" }}</span>
+                    </div>
+                    <div class="strip-row">
+                        <span class="strip-lbl">الموديل:</span>
+                        <span class="strip-data">{{ doc.custom_vehicle_model or "—" }}</span>
+                    </div>
+                    <div class="strip-row">
+                        <span class="strip-lbl">رقم اللوحة:</span>
+                        <span class="strip-data">{{ doc.custom_plate_number or "—" }}</span>
+                    </div>
+                </div>
+            </td>
+
+            <!-- Box 3: Invoice & Page Indicator -->
+            <td class="strip-card" style="width: 24%; text-align: center;">
+                <div class="strip-header">
+                    <span>📄</span>
+                    <span>رقم الفاتورة</span>
+                </div>
+                <div class="strip-body" style="text-align: center; padding: 10px 4px;">
+                    <div style="font-size: 12px; font-weight: 800; color: #1b2a4a; margin-bottom: 4px;">{{ doc.name }}</div>
+                    <div style="font-size: 10.5px; font-weight: 600; color: #64748b;">صفحة 1 من 2</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Main Table: Sales Invoice Items -->
+    <div class="data-table-container">
+        <div class="table-title-bar">
+            <span>📑</span>
+            <span>فاتورة المبيعات</span>
+        </div>
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th style="width: 35px;">م</th>
+                    <th style="text-align: right;">البيان</th>
+                    <th style="width: 65px;">الكمية</th>
+                    <th style="width: 75px;">الوحدة</th>
+                    <th style="width: 100px;">السعر (ر.س)</th>
+                    <th style="width: 110px;">الإجمالي (ر.س)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in doc.items %}
+                <tr>
+                    <td style="text-align: center; font-weight: 700;">{{ loop.index }}</td>
+                    <td style="font-weight: 600;">
+                        {{ item.item_name }}
+                        {% if item.description and item.description != item.item_name %}
+                            <div style="font-size: 9px; color: #64748b; font-weight: normal;">{{ item.description }}</div>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center; font-weight: 700;">{{ item.qty | int if item.qty == item.qty | int else item.qty }}</td>
+                    <td style="text-align: center;">{{ item.uom or "خدمة" }}</td>
+                    <td style="text-align: center; font-weight: 600; direction: ltr;">{{ frappe.format(item.rate, {'fieldtype': 'Currency', 'currency': doc.currency}) }}</td>
+                    <td style="text-align: center; font-weight: 700; direction: ltr;">{{ frappe.format(item.amount, {'fieldtype': 'Currency', 'currency': doc.currency}) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bottom Section of Page 1: Terms on Right & Totals on Left -->
+    <table class="bottom-layout-table">
+        <tr>
+            <!-- Right: General & Fixed Terms -->
+            <td class="bottom-col" style="width: 55%;">
+                <div class="section-box">
+                    <div class="section-box-header">
+                        <span>📜</span>
+                        <span>الشروط والأحكام</span>
+                    </div>
+                    <div class="section-box-body">
+                        <ol class="terms-list">
+                            <li>تخضع هذه الفاتورة لشروط وأحكام المؤسسة المعتمدة.</li>
+                            <li>الضمان على منتجات وخدمات الحماية والعزل الحراري حسب سياسة الضمان المعتمدة.</li>
+                            <li>لا يشمل الضمان الأضرار الناتجة عن سوء الاستخدام أو الحوادث أو الإهمال.</li>
+                            <li>يلتزم العميل بالمحافظة على السيارة بعد التركيب وفق الإرشادات والتعليمات المقدمة.</li>
+                            <li>في حال إلغاء الخدمة بعد البدء في التنفيذ، قد يتم تطبيق رسوم إضافية لتغطية التكاليف.</li>
+                            <li>جميع الأسعار بالريال السعودي وتشمل ضريبة القيمة المضافة بنسبة 15%.</li>
+                            <li>يعد سداد قيمة الفاتورة موافقة صريحة من العميل على جميع الشروط والأحكام.</li>
+                        </ol>
+                    </div>
+                </div>
+            </td>
+
+            <!-- Left: Totals Summary -->
+            <td class="bottom-col" style="width: 45%;">
+                <div class="section-box">
+                    <table class="totals-table">
+                        <tr>
+                            <td class="totals-label">المجموع الفرعي (قبل الضريبة)</td>
+                            <td class="totals-value">{{ frappe.format(doc.net_total, {'fieldtype': 'Currency', 'currency': doc.currency}) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="totals-label">ضريبة القيمة المضافة (15%)</td>
+                            <td class="totals-value">{{ frappe.format(doc.total_taxes_and_charges, {'fieldtype': 'Currency', 'currency': doc.currency}) }}</td>
+                        </tr>
+                        <tr class="grand-total-row">
+                            <td class="totals-label">الإجمالي شامل الضريبة</td>
+                            <td class="totals-value">{{ frappe.format(doc.grand_total, {'fieldtype': 'Currency', 'currency': doc.currency}) }}</td>
+                        </tr>
+                        <tr class="paid-row">
+                            <td class="totals-label">المبلغ المدفوع</td>
+                            <td class="totals-value">{{ frappe.format(doc.paid_amount or 0, {'fieldtype': 'Currency', 'currency': doc.currency}) }}</td>
+                        </tr>
+                        <tr class="outstanding-row">
+                            <td class="totals-label">المبلغ المتبقي</td>
+                            <td class="totals-value">{{ frappe.format(doc.outstanding_amount or 0, {'fieldtype': 'Currency', 'currency': doc.currency}) }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Footer of Page 1 -->
+    <div class="footer-container">
+        <table class="footer-table">
+            <tr>
+                <td class="footer-slogan-cell">
+                    عناية تحمي ما يهمك .. لرحلات أكثر أماناً
+                </td>
+                <td class="footer-car-cell">
+                    <!-- Elegant Linear Car Contour Silhouette -->
+                    <svg width="180" height="22" viewBox="0 0 240 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 24 C40 24 60 20 85 14 C110 8 140 7 165 11 C185 14 205 21 230 24" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M55 20 C70 17 90 11 115 8 C140 5 160 6 180 11 C195 15 210 20 220 22" stroke="#1b2a4a" stroke-width="1.8" stroke-linecap="round"/>
+                        <circle cx="70" cy="22" r="3.5" fill="#1b2a4a"/>
+                        <circle cx="195" cy="22" r="3.5" fill="#1b2a4a"/>
+                    </svg>
+                </td>
+                <td class="footer-brand-cell">
+                    Powered by <span>MUBTKIR ERP</span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+
+<!-- ####################################################################### -->
+<!-- PAGE 2: JADWAL AL-SEYANAH WAL-MUTABAAH (MAINTENANCE SCHEDULE)           -->
+<!-- ####################################################################### -->
+<div class="print-page page-break">
+
+    <!-- Top Header Page 2 -->
+    <table class="header-table">
+        <tr>
+            <!-- Left: Car Banner -->
+            <td class="header-car-cell">
+                <div class="header-car-banner">
+                    <svg viewBox="0 0 280 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 78 C25 78 45 77 65 72 C80 68 115 54 135 48 C155 42 185 41 205 45 C220 48 245 58 260 67 C270 73 275 76 275 78 C275 80 268 83 252 84 C236 85 200 85 140 85 C80 85 30 84 12 80 Z" fill="#ffffff" fill-opacity="0.12"/>
+                        <path d="M22 75 C38 73 55 69 75 62 C95 55 125 43 148 40 C170 37 195 38 215 42 C230 45 250 54 262 62 C265 64 268 67 268 70 C268 72 260 74 245 75 C230 76 195 77 145 77 C95 77 45 77 22 75 Z" fill="#ffffff" fill-opacity="0.2"/>
+                        <path d="M40 70 Q90 58 130 42 Q170 38 200 42 Q235 47 255 60 C258 62 258 64 255 65 C250 67 220 69 170 69 C120 69 65 69 40 70 Z" fill="#ffffff" fill-opacity="0.85"/>
+                        <path d="M242 58 Q258 62 265 65 Q255 67 240 64 Z" fill="#60a5fa"/>
+                        <ellipse cx="68" cy="74" rx="14" ry="14" fill="#0f172a" stroke="#cbd5e1" stroke-width="2"/>
+                        <circle cx="68" cy="74" r="6" fill="#94a3b8"/>
+                        <ellipse cx="225" cy="74" rx="14" ry="14" fill="#0f172a" stroke="#cbd5e1" stroke-width="2"/>
+                        <circle cx="225" cy="74" r="6" fill="#94a3b8"/>
+                    </svg>
+                </div>
+            </td>
+
+            <!-- Center: Title -->
+            <td class="header-title-cell">
+                <h1 class="header-main-title">جدول الصيانة والمتابعة</h1>
+                <p class="header-sub-title">متابعة الصيانة بعد تركيب حماية الطلاء (PPF) والعزل الحراري للسيارات</p>
+            </td>
+
+            <!-- Right: Company Info -->
+            <td class="header-company-cell">
+                <div class="company-logo-container">
+                    {% if company_logo %}
+                        <img src="{{ company_logo }}" class="company-logo-img" alt="{{ doc.company }}">
+                    {% else %}
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                                <path d="M20 4L36 34H4L20 4Z" stroke="#1b2a4a" stroke-width="3" fill="#e2e8f0" fill-opacity="0.5"/>
+                                <path d="M20 14L30 32H10L20 14Z" fill="#1b2a4a"/>
+                            </svg>
+                            <span style="font-size: 11px; font-weight: 800; color: #1b2a4a;">شعار المؤسسة<br><small style="font-size: 8px; color: #64748b;">LOGO</small></span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="company-name">{{ doc.company }}</div>
+                <div class="company-meta-item">سجل تجاري رقم: <b>{{ company_cr }}</b></div>
+                <div class="company-meta-item">الرقم الضريبي: <b>{{ company_tax_id }}</b></div>
+                <div class="company-meta-item">هاتف: <b>{{ company_phone }}</b></div>
+                <div class="company-meta-item">{{ company_city }}</div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- QR Code & Invoice Metadata Strip -->
+    <table class="meta-qr-table">
+        <tr>
+            <!-- Right: Square QR Code -->
+            <td class="qr-box-cell">
+                <div class="qr-code-square">
+                    {% if qr_image_src %}
+                        <img src="{{ qr_image_src }}" alt="ZATCA QR Code">
+                    {% else %}
+                        <svg class="qr-placeholder-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="100" height="100" fill="#f8fafc" rx="4"/>
+                            <rect x="8" y="8" width="28" height="28" rx="3" stroke="#1b2a4a" stroke-width="4" fill="none"/>
+                            <rect x="15" y="15" width="14" height="14" fill="#1b2a4a"/>
+                            <rect x="64" y="8" width="28" height="28" rx="3" stroke="#1b2a4a" stroke-width="4" fill="none"/>
+                            <rect x="71" y="15" width="14" height="14" fill="#1b2a4a"/>
+                            <rect x="8" y="64" width="28" height="28" rx="3" stroke="#1b2a4a" stroke-width="4" fill="none"/>
+                            <rect x="15" y="71" width="14" height="14" fill="#1b2a4a"/>
+                            <rect x="42" y="14" width="6" height="6" fill="#1b2a4a"/>
+                            <rect x="52" y="14" width="6" height="6" fill="#1b2a4a"/>
+                            <rect x="42" y="24" width="6" height="6" fill="#1b2a4a"/>
+                            <rect x="42" y="42" width="16" height="16" fill="#1b2a4a"/>
+                            <rect x="64" y="42" width="6" height="6" fill="#1b2a4a"/>
+                            <rect x="76" y="42" width="16" height="6" fill="#1b2a4a"/>
+                            <rect x="64" y="54" width="10" height="6" fill="#1b2a4a"/>
+                            <rect x="80" y="54" width="12" height="10" fill="#1b2a4a"/>
+                            <rect x="14" y="44" width="16" height="6" fill="#1b2a4a"/>
+                            <rect x="42" y="64" width="8" height="18" fill="#1b2a4a"/>
+                            <rect x="56" y="64" width="6" height="6" fill="#1b2a4a"/>
+                            <rect x="70" y="70" width="22" height="6" fill="#1b2a4a"/>
+                            <rect x="64" y="82" width="28" height="10" fill="#1b2a4a"/>
+                        </svg>
+                    {% endif %}
+                </div>
+            </td>
+
+            <!-- Left: Metadata -->
+            <td class="meta-data-cell">
+                <table class="meta-grid">
+                    <tr>
+                        <td class="meta-label">رقم الفاتورة</td>
+                        <td class="meta-colon">:</td>
+                        <td class="meta-val">{{ doc.name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="meta-label">تاريخ الفاتورة</td>
+                        <td class="meta-colon">:</td>
+                        <td class="meta-val">{{ frappe.format_date(doc.posting_date) or doc.posting_date }}</td>
+                    </tr>
+                    <tr>
+                        <td class="meta-label">مندوب المبيعات</td>
+                        <td class="meta-colon">:</td>
+                        <td class="meta-val">{{ sales_person_name or "—" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="meta-label">طريقة الدفع</td>
+                        <td class="meta-colon">:</td>
+                        <td class="meta-val">{{ pay_method }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <!-- 3-Box Strip (Page 2 of 2) -->
+    <table class="strip-table">
+        <tr>
+            <!-- Box 1: Customer Details -->
+            <td class="strip-card" style="width: 38%;">
+                <div class="strip-header">
+                    <span>👤</span>
+                    <span>بيانات العميل</span>
+                </div>
+                <div class="strip-body">
+                    <div class="strip-row">
+                        <span class="strip-lbl">اسم العميل:</span>
+                        <span class="strip-data">{{ doc.customer_name or doc.customer }}</span>
+                    </div>
+                    <div class="strip-row">
+                        <span class="strip-lbl">رقم الجوال:</span>
+                        <span class="strip-data" style="direction: ltr;">{{ cust_mobile }}</span>
+                    </div>
+                </div>
+            </td>
+
+            <!-- Box 2: Vehicle Details -->
+            <td class="strip-card" style="width: 38%;">
+                <div class="strip-header">
+                    <span>🚗</span>
+                    <span>بيانات المركبة</span>
+                </div>
+                <div class="strip-body">
+                    <div class="strip-row">
+                        <span class="strip-lbl">نوع السيارة:</span>
+                        <span class="strip-data">{{ doc.custom_vehicle_make or "—" }}</span>
+                    </div>
+                    <div class="strip-row">
+                        <span class="strip-lbl">الموديل:</span>
+                        <span class="strip-data">{{ doc.custom_vehicle_model or "—" }}</span>
+                    </div>
+                    <div class="strip-row">
+                        <span class="strip-lbl">رقم اللوحة:</span>
+                        <span class="strip-data">{{ doc.custom_plate_number or "—" }}</span>
+                    </div>
+                </div>
+            </td>
+
+            <!-- Box 3: Invoice & Page Indicator -->
+            <td class="strip-card" style="width: 24%; text-align: center;">
+                <div class="strip-header">
+                    <span>📄</span>
+                    <span>رقم الفاتورة</span>
+                </div>
+                <div class="strip-body" style="text-align: center; padding: 10px 4px;">
+                    <div style="font-size: 12px; font-weight: 800; color: #1b2a4a; margin-bottom: 4px;">{{ doc.name }}</div>
+                    <div style="font-size: 10.5px; font-weight: 600; color: #64748b;">صفحة 2 من 2</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Main Table: Maintenance & Follow-up Log (سجل الصيانة والمتابعة) -->
+    <div class="data-table-container">
+        <div class="table-title-bar">
+            <span>📅</span>
+            <span>سجل الصيانة والمتابعة</span>
+        </div>
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th style="width: 30px;">م</th>
+                    <th style="width: 95px;">التاريخ</th>
+                    <th style="width: 80px;">العداد (كم)</th>
+                    <th style="width: 95px;">نوع الزيارة</th>
+                    <th>الأعمال المنفذة</th>
+                    <th style="width: 95px;">الفني المسؤول</th>
+                    <th style="width: 95px;">ملاحظات</th>
+                    <th style="width: 75px;">توقيع العميل</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if doc.custom_maintenance_schedule and doc.custom_maintenance_schedule|length > 0 %}
+                    {% for row in doc.custom_maintenance_schedule %}
+                    <tr>
+                        <td style="text-align: center; font-weight: 700;">{{ row.idx }}</td>
+                        <td style="text-align: center; font-weight: 600;">{{ frappe.format_date(row.actual_visit_date or row.visit_date) or "" }}</td>
+                        <td style="text-align: center;">{{ row.odometer_km or "" }}</td>
+                        <td style="text-align: center; font-weight: 600;">{{ row.visit_type or "صيانة دورية" }}</td>
+                        <td style="font-size: 9.5px;">{{ row.work_done or "" }}</td>
+                        <td style="text-align: center;">{{ row.technician or "" }}</td>
+                        <td style="font-size: 9.5px;">{{ row.notes or "" }}</td>
+                        <td class="sign-cell"></td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    {# Fallback: 8 clean rows if no schedule entered #}
+                    {% for i in range(1, 9) %}
+                    <tr>
+                        <td style="text-align: center; font-weight: 700;">{{ i }}</td>
+                        <td></td>
+                        <td></td>
+                        <td style="text-align: center; color: #94a3b8;">صيانة دورية</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="sign-cell"></td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bottom Section of Page 2: Care Instructions on Left, Warranty & Notes on Right -->
+    <table class="bottom-layout-table">
+        <tr>
+            <!-- Left Column: Care & Maintenance Instructions (reads from doc.terms or defaults) -->
+            <td class="bottom-col" style="width: 50%;">
+                <div class="section-box" style="height: 100%;">
+                    <div class="section-box-header">
+                        <span>⚙️</span>
+                        <span>تعليمات العناية والصيانة</span>
+                    </div>
+                    <div class="section-box-body">
+                        {% if doc.terms %}
+                            <div style="font-size: 9.8px; color: #334155; line-height: 1.55;">
+                                {{ doc.terms | safe }}
+                            </div>
+                        {% else %}
+                            <ul class="care-instructions-list">
+                                <li class="care-instruction-item">
+                                    <span class="circle-num">1</span>
+                                    <span>ينصح بعدم غسيل السيارة لمدة 7 أيام بعد تركيب حماية الطلاء (PPF) والعزل الحراري.</span>
+                                </li>
+                                <li class="care-instruction-item">
+                                    <span class="circle-num">2</span>
+                                    <span>استخدام شامبو سيارات معتدل ومواد تنظيف غير كاشطة للحفاظ على لمعان الفيلم.</span>
+                                </li>
+                                <li class="care-instruction-item">
+                                    <span class="circle-num">3</span>
+                                    <span>تجنب استخدام المواد الكيميائية القوية أو المذيبات أو الفرش الخشنة أثناء التنظيف.</span>
+                                </li>
+                                <li class="care-instruction-item">
+                                    <span class="circle-num">4</span>
+                                    <span>يمكن الغسيل اليدوي باستخدام قطعة قماش ناعمة (مايكروفايبر) أو غسيل آلي بفرش ناعمة.</span>
+                                </li>
+                                <li class="care-instruction-item">
+                                    <span class="circle-num">5</span>
+                                    <span>الفحص الدوري لحواف الفيلم والتأكد من عدم وجود رفع أو تلف ناتج عن عوامل خارجية.</span>
+                                </li>
+                                <li class="care-instruction-item">
+                                    <span class="circle-num">6</span>
+                                    <span>في حال ملاحظة أي فقاعات أو تغير في اللون، يرجى التواصل معنا مباشرة لمراجعتها.</span>
+                                </li>
+                                <li class="care-instruction-item">
+                                    <span class="circle-num">7</span>
+                                    <span>تجنب استخدام أجهزة الغسيل بالضغط العالي على الحواف بشكل مباشر وقريب جداً.</span>
+                                </li>
+                                <li class="care-instruction-item">
+                                    <span class="circle-num">8</span>
+                                    <span>الالتزام بمواعيد الصيانة الدورية للحفاظ على جودة الخدمة وسريان الضمان.</span>
+                                </li>
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </td>
+
+            <!-- Right Column: Warranty Details + Additional Notes -->
+            <td class="bottom-col" style="width: 50%;">
+                <!-- Warranty Details Box -->
+                <div class="section-box">
+                    <div class="section-box-header">
+                        <span>🛡️</span>
+                        <span>تفاصيل الضمان</span>
+                    </div>
+                    <div class="section-box-body" style="padding: 0;">
+                        <table class="warranty-table">
+                            <thead>
+                                <tr>
+                                    <th>نوع الخدمة</th>
+                                    <th style="width: 70px;">مدة الضمان</th>
+                                    <th style="width: 75px;">تاريخ البداية</th>
+                                    <th style="width: 75px;">تاريخ الانتهاء</th>
+                                    <th>الشروط المختصرة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if doc.custom_warranty_details and doc.custom_warranty_details|length > 0 %}
+                                    {% for w in doc.custom_warranty_details %}
+                                    <tr>
+                                        <td style="font-weight: 700;">{{ w.service_type }}</td>
+                                        <td>{{ w.warranty_period or "—" }}</td>
+                                        <td>{{ frappe.format_date(w.start_date) if w.start_date else "—" }}</td>
+                                        <td>{{ frappe.format_date(w.end_date) if w.end_date else "—" }}</td>
+                                        <td style="text-align: right; font-size: 8.8px;">{{ w.summary_terms or "—" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    {# Default reference rows matching the design #}
+                                    <tr>
+                                        <td style="font-weight: 700;">حماية الطلاء PPF</td>
+                                        <td>5 سنوات</td>
+                                        <td>{{ frappe.format_date(doc.posting_date) or "—" }}</td>
+                                        <td>—</td>
+                                        <td style="text-align: right; font-size: 8.8px;">يشمل عيوب التصنيع، الاصفرار والتقشير في الظروف العادية.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 700;">العزل الحراري</td>
+                                        <td>7 سنوات</td>
+                                        <td>{{ frappe.format_date(doc.posting_date) or "—" }}</td>
+                                        <td>—</td>
+                                        <td style="text-align: right; font-size: 8.8px;">يشمل تغير اللون، الفقاعات وفصل الفيلم في الظروف العادية.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Additional Notes Box -->
+                <div class="section-box">
+                    <div class="section-box-header">
+                        <span>📝</span>
+                        <span>ملاحظات إضافية</span>
+                    </div>
+                    <div class="section-box-body">
+                        <div class="dotted-notes-area">
+                            {{ doc.remarks or "" }}
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Footer of Page 2 -->
+    <div class="footer-container">
+        <table class="footer-table">
+            <tr>
+                <td class="footer-slogan-cell">
+                    عناية تحمي ما يهمك .. لرحلات أكثر أماناً
+                </td>
+                <td class="footer-car-cell">
+                    <svg width="180" height="22" viewBox="0 0 240 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 24 C40 24 60 20 85 14 C110 8 140 7 165 11 C185 14 205 21 230 24" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M55 20 C70 17 90 11 115 8 C140 5 160 6 180 11 C195 15 210 20 220 22" stroke="#1b2a4a" stroke-width="1.8" stroke-linecap="round"/>
+                        <circle cx="70" cy="22" r="3.5" fill="#1b2a4a"/>
+                        <circle cx="195" cy="22" r="3.5" fill="#1b2a4a"/>
+                    </svg>
+                </td>
+                <td class="footer-brand-cell">
+                    Powered by <span>MUBTKIR ERP</span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>

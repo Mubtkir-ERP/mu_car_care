@@ -73,3 +73,14 @@ Posting Time,وقت القيد
 Mobile No,رقم الجوال
 Status,الحالة
 Naming Series,تسلسل الترقيم
+"Vehicle Warranty Item","بند تفاصيل الضمان"
+"Warranty Details","تفاصيل الضمان"
+"Service Type","نوع الخدمة"
+"Warranty Period","مدة الضمان"
+"Start Date","تاريخ البداية"
+"End Date","تاريخ الانتهاء"
+"Summary Terms","الشروط المختصرة"
+"Care & Maintenance Instructions / Terms","تعليمات العناية والصيانة والشروط"
+"Visit Type","نوع الزيارة"
+"Work Executed","الأعمال المنفذة"
+"Car Care Tax Invoice","فاتورة مبيعات ضريبية وجدول الصيانة"

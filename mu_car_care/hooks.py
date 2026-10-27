@@ -22,7 +22,15 @@ fixtures = [
 	{
 		"dt": "Custom Field",
 		"filters": [["module", "=", "Mu Car Care"]],
-	}
+	},
+	{
+		"dt": "Property Setter",
+		"filters": [["module", "=", "Mu Car Care"]],
+	},
+	{
+		"dt": "Print Format",
+		"filters": [["name", "=", "Car Care Tax Invoice"]],
+	},
 ]
 
 # Mubtkir ERP Master Guidelines (Rule 5): Auto-sync Workspaces and Desk Cache

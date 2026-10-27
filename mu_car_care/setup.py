@@ -16,7 +16,7 @@ def after_migrate():
 		frappe.cache.delete_key("bootinfo")
 
 		# Clear cache for key transaction DocTypes
-		for dt in ["Sales Invoice", "Quotation", "Sales Order", "Vehicle Reception"]:
+		for dt in ["Sales Invoice", "Quotation", "Sales Order", "Vehicle Reception", "Print Format"]:
 			frappe.clear_cache(doctype=dt)
 
 		# Clear site cache

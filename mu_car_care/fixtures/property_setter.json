@@ -1,0 +1,101 @@
+[
+ {
+  "doctype": "Property Setter",
+  "name": "Sales Invoice-tc_name-insert_after",
+  "doc_type": "Sales Invoice",
+  "doctype_or_field": "DocField",
+  "field_name": "tc_name",
+  "property": "insert_after",
+  "property_type": "Data",
+  "value": "custom_terms_section",
+  "module": "Mu Car Care"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Sales Invoice-terms-insert_after",
+  "doc_type": "Sales Invoice",
+  "doctype_or_field": "DocField",
+  "field_name": "terms",
+  "property": "insert_after",
+  "property_type": "Data",
+  "value": "tc_name",
+  "module": "Mu Car Care"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Sales Invoice-terms_section_break-hidden",
+  "doc_type": "Sales Invoice",
+  "doctype_or_field": "DocField",
+  "field_name": "terms_section_break",
+  "property": "hidden",
+  "property_type": "Check",
+  "value": "1",
+  "module": "Mu Car Care"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Quotation-tc_name-insert_after",
+  "doc_type": "Quotation",
+  "doctype_or_field": "DocField",
+  "field_name": "tc_name",
+  "property": "insert_after",
+  "property_type": "Data",
+  "value": "custom_terms_section",
+  "module": "Mu Car Care"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Quotation-terms-insert_after",
+  "doc_type": "Quotation",
+  "doctype_or_field": "DocField",
+  "field_name": "terms",
+  "property": "insert_after",
+  "property_type": "Data",
+  "value": "tc_name",
+  "module": "Mu Car Care"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Quotation-terms_section_break-hidden",
+  "doc_type": "Quotation",
+  "doctype_or_field": "DocField",
+  "field_name": "terms_section_break",
+  "property": "hidden",
+  "property_type": "Check",
+  "value": "1",
+  "module": "Mu Car Care"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Sales Order-tc_name-insert_after",
+  "doc_type": "Sales Order",
+  "doctype_or_field": "DocField",
+  "field_name": "tc_name",
+  "property": "insert_after",
+  "property_type": "Data",
+  "value": "custom_terms_section",
+  "module": "Mu Car Care"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Sales Order-terms-insert_after",
+  "doc_type": "Sales Order",
+  "doctype_or_field": "DocField",
+  "field_name": "terms",
+  "property": "insert_after",
+  "property_type": "Data",
+  "value": "tc_name",
+  "module": "Mu Car Care"
+ },
+ {
+  "doctype": "Property Setter",
+  "name": "Sales Order-terms_section_break-hidden",
+  "doc_type": "Sales Order",
+  "doctype_or_field": "DocField",
+  "field_name": "terms_section_break",
+  "property": "hidden",
+  "property_type": "Check",
+  "value": "1",
+  "module": "Mu Car Care"
+ }
+]
