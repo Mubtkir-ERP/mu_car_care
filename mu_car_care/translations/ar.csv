@@ -1,86 +1,92 @@
-Vehicle Reception,استلام وفحص سيارة
-Vehicle Information,معلومات السيارة
+1/2,نصف
+1/4,ربع
+3/4,ثلاثة أرباع
+Actual Visit Date,تاريخ الزيارة الفعلي
+All scheduled maintenance visits have been completed or none are scheduled.,تم استكمال كافة زيارات الصيانة المجدولة أو لا توجد زيارات مجدولة.
+Annual,سنوي
+Cancelled,ملغاة
+Car Care Tax Invoice,فاتورة مبيعات ضريبية وجدول الصيانة
+Care & Maintenance Instructions / Terms,تعليمات العناية والصيانة والشروط
+Chassis No (VIN),رقم الهيكل (VIN)
+Completed,تمت الصيانة
+Confirm Visit Completed,تأكيد إتمام الزيارة
+Create Quotation,إنشاء عرض سعر
+Create Sales Invoice,إنشاء فاتورة مبيعات
+Current Odometer (KM),قراءة العداد الحالية (كم)
+Customer Name,اسم العميل
+Deliver Vehicle,تسليم السيارة للعميل
+Delivered,تم التسليم
+Distribution Method,طريقة التوزيع
+Draft,مسودة
+Duration (Months),المدة (بالأشهر)
+Duration (Years),مدة الضمان بالسنة
+Empty,فارغ
+Enable Maintenance Schedule,تفعيل جدول الصيانة
+End Date,تاريخ الانتهاء
+Fuel Level,مستوى الوقود
+Full,ممتلئ
+General Notes,ملاحظات عامة
+Generate Schedule,توليد الجدول
+Generated {0} maintenance visits.,تم توليد {0} زيارة صيانة بنجاح.
+Generating maintenance schedule...,جاري توليد جدول الصيانة...
+In Progress,قيد التنفيذ
+Inspection & Service Notes,ملاحظات الفحص والخدمة
+Inspection & Vehicle Status,الفحص وحالة السيارة
+Maintenance Schedule,جدول الصيانة
+Maintenance Start Date,بداية الصيانة
+Maintenance visit #{0} updated to Completed successfully.,تم تحديث موعد الصيانة رقم {0} إلى تمت الصيانة بنجاح.
+Maintenance Visits,زيارات الصيانة
+Maintenance Visits Schedule,جدول زيارات الصيانة
+Mark Completed,تم إنجاز العمل
+Mobile No,رقم الجوال
+Monthly,شهري
+Naming Series,تسلسل الترقيم
+No Show,لم يحضر
+Notes,ملاحظات
+Odometer (KM),قراءة العداد (كم)
+Odometer Reading (KM),قراءة العداد (كم)
+Personal Belongings Inside Vehicle,المتعلقات الشخصية داخل السيارة
+Plate Number,رقم اللوحة
+Please select a valid visit from the list.,يرجى اختيار زيارة صيانة صالحة من القائمة.
+Posting Date,تاريخ القيد
+Posting Time,وقت القيد
+Pre-existing Scratches / Dents,الخدوش والضربات المسبقة
+Quarterly,ربع سنوي
+Received,تم الاستلام
+Record Maintenance Visit,تسجيل زيارة صيانة
+Requested Services & Documents,الخدمات المطلوبة والمستندات
+Requested Services & Specifications,الخدمات والمواصفات المطلوبة
+Schedule Configuration,إعدادات جدول الصيانة
+Scheduled,مجدولة
+Scheduled Visit Date,تاريخ الزيارة المجدول
+Select Due Visit,اختر الزيارة المستحقة
+Semi-Annual,نصف سنوي
+Service Type,نوع الخدمة
+Start Date,تاريخ البدء
+Start Work,بدء العمل
+Status,الحالة
+Summary Terms,الشروط المختصرة
+Technician,الفني المنفذ
+Technician Name,اسم الفني المنفذ
+Terms & Conditions,الشروط والأحكام
+Terms and Conditions,الشروط والأحكام
+Updating maintenance record...,جاري تحديث سجل الصيانة...
+Vehicle Color,لون السيارة
 Vehicle Details,معلومات السيارة
+Vehicle Information,معلومات السيارة
+Vehicle Maintenance Schedule,جدول الصيانة
+Vehicle Maintenance Schedule Item,بند جدول صيانة السيارة
 Vehicle Make,نوع السيارة
 Vehicle Model,موديل السيارة
 Vehicle Model / Year,موديل وسنة الصنع
-Plate Number,رقم اللوحة
-Vehicle Color,لون السيارة
-Chassis No (VIN),رقم الهيكل (VIN)
-Odometer (KM),قراءة العداد (كم)
-Odometer Reading (KM),قراءة العداد (كم)
-Fuel Level,مستوى الوقود
-Inspection & Vehicle Status,الفحص وحالة السيارة
-Personal Belongings Inside Vehicle,المتعلقات الشخصية داخل السيارة
-Pre-existing Scratches / Dents,الخدوش والضربات المسبقة
-Requested Services & Documents,الخدمات المطلوبة والمستندات
-Requested Services & Specifications,الخدمات والمواصفات المطلوبة
-General Notes,ملاحظات عامة
+Vehicle Reception,استلام وفحص سيارة
 Vehicle Reception Ref,مرجع استلام السيارة
-Maintenance Schedule,جدول الصيانة
-Schedule Configuration,إعدادات جدول الصيانة
-Maintenance Start Date,بداية الصيانة
-Duration (Months),المدة (بالأشهر)
-Warranty Duration (Years),مدة الضمان (بالسنوات)
-Distribution Method,طريقة التوزيع
-Monthly,شهري
-Quarterly,ربع سنوي
-Semi-Annual,نصف سنوي
-Annual,سنوي
-Generate Schedule,توليد الجدول
-Maintenance Visits Schedule,جدول زيارات الصيانة
-Maintenance Visits,زيارات الصيانة
-Vehicle Maintenance Schedule Item,بند جدول صيانة السيارة
-Scheduled Visit Date,تاريخ الزيارة المجدول
-Actual Visit Date,تاريخ الزيارة الفعلي
+Vehicle Warranty Item,بند تفاصيل الضمان
 Visit Status,حالة الزيارة
-Scheduled,مجدولة
-Completed,تمت الصيانة
-Cancelled,ملغاة
-No Show,لم يحضر
-Technician,الفني المنفذ
-Notes,ملاحظات
-Record Maintenance Visit,تسجيل زيارة صيانة
-Select Due Visit,اختر الزيارة المستحقة
-Current Odometer (KM),قراءة العداد الحالية (كم)
-Technician Name,اسم الفني المنفذ
-Inspection & Service Notes,ملاحظات الفحص والخدمة
-Confirm Visit Completed,تأكيد إتمام الزيارة
-Generating maintenance schedule...,جاري توليد جدول الصيانة...
-Updating maintenance record...,جاري تحديث سجل الصيانة...
-All scheduled maintenance visits have been completed or none are scheduled.,تم استكمال كافة زيارات الصيانة المجدولة أو لا توجد زيارات مجدولة.
-Generated {0} maintenance visits.,تم توليد {0} زيارة صيانة بنجاح.
-Maintenance visit #{0} updated to Completed successfully.,تم تحديث موعد الصيانة رقم {0} إلى تمت الصيانة بنجاح.
-Please select a valid visit from the list.,يرجى اختيار زيارة صيانة صالحة من القائمة.
-Create Sales Invoice,إنشاء فاتورة مبيعات
-Create Quotation,إنشاء عرض سعر
-Start Work,بدء العمل
-Mark Completed,تم إنجاز العمل
-Deliver Vehicle,تسليم السيارة للعميل
-Received,تم الاستلام
-In Progress,قيد التنفيذ
+Visit Type,نوع الزيارة
+Warranty Details,تفاصيل الضمان
+Warranty Duration (Years),مدة الضمان بالسنة
+Warranty Duration in Years,مدة الضمان بالسنة
+Warranty Period,مدة الضمان
 Work Completed,تم إنجاز العمل
-Delivered,تم التسليم
-Draft,مسودة
-Empty,فارغ
-Full,ممتلئ
-1/4,ربع
-1/2,نصف
-3/4,ثلاثة أرباع
-Customer Name,اسم العميل
-Posting Date,تاريخ القيد
-Posting Time,وقت القيد
-Mobile No,رقم الجوال
-Status,الحالة
-Naming Series,تسلسل الترقيم
-"Vehicle Warranty Item","بند تفاصيل الضمان"
-"Warranty Details","تفاصيل الضمان"
-"Service Type","نوع الخدمة"
-"Warranty Period","مدة الضمان"
-"Start Date","تاريخ البداية"
-"End Date","تاريخ الانتهاء"
-"Summary Terms","الشروط المختصرة"
-"Care & Maintenance Instructions / Terms","تعليمات العناية والصيانة والشروط"
-"Visit Type","نوع الزيارة"
-"Work Executed","الأعمال المنفذة"
-"Car Care Tax Invoice","فاتورة مبيعات ضريبية وجدول الصيانة"
+Work Executed,الأعمال المنفذة

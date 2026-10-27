@@ -200,3 +200,51 @@ const transaction_events = {
 frappe.ui.form.on("Sales Invoice", transaction_events);
 frappe.ui.form.on("Quotation", transaction_events);
 frappe.ui.form.on("Sales Order", transaction_events);
+
+// Child table handlers for Vehicle Warranty Item
+frappe.ui.form.on("Vehicle Warranty Item", {
+	custom_warranty_details_add: function (frm, cdt, cdn) {
+		const start_date =
+			frm.doc.posting_date || frm.doc.transaction_date || frappe.datetime.get_today();
+		frappe.model.set_value(cdt, cdn, "start_date", start_date);
+		frappe.model.set_value(cdt, cdn, "warranty_period", 1);
+		mu_car_care.calculate_warranty_end_date(frm, cdt, cdn);
+	},
+	warranty_period: function (frm, cdt, cdn) {
+		mu_car_care.calculate_warranty_end_date(frm, cdt, cdn);
+	},
+	start_date: function (frm, cdt, cdn) {
+		mu_car_care.calculate_warranty_end_date(frm, cdt, cdn);
+	},
+	terms_template: function (frm, cdt, cdn) {
+		const row = locals[cdt][cdn];
+		if (row.terms_template) {
+			frappe.db.get_value("Terms and Conditions", row.terms_template, "terms", function (r) {
+				if (r && r.terms) {
+					// Strip HTML tags for clean summary text
+					const tmp = document.createElement("div");
+					tmp.innerHTML = r.terms;
+					const plainText = (tmp.textContent || tmp.innerText || "").trim();
+					frappe.model.set_value(cdt, cdn, "summary_terms", plainText);
+				}
+			});
+		}
+	},
+});
+
+mu_car_care.calculate_warranty_end_date = function (frm, cdt, cdn) {
+	const row = locals[cdt][cdn];
+	const start_date =
+		row.start_date || frm.doc.posting_date || frm.doc.transaction_date || frappe.datetime.get_today();
+	const years = cint(row.warranty_period);
+
+	if (start_date && years > 0) {
+		// Calculate end date: start_date + (years * 12 months) - 1 day (e.g. 2025-04-24 to 2030-04-23)
+		let end_date = frappe.datetime.add_months(start_date, years * 12);
+		end_date = frappe.datetime.add_days(end_date, -1);
+		frappe.model.set_value(cdt, cdn, "end_date", end_date);
+		if (!row.start_date) {
+			frappe.model.set_value(cdt, cdn, "start_date", start_date);
+		}
+	}
+};

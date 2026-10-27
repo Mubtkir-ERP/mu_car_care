@@ -6,12 +6,12 @@
  "engine": "InnoDB",
  "field_order": [
   "visit_date",
-  "actual_visit_date",
   "visit_type",
-  "odometer_km",
-  "work_done",
-  "technician",
   "visit_status",
+  "odometer_km",
+  "technician",
+  "work_done",
+  "actual_visit_date",
   "notes"
  ],
  "fields": [
@@ -26,42 +26,10 @@
   {
    "allow_on_submit": 1,
    "columns": 2,
-   "fieldname": "actual_visit_date",
-   "fieldtype": "Date",
-   "in_list_view": 1,
-   "label": "Actual Visit Date"
-  },
-  {
-   "allow_on_submit": 1,
-   "columns": 2,
    "fieldname": "visit_type",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Visit Type"
-  },
-  {
-   "allow_on_submit": 1,
-   "columns": 2,
-   "fieldname": "odometer_km",
-   "fieldtype": "Int",
-   "in_list_view": 1,
-   "label": "Odometer (KM)"
-  },
-  {
-   "allow_on_submit": 1,
-   "columns": 2,
-   "fieldname": "work_done",
-   "fieldtype": "Small Text",
-   "in_list_view": 1,
-   "label": "Work Executed"
-  },
-  {
-   "allow_on_submit": 1,
-   "columns": 2,
-   "fieldname": "technician",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Technician"
   },
   {
    "allow_on_submit": 1,
@@ -76,6 +44,36 @@
   },
   {
    "allow_on_submit": 1,
+   "columns": 1,
+   "fieldname": "odometer_km",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Odometer (KM)"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 2,
+   "fieldname": "technician",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Technician"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 2,
+   "fieldname": "work_done",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Work Executed"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "actual_visit_date",
+   "fieldtype": "Date",
+   "label": "Actual Visit Date"
+  },
+  {
+   "allow_on_submit": 1,
    "fieldname": "notes",
    "fieldtype": "Small Text",
    "label": "Notes"
@@ -84,7 +82,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-10-26 11:00:00.000000",
+ "modified": "2026-10-27 13:50:00.000000",
  "modified_by": "Administrator",
  "module": "Mu Car Care",
  "name": "Vehicle Maintenance Schedule Item",
