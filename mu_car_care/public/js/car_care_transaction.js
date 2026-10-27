@@ -83,7 +83,7 @@ mu_car_care.open_maintenance_dialog = function (frm) {
 
 	// Format options as clean strings compatible with Frappe Dialog Select control
 	const visit_options = pending_visits.map(function (row) {
-		return `${row.idx}: ${row.visit_date} - ${row.notes || __("Scheduled")}`;
+		return row.notes ? `${row.idx}: ${row.visit_date} - ${row.notes}` : `${row.idx}: ${row.visit_date}`;
 	});
 
 	const dialog = new frappe.ui.Dialog({

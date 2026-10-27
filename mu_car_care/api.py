@@ -47,16 +47,11 @@ def calculate_maintenance_schedule(start_date=None, duration_years=None, distrib
 	current_month_offset = step
 	while current_month_offset <= total_months:
 		visit_date = add_months(start_date, current_month_offset)
-		if current_month_offset % 12 == 0:
-			period_label = f"سنة {current_month_offset // 12}"
-		else:
-			period_label = f"شهر {current_month_offset}"
 
 		visits.append({
 			"visit_date": str(visit_date),
-			"visit_type": "صيانة دورية",
 			"visit_status": "Scheduled",
-			"notes": f"زيارة صيانة دورية ({period_label})",
+			"notes": "",
 		})
 		current_month_offset += step
 

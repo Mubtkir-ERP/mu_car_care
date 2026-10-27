@@ -72,6 +72,14 @@ def execute():
 			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
 			"""
 		)
+		# Clear auto-generated notes from database
+		frappe.db.sql(
+			"""
+			UPDATE `tabVehicle Maintenance Schedule Item`
+			SET notes = ''
+			WHERE notes LIKE 'زيارة صيانة دورية%'
+			"""
+		)
 		frappe.db.commit()
 	except Exception as e:
 		frappe.log_error(title="mu_car_care v1_1_8 update custom fields", message=str(e))

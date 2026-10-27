@@ -61,6 +61,14 @@ def after_migrate():
 			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
 			"""
 		)
+		# Clear auto-generated notes from database
+		frappe.db.sql(
+			"""
+			UPDATE `tabVehicle Maintenance Schedule Item`
+			SET notes = ''
+			WHERE notes LIKE 'زيارة صيانة دورية%'
+			"""
+		)
 		frappe.db.commit()
 	except Exception:
 		pass
