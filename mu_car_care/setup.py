@@ -98,37 +98,40 @@ def after_migrate():
 
 
 def sync_print_formats():
-	try:
-		app_path = frappe.get_app_path("mu_car_care")
-		html_file = os.path.join(
-			app_path, "mu_car_care", "print_format", "car_care_tax_invoice", "car_care_tax_invoice.html"
-		)
-		if os.path.exists(html_file):
-			with open(html_file, "r", encoding="utf-8") as f:
-				html_content = f.read()
-
-			pf_name = "Car Care Tax Invoice"
-			if frappe.db.exists("Print Format", pf_name):
-				pf = frappe.get_doc("Print Format", pf_name)
-			else:
-				pf = frappe.new_doc("Print Format")
-				pf.name = pf_name
-
-			pf.doc_type = "Sales Invoice"
-			pf.module = "Mu Car Care"
-			pf.custom_format = 1
-			pf.print_format_type = "Jinja"
-			pf.pdf_generator = "wkhtmltopdf"
-			pf.html = html_content
-			pf.standard = "No"
-			pf.disabled = 0
-			pf.default_print_language = "ar"
-			pf.font_size = 13
-			pf.margin_top = 5.0
-			pf.margin_bottom = 5.0
-			pf.margin_left = 5.0
-			pf.margin_right = 5.0
-			pf.save(ignore_permissions=True)
-			frappe.db.commit()
-	except Exception:
-		pass
+    """مزامنة قوالب الفاتورة وعرض السعر وطلب المبيعات مع ملفات التطبيق بعد التحديث."""
+    formats = (
+        ("Car Care Tax Invoice", "Sales Invoice", "car_care_tax_invoice"),
+        ("Car Care Quotation", "Quotation", "car_care_quotation"),
+        ("Car Care Sales Order", "Sales Order", "car_care_sales_order"),
+    )
+    app_path = frappe.get_app_path("mu_car_care")
+    for pf_name, doctype, slug in formats:
+        try:
+            html_file = os.path.join(app_path, "mu_car_care", "print_format", slug, slug + ".html")
+            if not os.path.exists(html_file):
+                continue
+            with open(html_file, "r", encoding="utf-8") as f:
+                html_content = f.read()
+            if frappe.db.exists("Print Format", pf_name):
+                pf = frappe.get_doc("Print Format", pf_name)
+            else:
+                pf = frappe.new_doc("Print Format")
+                pf.name = pf_name
+            pf.doc_type = doctype
+            pf.module = "Mu Car Care"
+            pf.custom_format = 1
+            pf.print_format_type = "Jinja"
+            pf.pdf_generator = "wkhtmltopdf"
+            pf.html = html_content
+            pf.standard = "No"
+            pf.disabled = 0
+            pf.default_print_language = "ar"
+            pf.font_size = 13
+            pf.margin_top = 5.0
+            pf.margin_bottom = 5.0
+            pf.margin_left = 5.0
+            pf.margin_right = 5.0
+            pf.save(ignore_permissions=True)
+        except Exception:
+            frappe.log_error(frappe.get_traceback(), "Mu Car Care Print Format Sync: " + pf_name)
+    frappe.db.commit()

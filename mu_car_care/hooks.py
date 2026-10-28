@@ -25,7 +25,7 @@ fixtures = [
 	},
 	{
 		"dt": "Print Format",
-		"filters": [["name", "=", "Car Care Tax Invoice"]],
+		"filters": [["name", "in", ["Car Care Tax Invoice", "Car Care Quotation", "Car Care Sales Order"]]],
 	},
 ]
 
