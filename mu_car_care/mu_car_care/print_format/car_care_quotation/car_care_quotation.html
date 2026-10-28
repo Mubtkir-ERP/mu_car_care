@@ -429,7 +429,7 @@ html, body { margin:0; padding:0; direction:rtl; font-family:'Cairo','IBM Plex S
             <tbody>
                 {% for row in warranty_rows %}
                 <tr>
-                    <td>{{ row.service_type or '—' }}</td>
+                    <td>{{ row.service_type or (doc.items[loop.index0].item_name if doc.items and doc.items|length > loop.index0 else '') or (doc.items[0].item_name if doc.items else '—') }}</td>
                     <td class="center">{{ row.warranty_period or '—' }}</td>
                     <td class="center">{{ frappe.utils.formatdate(row.start_date, 'yyyy/MM/dd') if row.start_date else '—' }}</td>
                     <td class="center">{{ frappe.utils.formatdate(row.end_date, 'yyyy/MM/dd') if row.end_date else '—' }}</td>

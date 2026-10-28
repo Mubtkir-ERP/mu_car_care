@@ -22,7 +22,149 @@ mu_car_care.setup_transaction = function (frm) {
 	}
 };
 
+mu_car_care.lock_registered_fields = function (frm) {
+	const is_registered = !frm.is_new();
+
+	// 1. Hide legacy car fields and legacy section break
+	const legacy_fields = [
+		"custom_section_break_khlav",
+		"custom_car_type",
+		"custom_car_plate",
+		"custom_car_model",
+		"custom_car_color",
+	];
+	legacy_fields.forEach(function (f) {
+		if (frm.fields_dict[f]) {
+			frm.set_df_property(f, "hidden", 1);
+		}
+	});
+
+	// 2. بعد التسجيل اظهار حقول معلومات السيارة للقراءة
+	const vehicle_fields = [
+		"custom_vehicle_make",
+		"custom_vehicle_model",
+		"custom_plate_number",
+		"custom_vehicle_color",
+		"custom_chassis_no",
+	];
+	vehicle_fields.forEach(function (f) {
+		if (frm.fields_dict[f]) {
+			frm.set_df_property(f, "read_only", is_registered ? 1 : 0);
+		}
+	});
+
+	// 3. عدم السماح بتحديث حقل تفعيل جدول الصيانة بعد التسجيل
+	frm.set_df_property("custom_has_maintenance_schedule", "read_only", is_registered ? 1 : 0);
+
+	// 4. عدم السماح بتحديث حقول اعدادات الصيانة مثل تاريخ بداية الصيانة - والمدة وطريقة التوزيع
+	const maintenance_setting_fields = [
+		"custom_maintenance_start_date",
+		"custom_maintenance_duration_years",
+		"custom_distribution_method",
+	];
+	maintenance_setting_fields.forEach(function (f) {
+		if (frm.fields_dict[f]) {
+			frm.set_df_property(f, "read_only", is_registered ? 1 : 0);
+		}
+	});
+
+	if (frm.fields_dict.custom_generate_schedule_btn) {
+		frm.set_df_property("custom_generate_schedule_btn", "read_only", is_registered ? 1 : 0);
+		frm.set_df_property("custom_generate_schedule_btn", "hidden", is_registered ? 1 : 0);
+	}
+
+	// 5. عدم السماح بتحديث بيانات جدول الضمان كلها
+	frm.set_df_property("custom_warranty_details", "read_only", is_registered ? 1 : 0);
+	if (frm.fields_dict.custom_warranty_details) {
+		const grid = frm.fields_dict.custom_warranty_details.grid;
+		if (grid) {
+			// حذف عمود نوع الخدمة من جدول الضمان في الشاشة
+			if (typeof grid.set_column_disp === "function") {
+				grid.set_column_disp("service_type", false);
+			}
+			grid.cannot_add_rows = is_registered;
+			grid.only_sortable = is_registered;
+			if (is_registered) {
+				grid.wrapper.find(".grid-add-row").hide();
+				grid.wrapper.find(".grid-remove-rows").hide();
+				grid.wrapper.find(".grid-delete-row").hide();
+				grid.wrapper.find(".grid-row-check").hide();
+			} else {
+				grid.wrapper.find(".grid-add-row").show();
+				grid.wrapper.find(".grid-remove-rows").show();
+			}
+			if (grid.docfields) {
+				grid.docfields.forEach(function (df) {
+					df.read_only = is_registered ? 1 : 0;
+					if (df.fieldname === "service_type") {
+						df.in_list_view = 0;
+						df.hidden = 1;
+					}
+				});
+			}
+		}
+	}
+
+	// Disable settings toolbar inputs if registered
+	if (frm.fields_dict.custom_schedule_visits_section && frm.fields_dict.custom_schedule_visits_section.wrapper) {
+		const $sec = frm.fields_dict.custom_schedule_visits_section.wrapper;
+		if (is_registered) {
+			$sec.find(".car-care-settings-row input, .car-care-settings-row select, .car-care-settings-row button").prop("disabled", true);
+			$sec.find(".car-care-settings-row button").hide();
+		} else {
+			$sec.find(".car-care-settings-row input, .car-care-settings-row select").prop("disabled", false);
+			$sec.find(".car-care-settings-row button").show().prop("disabled", false);
+		}
+	}
+};
+
+mu_car_care.sync_warranty_from_items = function (frm) {
+	if (!frm.is_new() || !frm.doc.items || frm.doc.items.length === 0) return;
+	const current_warranty = frm.doc.custom_warranty_details || [];
+
+	frm.doc.items.forEach(function (item, idx) {
+		if (!item.item_code) return;
+		let matching_row = current_warranty.find(function (w) {
+			return w.service_type === item.item_code;
+		});
+
+		if (!matching_row) {
+			const row = frm.add_child("custom_warranty_details");
+			row.service_type = item.item_code;
+			row.start_date =
+				frm.doc.posting_date || frm.doc.transaction_date || frappe.datetime.get_today();
+			row.warranty_period = 1;
+
+			frappe.call({
+				method: "mu_car_care.api.get_item_warranty_details",
+				args: {
+					item_code: item.item_code,
+				},
+				callback: function (r) {
+					if (r && r.message) {
+						if (r.message.warranty_period) {
+							frappe.model.set_value(row.doctype, row.name, "warranty_period", r.message.warranty_period);
+						}
+						if (r.message.terms) {
+							frappe.model.set_value(row.doctype, row.name, "terms", r.message.terms);
+						}
+						mu_car_care.calculate_warranty_end_date(frm, row.doctype, row.name);
+						frm.refresh_field("custom_warranty_details");
+					}
+				},
+			});
+			mu_car_care.calculate_warranty_end_date(frm, row.doctype, row.name);
+		}
+	});
+	frm.refresh_field("custom_warranty_details");
+};
+
 mu_car_care.generate_schedule = function (frm) {
+	if (!frm.is_new()) {
+		frappe.msgprint(__("لا يمكن تعديل جدول الصيانة بعد تسجيل المستند."));
+		return;
+	}
+
 	const start_date =
 		frm.doc.custom_maintenance_start_date ||
 		frm.doc.posting_date ||
@@ -88,12 +230,11 @@ mu_car_care.open_maintenance_dialog = function (frm) {
 
 	const dialog = new frappe.ui.Dialog({
 		title: __("زيارة صيانة"),
-		size: "small",
 		fields: [
 			{
 				fieldtype: "Select",
 				fieldname: "visit_selection",
-				label: __("Select Due Visit"),
+				label: __("اختر موعد الزيارة"),
 				options: visit_options,
 				default: visit_options[0],
 				reqd: 1,
@@ -199,15 +340,24 @@ const transaction_events = {
 			}
 		}
 
-		// Automatically add default first row in warranty table if empty on new doc
-		if (frm.is_new() && (!frm.doc.custom_warranty_details || frm.doc.custom_warranty_details.length === 0)) {
-			const row = frm.add_child("custom_warranty_details");
-			const start_date =
-				frm.doc.posting_date || frm.doc.transaction_date || frappe.datetime.get_today();
-			row.start_date = start_date;
-			row.warranty_period = 1;
-			mu_car_care.calculate_warranty_end_date(frm, row.doctype, row.name);
-			frm.refresh_field("custom_warranty_details");
+		// Apply read-only locks after registration
+		mu_car_care.lock_registered_fields(frm);
+
+		// Auto sync warranty rows from items on new document
+		if (frm.is_new()) {
+			if (!frm.doc.custom_warranty_details || frm.doc.custom_warranty_details.length === 0) {
+				if (frm.doc.items && frm.doc.items.length > 0) {
+					mu_car_care.sync_warranty_from_items(frm);
+				} else {
+					const row = frm.add_child("custom_warranty_details");
+					const start_date =
+						frm.doc.posting_date || frm.doc.transaction_date || frappe.datetime.get_today();
+					row.start_date = start_date;
+					row.warranty_period = 1;
+					mu_car_care.calculate_warranty_end_date(frm, row.doctype, row.name);
+					frm.refresh_field("custom_warranty_details");
+				}
+			}
 		}
 
 		// Center ONLY column headers (names) for Warranty and Maintenance tables
@@ -226,6 +376,10 @@ const transaction_events = {
 				[data-fieldname='custom_maintenance_schedule'] .grid-heading-row .static-area { \
 					width: 100% !important; \
 					text-align: center !important; \
+				} \
+				/* Hide service_type column from warranty grid */ \
+				[data-fieldname='custom_warranty_details'] [data-fieldname='service_type'] { \
+					display: none !important; \
 				} \
 				/* Force cell values in RTL to align right, overriding Frappe numeric flip */ \
 				[dir='rtl'] [data-fieldname='custom_warranty_details'] .grid-body .grid-static-col, \
@@ -249,7 +403,7 @@ const transaction_events = {
 		}
 
 		// Double-bind the button to guarantee click response across all Frappe versions
-		if (frm.fields_dict && frm.fields_dict.custom_generate_schedule_btn) {
+		if (frm.is_new() && frm.fields_dict && frm.fields_dict.custom_generate_schedule_btn) {
 			const btn = frm.fields_dict.custom_generate_schedule_btn;
 			if (btn.$input) {
 				btn.$input.off("click").on("click", function () {
@@ -264,8 +418,19 @@ const transaction_events = {
 		}
 	},
 
+	validate: function (frm) {
+		// Populate service_type on warranty details from items if empty
+		if (frm.doc.custom_warranty_details && frm.doc.items) {
+			frm.doc.custom_warranty_details.forEach(function (w_row, idx) {
+				if (!w_row.service_type && idx < frm.doc.items.length) {
+					w_row.service_type = frm.doc.items[idx].item_code || frm.doc.items[idx].item_name;
+				}
+			});
+		}
+	},
+
 	custom_has_maintenance_schedule: function (frm) {
-		if (frm.doc.custom_has_maintenance_schedule) {
+		if (frm.is_new() && frm.doc.custom_has_maintenance_schedule) {
 			if (!frm.doc.custom_maintenance_start_date) {
 				frm.set_value(
 					"custom_maintenance_start_date",
@@ -282,13 +447,29 @@ const transaction_events = {
 	},
 
 	custom_generate_schedule_btn: function (frm) {
-		mu_car_care.generate_schedule(frm);
+		if (frm.is_new()) {
+			mu_car_care.generate_schedule(frm);
+		}
 	},
 };
 
 frappe.ui.form.on("Sales Invoice", transaction_events);
 frappe.ui.form.on("Quotation", transaction_events);
 frappe.ui.form.on("Sales Order", transaction_events);
+
+// Child table handlers for items to auto-sync warranty
+const item_child_events = {
+	item_code: function (frm, cdt, cdn) {
+		const row = locals[cdt][cdn];
+		if (row && row.item_code && frm.is_new()) {
+			mu_car_care.sync_warranty_from_items(frm);
+		}
+	},
+};
+
+frappe.ui.form.on("Sales Invoice Item", item_child_events);
+frappe.ui.form.on("Sales Order Item", item_child_events);
+frappe.ui.form.on("Quotation Item", item_child_events);
 
 // Child table handlers for Vehicle Warranty Item
 frappe.ui.form.on("Vehicle Warranty Item", {
@@ -297,29 +478,34 @@ frappe.ui.form.on("Vehicle Warranty Item", {
 			frm.doc.posting_date || frm.doc.transaction_date || frappe.datetime.get_today();
 		frappe.model.set_value(cdt, cdn, "start_date", start_date);
 		frappe.model.set_value(cdt, cdn, "warranty_period", 1);
-		mu_car_care.calculate_warranty_end_date(frm, cdt, cdn);
-	},
-	service_type: function (frm, cdt, cdn) {
+
+		// If items exist, assign service_type from corresponding item
 		const row = locals[cdt][cdn];
-		if (row.service_type) {
-			frappe.call({
-				method: "mu_car_care.api.get_item_warranty_details",
-				args: {
-					item_code: row.service_type,
-				},
-				callback: function (r) {
-					if (r && r.message) {
-						if (r.message.warranty_period) {
-							frappe.model.set_value(cdt, cdn, "warranty_period", r.message.warranty_period);
-						}
-						if (r.message.terms) {
-							frappe.model.set_value(cdt, cdn, "terms", r.message.terms);
-						}
-						mu_car_care.calculate_warranty_end_date(frm, cdt, cdn);
-					}
-				},
-			});
+		if (!row.service_type && frm.doc.items) {
+			const idx = (frm.doc.custom_warranty_details || []).length - 1;
+			if (idx >= 0 && idx < frm.doc.items.length) {
+				const it = frm.doc.items[idx];
+				if (it && it.item_code) {
+					frappe.model.set_value(cdt, cdn, "service_type", it.item_code);
+					frappe.call({
+						method: "mu_car_care.api.get_item_warranty_details",
+						args: { item_code: it.item_code },
+						callback: function (r) {
+							if (r && r.message) {
+								if (r.message.warranty_period) {
+									frappe.model.set_value(cdt, cdn, "warranty_period", r.message.warranty_period);
+								}
+								if (r.message.terms) {
+									frappe.model.set_value(cdt, cdn, "terms", r.message.terms);
+								}
+								mu_car_care.calculate_warranty_end_date(frm, cdt, cdn);
+							}
+						},
+					});
+				}
+			}
 		}
+		mu_car_care.calculate_warranty_end_date(frm, cdt, cdn);
 	},
 	warranty_period: function (frm, cdt, cdn) {
 		mu_car_care.calculate_warranty_end_date(frm, cdt, cdn);
@@ -336,7 +522,6 @@ mu_car_care.calculate_warranty_end_date = function (frm, cdt, cdn) {
 	const years = cint(row.warranty_period);
 
 	if (start_date && years > 0) {
-		// Calculate end date: start_date + (years * 12 months) - 1 day (e.g. 2025-04-24 to 2030-04-23)
 		let end_date = frappe.datetime.add_months(start_date, years * 12);
 		end_date = frappe.datetime.add_days(end_date, -1);
 		frappe.model.set_value(cdt, cdn, "end_date", end_date);

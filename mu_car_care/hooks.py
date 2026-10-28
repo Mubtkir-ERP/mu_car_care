@@ -29,5 +29,18 @@ fixtures = [
 	},
 ]
 
+# Document Events
+doc_events = {
+	"Sales Invoice": {
+		"before_save": "mu_car_care.api.sync_transaction_warranty",
+	},
+	"Sales Order": {
+		"before_save": "mu_car_care.api.sync_transaction_warranty",
+	},
+	"Quotation": {
+		"before_save": "mu_car_care.api.sync_transaction_warranty",
+	},
+}
+
 # Mubtkir ERP Master Guidelines (Rule 5): Auto-sync Workspaces and Desk Cache
 after_migrate = "mu_car_care.setup.after_migrate"

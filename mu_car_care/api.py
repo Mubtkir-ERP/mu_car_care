@@ -249,3 +249,34 @@ def make_quotation_from_reception(source_name, target_doc=None):
 	)
 
 	return doclist
+
+
+def sync_transaction_warranty(doc, method=None):
+	"""
+	Hook called on before_save for Sales Invoice, Sales Order, Quotation:
+	1. Auto-assign service_type in custom_warranty_details from doc.items if missing.
+	2. Map legacy car fields to standard fields.
+	"""
+	# 1. Map legacy car fields
+	if doc.get("custom_car_type") and not doc.get("custom_vehicle_make"):
+		doc.custom_vehicle_make = doc.custom_car_type
+	if doc.get("custom_car_plate") and not doc.get("custom_plate_number"):
+		doc.custom_plate_number = doc.custom_car_plate
+	if doc.get("custom_car_model") and not doc.get("custom_vehicle_model"):
+		doc.custom_vehicle_model = doc.custom_car_model
+	if doc.get("custom_car_color") and not doc.get("custom_vehicle_color"):
+		doc.custom_vehicle_color = doc.custom_car_color
+
+	# 2. Auto sync service_type in warranty details from items
+	if doc.get("custom_warranty_details") and doc.get("items"):
+		items = doc.get("items")
+		for idx, w_row in enumerate(doc.custom_warranty_details):
+			if not w_row.service_type and idx < len(items):
+				it = items[idx]
+				w_row.service_type = it.item_code or it.item_name
+				if not w_row.terms or not w_row.warranty_period:
+					details = get_item_warranty_details(it.item_code)
+					if details.get("warranty_period") and not w_row.warranty_period:
+						w_row.warranty_period = details["warranty_period"]
+					if details.get("terms") and not w_row.terms:
+						w_row.terms = details["terms"]

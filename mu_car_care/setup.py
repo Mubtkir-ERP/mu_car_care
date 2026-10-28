@@ -69,6 +69,52 @@ def after_migrate():
 			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
 			"""
 		)
+		# Delete legacy custom fields and old section
+		frappe.db.sql(
+			"""
+			DELETE FROM `tabCustom Field`
+			WHERE fieldname IN (
+				'custom_section_break_khlav',
+				'custom_car_type',
+				'custom_car_plate',
+				'custom_car_model',
+				'custom_car_color'
+			)
+			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
+			"""
+		)
+		# Set allow_on_submit = 0 for locked maintenance settings and warranty details
+		frappe.db.sql(
+			"""
+			UPDATE `tabCustom Field`
+			SET allow_on_submit = 0
+			WHERE fieldname IN (
+				'custom_has_maintenance_schedule',
+				'custom_maintenance_start_date',
+				'custom_maintenance_duration_years',
+				'custom_distribution_method',
+				'custom_warranty_details'
+			)
+			AND dt IN ('Sales Invoice', 'Quotation', 'Sales Order')
+			"""
+		)
+		# Migrate legacy car data if old columns exist
+		for dt in ["Sales Invoice", "Sales Order", "Quotation"]:
+			try:
+				existing_cols = frappe.db.get_table_columns(dt)
+				updates = []
+				if "custom_car_type" in existing_cols and "custom_vehicle_make" in existing_cols:
+					updates.append("`custom_vehicle_make` = COALESCE(NULLIF(`custom_vehicle_make`, ''), `custom_car_type`)")
+				if "custom_car_plate" in existing_cols and "custom_plate_number" in existing_cols:
+					updates.append("`custom_plate_number` = COALESCE(NULLIF(`custom_plate_number`, ''), `custom_car_plate`)")
+				if "custom_car_model" in existing_cols and "custom_vehicle_model" in existing_cols:
+					updates.append("`custom_vehicle_model` = COALESCE(NULLIF(`custom_vehicle_model`, ''), `custom_car_model`)")
+				if "custom_car_color" in existing_cols and "custom_vehicle_color" in existing_cols:
+					updates.append("`custom_vehicle_color` = COALESCE(NULLIF(`custom_vehicle_color`, ''), `custom_car_color`)")
+				if updates:
+					frappe.db.sql(f"UPDATE `tab{dt}` SET {', '.join(updates)}")
+			except Exception:
+				pass
 		# Clear auto-generated notes from database
 		frappe.db.sql(
 			"""
