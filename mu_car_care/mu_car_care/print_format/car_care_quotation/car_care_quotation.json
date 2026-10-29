@@ -18,7 +18,7 @@
  "modified": "2026-10-27 11:50:00.000000",
  "modified_by": "Administrator",
  "module": "Mu Car Care",
- "name": "Car Care Quotation",
+ "name": "عرض سعر مع الصيانة",
  "owner": "Administrator",
  "page_number": "Hide",
  "print_format_builder": 0,
@@ -26,6 +26,6 @@
  "print_format_type": "Jinja",
  "raw_printing": 0,
  "show_section_headings": 0,
- "standard": "Yes",
+ "standard": "No",
  "pdf_generator": "wkhtmltopdf"
 }

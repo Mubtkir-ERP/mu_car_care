@@ -129,6 +129,14 @@ def after_migrate():
 
 	# 2. Sync Print Formats
 	try:
+		# Delete legacy/old-named Print Formats to prevent duplicates
+		frappe.db.sql(
+			"""
+			DELETE FROM `tabPrint Format`
+			WHERE name IN ('Car Care Tax Invoice', 'Car Care Quotation', 'Car Care Sales Order')
+			"""
+		)
+		frappe.db.commit()
 		sync_print_formats()
 	except Exception:
 		pass
@@ -146,9 +154,10 @@ def after_migrate():
 def sync_print_formats():
     """مزامنة قوالب الفاتورة وعرض السعر وطلب المبيعات مع ملفات التطبيق بعد التحديث."""
     formats = (
-        ("Car Care Tax Invoice", "Sales Invoice", "car_care_tax_invoice"),
-        ("Car Care Quotation", "Quotation", "car_care_quotation"),
-        ("Car Care Sales Order", "Sales Order", "car_care_sales_order"),
+        ("فاتورة مبيعات ضريبية", "Sales Invoice", "car_care_tax_invoice"),
+        ("فاتورة مبيعات بدون ضريبة", "Sales Invoice", "car_care_non_tax_invoice"),
+        ("طلب مبيعات مع الصيانة", "Sales Order", "car_care_sales_order"),
+        ("عرض سعر مع الصيانة", "Quotation", "car_care_quotation"),
     )
     app_path = frappe.get_app_path("mu_car_care")
     for pf_name, doctype, slug in formats:
