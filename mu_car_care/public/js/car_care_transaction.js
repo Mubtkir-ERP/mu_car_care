@@ -23,7 +23,9 @@ mu_car_care.setup_transaction = function (frm) {
 };
 
 mu_car_care.lock_registered_fields = function (frm) {
-	const is_registered = !frm.is_new();
+	// Only lock fields after registration / submission (docstatus === 1 or 2)
+	// Draft documents (docstatus === 0) MUST remain completely editable
+	const is_submitted = (frm.doc.docstatus === 1 || frm.doc.docstatus === 2);
 
 	// 1. Hide legacy car fields and legacy section break
 	const legacy_fields = [
@@ -49,12 +51,12 @@ mu_car_care.lock_registered_fields = function (frm) {
 	];
 	vehicle_fields.forEach(function (f) {
 		if (frm.fields_dict[f]) {
-			frm.set_df_property(f, "read_only", is_registered ? 1 : 0);
+			frm.set_df_property(f, "read_only", is_submitted ? 1 : 0);
 		}
 	});
 
 	// 3. عدم السماح بتحديث حقل تفعيل جدول الصيانة بعد التسجيل
-	frm.set_df_property("custom_has_maintenance_schedule", "read_only", is_registered ? 1 : 0);
+	frm.set_df_property("custom_has_maintenance_schedule", "read_only", is_submitted ? 1 : 0);
 
 	// 4. عدم السماح بتحديث حقول اعدادات الصيانة مثل تاريخ بداية الصيانة - والمدة وطريقة التوزيع
 	const maintenance_setting_fields = [
@@ -64,17 +66,17 @@ mu_car_care.lock_registered_fields = function (frm) {
 	];
 	maintenance_setting_fields.forEach(function (f) {
 		if (frm.fields_dict[f]) {
-			frm.set_df_property(f, "read_only", is_registered ? 1 : 0);
+			frm.set_df_property(f, "read_only", is_submitted ? 1 : 0);
 		}
 	});
 
 	if (frm.fields_dict.custom_generate_schedule_btn) {
-		frm.set_df_property("custom_generate_schedule_btn", "read_only", is_registered ? 1 : 0);
-		frm.set_df_property("custom_generate_schedule_btn", "hidden", is_registered ? 1 : 0);
+		frm.set_df_property("custom_generate_schedule_btn", "read_only", is_submitted ? 1 : 0);
+		frm.set_df_property("custom_generate_schedule_btn", "hidden", is_submitted ? 1 : 0);
 	}
 
 	// 5. عدم السماح بتحديث بيانات جدول الضمان كلها
-	frm.set_df_property("custom_warranty_details", "read_only", is_registered ? 1 : 0);
+	frm.set_df_property("custom_warranty_details", "read_only", is_submitted ? 1 : 0);
 	if (frm.fields_dict.custom_warranty_details) {
 		const grid = frm.fields_dict.custom_warranty_details.grid;
 		if (grid) {
@@ -82,9 +84,9 @@ mu_car_care.lock_registered_fields = function (frm) {
 			if (typeof grid.set_column_disp === "function") {
 				grid.set_column_disp("service_type", false);
 			}
-			grid.cannot_add_rows = is_registered;
-			grid.only_sortable = is_registered;
-			if (is_registered) {
+			grid.cannot_add_rows = is_submitted;
+			grid.only_sortable = is_submitted;
+			if (is_submitted) {
 				grid.wrapper.find(".grid-add-row").hide();
 				grid.wrapper.find(".grid-remove-rows").hide();
 				grid.wrapper.find(".grid-delete-row").hide();
@@ -92,10 +94,12 @@ mu_car_care.lock_registered_fields = function (frm) {
 			} else {
 				grid.wrapper.find(".grid-add-row").show();
 				grid.wrapper.find(".grid-remove-rows").show();
+				grid.wrapper.find(".grid-delete-row").show();
+				grid.wrapper.find(".grid-row-check").show();
 			}
 			if (grid.docfields) {
 				grid.docfields.forEach(function (df) {
-					df.read_only = is_registered ? 1 : 0;
+					df.read_only = is_submitted ? 1 : 0;
 					if (df.fieldname === "service_type") {
 						df.in_list_view = 0;
 						df.hidden = 1;
@@ -108,7 +112,7 @@ mu_car_care.lock_registered_fields = function (frm) {
 	// Disable settings toolbar inputs if registered
 	if (frm.fields_dict.custom_schedule_visits_section && frm.fields_dict.custom_schedule_visits_section.wrapper) {
 		const $sec = frm.fields_dict.custom_schedule_visits_section.wrapper;
-		if (is_registered) {
+		if (is_submitted) {
 			$sec.find(".car-care-settings-row input, .car-care-settings-row select, .car-care-settings-row button").prop("disabled", true);
 			$sec.find(".car-care-settings-row button").hide();
 		} else {
@@ -119,7 +123,7 @@ mu_car_care.lock_registered_fields = function (frm) {
 };
 
 mu_car_care.sync_warranty_from_items = function (frm) {
-	if (!frm.is_new() || !frm.doc.items || frm.doc.items.length === 0) return;
+	if ((frm.doc.docstatus === 1 || frm.doc.docstatus === 2) || !frm.doc.items || frm.doc.items.length === 0) return;
 	const current_warranty = frm.doc.custom_warranty_details || [];
 
 	frm.doc.items.forEach(function (item, idx) {
@@ -160,7 +164,7 @@ mu_car_care.sync_warranty_from_items = function (frm) {
 };
 
 mu_car_care.generate_schedule = function (frm) {
-	if (!frm.is_new()) {
+	if (frm.doc.docstatus === 1 || frm.doc.docstatus === 2) {
 		frappe.msgprint(__("لا يمكن تعديل جدول الصيانة بعد تسجيل المستند."));
 		return;
 	}
@@ -403,7 +407,7 @@ const transaction_events = {
 		}
 
 		// Double-bind the button to guarantee click response across all Frappe versions
-		if (frm.is_new() && frm.fields_dict && frm.fields_dict.custom_generate_schedule_btn) {
+		if (frm.doc.docstatus === 0 && frm.fields_dict && frm.fields_dict.custom_generate_schedule_btn) {
 			const btn = frm.fields_dict.custom_generate_schedule_btn;
 			if (btn.$input) {
 				btn.$input.off("click").on("click", function () {
@@ -430,7 +434,7 @@ const transaction_events = {
 	},
 
 	custom_has_maintenance_schedule: function (frm) {
-		if (frm.is_new() && frm.doc.custom_has_maintenance_schedule) {
+		if (frm.doc.docstatus === 0 && frm.doc.custom_has_maintenance_schedule) {
 			if (!frm.doc.custom_maintenance_start_date) {
 				frm.set_value(
 					"custom_maintenance_start_date",
@@ -447,7 +451,7 @@ const transaction_events = {
 	},
 
 	custom_generate_schedule_btn: function (frm) {
-		if (frm.is_new()) {
+		if (frm.doc.docstatus === 0) {
 			mu_car_care.generate_schedule(frm);
 		}
 	},
@@ -461,7 +465,7 @@ frappe.ui.form.on("Sales Order", transaction_events);
 const item_child_events = {
 	item_code: function (frm, cdt, cdn) {
 		const row = locals[cdt][cdn];
-		if (row && row.item_code && frm.is_new()) {
+		if (row && row.item_code && frm.doc.docstatus === 0) {
 			mu_car_care.sync_warranty_from_items(frm);
 		}
 	},
