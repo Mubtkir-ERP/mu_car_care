@@ -18,19 +18,47 @@
   "vehicle_model",
   "vehicle_color",
   "chassis_no",
+  "sec_break_services",
+  "film_front_window",
+  "film_front_doors",
+  "film_back_doors",
+  "film_back_window",
+  "film_triangle_window",
+  "film_type",
+  "col_break_serv_protection",
+  "prot_front",
+  "prot_headlights",
+  "prot_body",
+  "prot_leather_mat",
+  "prot_leather",
+  "prot_velvet",
+  "col_break_serv_polish",
+  "polish_inside",
+  "polish_outside",
+  "polish_wax",
+  "polish_nano_ceramic",
+  "nano_layers_warranty",
+  "accessories",
   "sec_break_inspection",
   "odometer_km",
   "fuel_level",
-  "col_break_inspection",
   "personal_belongings",
+  "col_break_inspection",
+  "inspection_diagram",
   "external_condition_notes",
-  "sec_break_services",
-  "requested_services",
-  "col_break_billing",
+  "notes",
+  "sec_break_pricing_undertaking",
+  "price",
+  "in_charge_name",
+  "col_break_signatures",
+  "customer_signature",
+  "in_charge_signature",
+  "undertaking_text",
+  "sec_break_billing",
   "sales_invoice",
   "sales_order",
   "quotation",
-  "notes"
+  "requested_services"
  ],
  "fields": [
   {
@@ -126,6 +154,109 @@
    "label": "Chassis No (VIN)"
   },
   {
+   "fieldname": "sec_break_services",
+   "fieldtype": "Section Break",
+   "label": "Requested Services & Film Specifications"
+  },
+  {
+   "fieldname": "film_front_window",
+   "fieldtype": "Check",
+   "label": "Front Window"
+  },
+  {
+   "fieldname": "film_front_doors",
+   "fieldtype": "Check",
+   "label": "Front Doors"
+  },
+  {
+   "fieldname": "film_back_doors",
+   "fieldtype": "Check",
+   "label": "Back Doors"
+  },
+  {
+   "fieldname": "film_back_window",
+   "fieldtype": "Check",
+   "label": "Back Window"
+  },
+  {
+   "fieldname": "film_triangle_window",
+   "fieldtype": "Check",
+   "label": "Triangle Window"
+  },
+  {
+   "fieldname": "film_type",
+   "fieldtype": "Data",
+   "label": "Film Type"
+  },
+  {
+   "fieldname": "col_break_serv_protection",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "prot_front",
+   "fieldtype": "Check",
+   "label": "Front"
+  },
+  {
+   "fieldname": "prot_headlights",
+   "fieldtype": "Check",
+   "label": "Headlights"
+  },
+  {
+   "fieldname": "prot_body",
+   "fieldtype": "Check",
+   "label": "Car Body"
+  },
+  {
+   "fieldname": "prot_leather_mat",
+   "fieldtype": "Check",
+   "label": "Leather Mat"
+  },
+  {
+   "fieldname": "prot_leather",
+   "fieldtype": "Check",
+   "label": "Leather"
+  },
+  {
+   "fieldname": "prot_velvet",
+   "fieldtype": "Check",
+   "label": "Velvet"
+  },
+  {
+   "fieldname": "col_break_serv_polish",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "polish_inside",
+   "fieldtype": "Check",
+   "label": "Inside Polishing"
+  },
+  {
+   "fieldname": "polish_outside",
+   "fieldtype": "Check",
+   "label": "Outside Polishing"
+  },
+  {
+   "fieldname": "polish_wax",
+   "fieldtype": "Check",
+   "label": "Wax Coat"
+  },
+  {
+   "fieldname": "polish_nano_ceramic",
+   "fieldtype": "Check",
+   "label": "Nano Ceramic"
+  },
+  {
+   "fieldname": "nano_layers_warranty",
+   "fieldtype": "Data",
+   "label": "Nano Layers & Warranty"
+  },
+  {
+   "fieldname": "accessories",
+   "fieldtype": "Small Text",
+   "label": "Accessories"
+  },
+  {
    "fieldname": "sec_break_inspection",
    "fieldtype": "Section Break",
    "label": "Inspection & Vehicle Status"
@@ -142,13 +273,18 @@
    "options": "\nEmpty\n1/4\n1/2\n3/4\nFull"
   },
   {
+   "fieldname": "personal_belongings",
+   "fieldtype": "Small Text",
+   "label": "Personal Belongings Inside Vehicle"
+  },
+  {
    "fieldname": "col_break_inspection",
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "personal_belongings",
-   "fieldtype": "Small Text",
-   "label": "Personal Belongings Inside Vehicle"
+   "fieldname": "inspection_diagram",
+   "fieldtype": "Signature",
+   "label": "Vehicle Inspection Diagram"
   },
   {
    "fieldname": "external_condition_notes",
@@ -156,18 +292,51 @@
    "label": "Pre-existing Scratches / Dents"
   },
   {
-   "fieldname": "sec_break_services",
-   "fieldtype": "Section Break",
-   "label": "Requested Services & Documents"
-  },
-  {
-   "fieldname": "requested_services",
+   "fieldname": "notes",
    "fieldtype": "Small Text",
-   "label": "Requested Services & Specifications"
+   "label": "Inspection & Service Notes"
   },
   {
-   "fieldname": "col_break_billing",
+   "fieldname": "sec_break_pricing_undertaking",
+   "fieldtype": "Section Break",
+   "label": "Pricing, Undertaking & Signatures"
+  },
+  {
+   "fieldname": "price",
+   "fieldtype": "Currency",
+   "label": "Agreed Price"
+  },
+  {
+   "fieldname": "in_charge_name",
+   "fieldtype": "Data",
+   "label": "In-Charge Officer"
+  },
+  {
+   "fieldname": "col_break_signatures",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer_signature",
+   "fieldtype": "Signature",
+   "label": "Customer Signature"
+  },
+  {
+   "fieldname": "in_charge_signature",
+   "fieldtype": "Signature",
+   "label": "Officer Signature"
+  },
+  {
+   "default": "أقر بأنني استلمت السيارة بعد أن تم تنفيذ جميع خدمات الحماية المطلوبة بشكل ممتاز، وأشهد بأنني راضٍ تماماً عن الخدمة المقدمة ولا توجد لدي أي ملاحظات. ملحوظة: في حالة غسيل السيارة بأي مواد تضر الحماية (PPF) تكون السيارة خارج الضمان.",
+   "fieldname": "undertaking_text",
+   "fieldtype": "Small Text",
+   "label": "Vehicle Delivery Undertaking",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "sec_break_billing",
+   "fieldtype": "Section Break",
+   "label": "Related Documents"
   },
   {
    "fieldname": "sales_invoice",
@@ -188,14 +357,15 @@
    "options": "Quotation"
   },
   {
-   "fieldname": "notes",
+   "fieldname": "requested_services",
    "fieldtype": "Small Text",
-   "label": "General Notes"
+   "label": "Summary of Requested Services",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-10-26 11:00:00.000000",
+ "modified": "2026-10-29 15:45:00.000000",
  "modified_by": "Administrator",
  "module": "Mu Car Care",
  "name": "Vehicle Reception",
@@ -243,5 +413,6 @@
  "sort_order": "DESC",
  "states": [],
  "title_field": "plate_number",
- "track_changes": 1
+ "track_changes": 1,
+ "search_fields": "customer,plate_number,vehicle_make,vehicle_model,status"
 }

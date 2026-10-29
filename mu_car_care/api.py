@@ -220,6 +220,41 @@ def make_sales_invoice_from_reception(source_name, target_doc=None):
 
 
 @frappe.whitelist()
+def make_sales_order_from_reception(source_name, target_doc=None):
+	"""Create a Sales Order pre-filled with vehicle details from Vehicle Reception."""
+	def set_missing_values(source, target):
+		target.custom_has_maintenance_schedule = 1
+		target.custom_maintenance_start_date = source.posting_date
+		if not target.delivery_date:
+			target.delivery_date = source.posting_date
+
+	doclist = get_mapped_doc(
+		"Vehicle Reception",
+		source_name,
+		{
+			"Vehicle Reception": {
+				"doctype": "Sales Order",
+				"field_map": {
+					"customer": "customer",
+					"plate_number": "custom_plate_number",
+					"vehicle_make": "custom_vehicle_make",
+					"vehicle_model": "custom_vehicle_model",
+					"vehicle_color": "custom_vehicle_color",
+					"odometer_km": "custom_odometer_reading",
+					"chassis_no": "custom_chassis_no",
+					"name": "custom_vehicle_reception_ref",
+				},
+			}
+		},
+		target_doc,
+		set_missing_values,
+	)
+
+	return doclist
+
+
+
+@frappe.whitelist()
 def make_quotation_from_reception(source_name, target_doc=None):
 	"""Create a Quotation pre-filled with vehicle details from Vehicle Reception."""
 	def set_missing_values(source, target):
