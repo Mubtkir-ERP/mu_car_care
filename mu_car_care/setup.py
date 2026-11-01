@@ -123,6 +123,32 @@ def after_migrate():
 			WHERE notes LIKE 'زيارة صيانة دورية%'
 			"""
 		)
+		# Ensure custom_paid_amount field on transactions
+		for dt in ["Sales Invoice", "Sales Order", "Quotation"]:
+			try:
+				cols = frappe.db.get_table_columns(dt)
+				if "custom_paid_amount" not in cols:
+					frappe.db.sql(f"ALTER TABLE `tab{dt}` ADD COLUMN `custom_paid_amount` decimal(21,9) DEFAULT 0.0")
+			except Exception:
+				pass
+
+			if not frappe.db.exists("Custom Field", {"dt": dt, "fieldname": "custom_paid_amount"}):
+				try:
+					cf = frappe.get_doc({
+						"doctype": "Custom Field",
+						"dt": dt,
+						"fieldname": "custom_paid_amount",
+						"label": "Paid Deposit Amount",
+						"fieldtype": "Currency",
+						"options": "Company:company:default_currency",
+						"insert_after": "custom_odometer_reading",
+						"read_only": 0,
+						"allow_on_submit": 0,
+					})
+					cf.insert(ignore_permissions=True)
+				except Exception:
+					pass
+
 		frappe.db.commit()
 	except Exception:
 		pass

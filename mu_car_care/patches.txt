@@ -14,3 +14,4 @@ mu_car_care.patches.v1_1.v1_1_9_move_notes_under_customer_name
 mu_car_care.patches.v1_1.v1_1_10_cleanup_legacy_car_fields_and_lock_submitted
 mu_car_care.patches.v1_1.v1_1_23_make_reception_submittable
 mu_car_care.patches.v1_1.v1_1_24_window_film_child_table_and_naming_series
+mu_car_care.patches.v1_1.v1_1_25_reception_fixes

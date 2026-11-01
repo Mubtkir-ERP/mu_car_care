@@ -474,6 +474,9 @@ def make_sales_invoice_from_reception(source_name, target_doc=None):
 	def set_missing_values(source, target):
 		target.custom_has_maintenance_schedule = 1
 		target.custom_maintenance_start_date = source.posting_date
+		if source.get("paid_amount"):
+			target.custom_paid_amount = flt(source.paid_amount)
+			target.paid_amount = flt(source.paid_amount)
 		_populate_transaction_items(source, target)
 		try:
 			target.run_method("set_missing_values")
@@ -499,6 +502,7 @@ def make_sales_invoice_from_reception(source_name, target_doc=None):
 					"odometer_km": "custom_odometer_reading",
 					"chassis_no": "custom_chassis_no",
 					"name": "custom_vehicle_reception_ref",
+					"paid_amount": "custom_paid_amount",
 				},
 			}
 		},
@@ -517,6 +521,8 @@ def make_sales_order_from_reception(source_name, target_doc=None):
 		target.custom_maintenance_start_date = source.posting_date
 		if not target.delivery_date:
 			target.delivery_date = source.posting_date
+		if source.get("paid_amount"):
+			target.custom_paid_amount = flt(source.paid_amount)
 		_populate_transaction_items(source, target)
 		try:
 			target.run_method("set_missing_values")
@@ -542,6 +548,7 @@ def make_sales_order_from_reception(source_name, target_doc=None):
 					"odometer_km": "custom_odometer_reading",
 					"chassis_no": "custom_chassis_no",
 					"name": "custom_vehicle_reception_ref",
+					"paid_amount": "custom_paid_amount",
 				},
 			}
 		},
@@ -558,6 +565,8 @@ def make_quotation_from_reception(source_name, target_doc=None):
 	def set_missing_values(source, target):
 		target.custom_has_maintenance_schedule = 1
 		target.custom_maintenance_start_date = source.posting_date
+		if source.get("paid_amount"):
+			target.custom_paid_amount = flt(source.paid_amount)
 		_populate_transaction_items(source, target)
 		try:
 			target.run_method("set_missing_values")
@@ -583,6 +592,7 @@ def make_quotation_from_reception(source_name, target_doc=None):
 					"odometer_km": "custom_odometer_reading",
 					"chassis_no": "custom_chassis_no",
 					"name": "custom_vehicle_reception_ref",
+					"paid_amount": "custom_paid_amount",
 				},
 			}
 		},

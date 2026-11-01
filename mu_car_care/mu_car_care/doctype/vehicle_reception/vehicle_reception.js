@@ -14,8 +14,8 @@ frappe.ui.form.on("Vehicle Reception", {
 	},
 
 	refresh: function (frm) {
-		// Add quick document creation buttons
-		if (!frm.is_new()) {
+		// Create and workflow buttons only available once the document is submitted (تسجيل / docstatus === 1)
+		if (frm.doc.docstatus === 1) {
 			if (!frm.doc.sales_invoice) {
 				frm.add_custom_button(
 					__("Create Sales Invoice"),
@@ -55,26 +55,55 @@ frappe.ui.form.on("Vehicle Reception", {
 				);
 			}
 
-			// Add workflow action buttons (available once submitted)
-			if (frm.doc.docstatus === 1) {
-				if (frm.doc.status === "Received") {
-					frm.add_custom_button(__("Start Work"), function () {
-						frm.set_value("status", "In Progress");
-						frm.save();
-					});
-				} else if (frm.doc.status === "In Progress") {
-					frm.add_custom_button(__("Mark Completed"), function () {
-						frm.set_value("status", "Work Completed");
-						frm.save();
-					});
-				} else if (frm.doc.status === "Work Completed") {
-					frm.add_custom_button(__("Deliver Vehicle"), function () {
-						frm.set_value("status", "Delivered");
-						frm.save();
-					});
-				}
+			// Add workflow action buttons
+			if (frm.doc.status === "Received") {
+				frm.add_custom_button(__("Start Work"), function () {
+					frm.set_value("status", "In Progress");
+					frm.save();
+				});
+			} else if (frm.doc.status === "In Progress") {
+				frm.add_custom_button(__("Mark Completed"), function () {
+					frm.set_value("status", "Work Completed");
+					frm.save();
+				});
+			} else if (frm.doc.status === "Work Completed") {
+				frm.add_custom_button(__("Deliver Vehicle"), function () {
+					frm.set_value("status", "Delivered");
+					frm.save();
+				});
 			}
 		}
+
+		// Ensure notes boxes have equal height
+		frm.trigger("set_notes_equal_height");
+
+		// Ensure window film table has a default blank row if active on draft
+		if (frm.doc.docstatus === 0 && frm.doc.service_window_film && (!frm.doc.window_film_items || frm.doc.window_film_items.length === 0)) {
+			frm.add_child("window_film_items");
+			frm.refresh_field("window_film_items");
+		}
+	},
+
+	service_window_film: function (frm) {
+		// Auto-create a blank row when window film checkbox is enabled
+		if (frm.doc.service_window_film && (!frm.doc.window_film_items || frm.doc.window_film_items.length === 0)) {
+			frm.add_child("window_film_items");
+			frm.refresh_field("window_film_items");
+		}
+	},
+
+	set_notes_equal_height: function (frm) {
+		const notes_fields = ["personal_belongings", "external_condition_notes", "notes"];
+		notes_fields.forEach(function (f) {
+			if (frm.fields_dict[f] && frm.fields_dict[f].$wrapper) {
+				frm.fields_dict[f].$wrapper.find("textarea").css({
+					"height": "95px",
+					"min-height": "95px",
+					"max-height": "95px",
+					"resize": "none",
+				});
+			}
+		});
 	},
 
 	customer: function (frm) {

@@ -41,9 +41,10 @@
 {# عدد الزيارات الفعلي فقط: 17 زيارة بحد أقصى لكل ورقة؛ ترك الهامش السفلي لصورة الفوتر #}
 {% set visits_per_page = 17 %}
 {% set visit_page_count = 1 if maintenance_rows|length == 0 else ((maintenance_rows|length - 1) // visits_per_page) + 1 %}
-{% set page_count = 1 + visit_page_count %}
-{% set paid_amount = ((doc.get('grand_total') or 0)|float - (doc.get('outstanding_amount') or 0)|float) if doc.docstatus == 1 else (doc.get('paid_amount') or 0)|float %}
+{% set direct_paid = (doc.get('custom_paid_amount') or doc.get('paid_amount') or 0)|float %}
+{% set paid_amount = ((doc.get('grand_total') or 0)|float - (doc.get('outstanding_amount') or 0)|float) if (doc.docstatus == 1 and (doc.get('outstanding_amount') is not none) and ((doc.get('grand_total') or 0)|float != (doc.get('outstanding_amount') or 0)|float)) else direct_paid %}
 {% set paid_amount = paid_amount if paid_amount > 0 else 0 %}
+{% set remaining_amount = (doc.get('outstanding_amount') or 0)|float if (doc.docstatus == 1 and (doc.get('outstanding_amount') is not none) and ((doc.get('grand_total') or 0)|float != (doc.get('outstanding_amount') or 0)|float)) else (((doc.get('grand_total') or 0)|float - paid_amount) if ((doc.get('grand_total') or 0)|float - paid_amount) > 0 else 0) %}
 {% set invoice_title = 'فاتورة مبيعات ضريبية' if doc.docstatus == 1 else 'فاتورة مسودة' %}
 
 {# الشروط: الأولوية لشروط الفاتورة، ثم مستند الشروط المحدد فيها، ثم شروط الضمان المختارة #}
@@ -606,7 +607,7 @@ tr, td, th { page-break-inside:avoid; break-inside:avoid; }
                     <tr><td class="sum-label">ضريبة القيمة المضافة</td><td class="sum-value">{{ '{:,.2f}'.format((doc.get('total_taxes_and_charges') or 0)|float) }}</td></tr>
                     <tr class="grand"><td class="sum-label">الإجمالي شامل الضريبة</td><td class="sum-value">{{ '{:,.2f}'.format((doc.get('grand_total') or 0)|float) }}</td></tr>
                     <tr class="paid"><td class="sum-label">المبلغ المدفوع</td><td class="sum-value">{{ '{:,.2f}'.format(paid_amount|float) }}</td></tr>
-                    <tr class="due"><td class="sum-label">المبلغ المتبقي</td><td class="sum-value">{{ '{:,.2f}'.format((doc.get('outstanding_amount') or 0)|float) }}</td></tr>
+                    <tr class="due"><td class="sum-label">المبلغ المتبقي</td><td class="sum-value">{{ '{:,.2f}'.format(remaining_amount|float) }}</td></tr>
                 </tbody></table>
             </div>
         </td>

@@ -33,7 +33,7 @@
    "fieldname": "film_type",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Film Type (UOM)",
+   "label": "Film Type",
    "options": "UOM"
   },
   {

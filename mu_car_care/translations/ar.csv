@@ -49,7 +49,7 @@ End Date,تاريخ النهاية
 Exterior Polishing,خارجي
 Fenders,الرفارف
 Film Shade Degree,الدرجة
-Film Type,نوع العازل
+Film Type,نوع الفيلم
 Film Type (Unit),النوع
 Film Type (UOM),النوع
 Front,المقدمة
@@ -103,6 +103,7 @@ Odometer Reading (KM),قراءة العداد (كم)
 Officer Signature,توقيع الموظف المسؤول
 Outside Polishing,تلميع خارجي
 Paid Amount,المبلغ المدفوع
+Paid Deposit Amount,المبلغ المدفوع (دفعة مقدمة)
 Panorama Roof,سقف بانوراما
 Panorama Roof Film Type,النوع
 Panorama Roof Shade Degree,الدرجة
