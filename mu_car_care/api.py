@@ -254,24 +254,41 @@ def _get_or_create_service_item(default_code, candidates, default_name_ar=None, 
 
 def _build_film_description(source):
 	lines = []
-	glass_items = [
-		(source.get("film_front_window"), _("Front Window"), source.get("film_front_degree"), source.get("film_front_uom")),
-		(source.get("film_back_window"), _("Back Window"), source.get("film_back_degree"), source.get("film_back_uom")),
-		(source.get("film_triangle_window"), _("Triangle Window"), source.get("film_triangle_degree"), source.get("film_triangle_uom")),
-		(source.get("film_rear_driver"), _("Behind Driver Window"), source.get("film_rear_driver_degree"), source.get("film_rear_driver_uom")),
-		(source.get("film_rear_passenger"), _("Behind Passenger Window"), source.get("film_rear_passenger_degree"), source.get("film_rear_passenger_uom")),
-		(source.get("film_sunroof"), _("Sunroof"), source.get("film_sunroof_degree"), source.get("film_sunroof_uom")),
-		(source.get("film_panorama"), _("Panorama Roof"), source.get("film_panorama_degree"), source.get("film_panorama_uom")),
-	]
-	for is_sel, name, degree, uom in glass_items:
-		if is_sel:
+	if source.get("window_film_items"):
+		for row in source.get("window_film_items"):
 			specs = []
+			degree = row.get("shade_degree") if isinstance(row, dict) else getattr(row, "shade_degree", None)
+			film_type = row.get("film_type") if isinstance(row, dict) else getattr(row, "film_type", None)
+			notes = row.get("notes") if isinstance(row, dict) else getattr(row, "notes", None)
+			loc = row.get("window_location") if isinstance(row, dict) else getattr(row, "window_location", None)
 			if degree:
 				specs.append(f"{_('Degree')}: {degree}")
-			if uom:
-				specs.append(f"{_('Type')}: {uom}")
+			if film_type:
+				specs.append(f"{_('Type')}: {film_type}")
+			if notes:
+				specs.append(str(notes))
 			spec_str = f" [{ ' - '.join(specs) }]" if specs else ""
-			lines.append(f"• {name}{spec_str}")
+			loc_label = _(loc) if loc else ""
+			lines.append(f"• {loc_label}{spec_str}")
+	else:
+		glass_items = [
+			(source.get("film_front_window"), _("Front Window"), source.get("film_front_degree"), source.get("film_front_uom")),
+			(source.get("film_back_window"), _("Back Window"), source.get("film_back_degree"), source.get("film_back_uom")),
+			(source.get("film_triangle_window"), _("Triangle Window"), source.get("film_triangle_degree"), source.get("film_triangle_uom")),
+			(source.get("film_rear_driver"), _("Behind Driver Window"), source.get("film_rear_driver_degree"), source.get("film_rear_driver_uom")),
+			(source.get("film_rear_passenger"), _("Behind Passenger Window"), source.get("film_rear_passenger_degree"), source.get("film_rear_passenger_uom")),
+			(source.get("film_sunroof"), _("Sunroof"), source.get("film_sunroof_degree"), source.get("film_sunroof_uom")),
+			(source.get("film_panorama"), _("Panorama Roof"), source.get("film_panorama_degree"), source.get("film_panorama_uom")),
+		]
+		for is_sel, name, degree, uom in glass_items:
+			if is_sel:
+				specs = []
+				if degree:
+					specs.append(f"{_('Degree')}: {degree}")
+				if uom:
+					specs.append(f"{_('Type')}: {uom}")
+				spec_str = f" [{ ' - '.join(specs) }]" if specs else ""
+				lines.append(f"• {name}{spec_str}")
 
 	if not lines:
 		lines.append(f"• {_('Window Film')}")
@@ -337,7 +354,7 @@ def _populate_transaction_items(source, target):
 	services = []
 
 	# 1. Window Film
-	has_film = source.get("service_window_film") or any([
+	has_film = source.get("service_window_film") or source.get("window_film_items") or any([
 		source.get("film_front_window"), source.get("film_back_window"),
 		source.get("film_triangle_window"), source.get("film_rear_driver"),
 		source.get("film_rear_passenger"), source.get("film_sunroof"),

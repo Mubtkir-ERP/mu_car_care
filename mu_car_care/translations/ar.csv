@@ -51,6 +51,7 @@ Fenders,الرفارف
 Film Shade Degree,الدرجة
 Film Type,نوع العازل
 Film Type (Unit),النوع
+Film Type (UOM),النوع
 Front,المقدمة
 Front Bumper,الصدام الأمامي
 Front Doors,الأبواب الأمامية
@@ -140,6 +141,7 @@ Select Due Visit,اختر الزيارة المستحقة
 Semi-Annual,نصف سنوي
 Service Type,نوع الخدمة
 Shade,الدرجة
+Shade Degree,الدرجة
 Signatures & Undertaking,قسم التوقيع
 Start Date,تاريخ البداية
 Start Work,بدء العمل
@@ -164,6 +166,7 @@ Updating maintenance record...,جاري تحديث سجل الصيانة...
 Vehicle Color,لون السيارة
 Vehicle Delivery Undertaking,إقرار استلام السيارة
 Vehicle Details,معلومات السيارة
+Vehicle Film Item,بند مواصفات العازل الحراري
 Vehicle Information,معلومات السيارة
 Vehicle Inspection Diagram,مخطط فحص ومعاينة هيكل السيارة
 Vehicle Maintenance Schedule,جدول الصيانة
@@ -188,5 +191,6 @@ Wax Layer,طبقة الواكس
 Window Film,عازل حراري
 Window Film Service,خدمة عازل حراري
 Window Film Specifications,مواصفات العازل الحراري
+Window Location,المكان / الزجاج
 Work Completed,تم إنجاز العمل
 Work Executed,الأعمال المنفذة

@@ -50,26 +50,39 @@ class VehicleReception(Document):
 		summary_lines = []
 
 		# 1. Window Film
-		if self.service_window_film or self.film_front_window or self.film_back_window or self.film_triangle_window or self.film_rear_driver or self.film_rear_passenger or self.film_sunroof or self.film_panorama:
-			glass_items = [
-				(self.film_front_window, _("Front Window"), self.film_front_degree, self.film_front_uom),
-				(self.film_back_window, _("Back Window"), self.film_back_degree, self.film_back_uom),
-				(self.film_triangle_window, _("Triangle Window"), self.film_triangle_degree, self.film_triangle_uom),
-				(self.film_rear_driver, _("Behind Driver Window"), self.film_rear_driver_degree, self.film_rear_driver_uom),
-				(self.film_rear_passenger, _("Behind Passenger Window"), self.film_rear_passenger_degree, self.film_rear_passenger_uom),
-				(self.film_sunroof, _("Sunroof"), self.film_sunroof_degree, self.film_sunroof_uom),
-				(self.film_panorama, _("Panorama Roof"), self.film_panorama_degree, self.film_panorama_uom),
-			]
+		if self.service_window_film or self.get("window_film_items") or self.film_front_window or self.film_back_window:
 			film_lines = []
-			for is_selected, name, degree, uom in glass_items:
-				if is_selected:
+			if self.get("window_film_items"):
+				for row in self.window_film_items:
 					specs = []
-					if degree:
-						specs.append(f"{_('Degree')}: {degree}")
-					if uom:
-						specs.append(f"{_('Type')}: {uom}")
+					if row.get("shade_degree"):
+						specs.append(f"{_('Degree')}: {row.shade_degree}")
+					if row.get("film_type"):
+						specs.append(f"{_('Type')}: {row.film_type}")
+					if row.get("notes"):
+						specs.append(str(row.notes))
 					spec_str = f" [{', '.join(specs)}]" if specs else ""
-					film_lines.append(f"{name}{spec_str}")
+					loc_label = _(row.window_location) if row.window_location else ""
+					film_lines.append(f"{loc_label}{spec_str}")
+			else:
+				glass_items = [
+					(self.film_front_window, _("Front Window"), self.film_front_degree, self.film_front_uom),
+					(self.film_back_window, _("Back Window"), self.film_back_degree, self.film_back_uom),
+					(self.film_triangle_window, _("Triangle Window"), self.film_triangle_degree, self.film_triangle_uom),
+					(self.film_rear_driver, _("Behind Driver Window"), self.film_rear_driver_degree, self.film_rear_driver_uom),
+					(self.film_rear_passenger, _("Behind Passenger Window"), self.film_rear_passenger_degree, self.film_rear_passenger_uom),
+					(self.film_sunroof, _("Sunroof"), self.film_sunroof_degree, self.film_sunroof_uom),
+					(self.film_panorama, _("Panorama Roof"), self.film_panorama_degree, self.film_panorama_uom),
+				]
+				for is_selected, name, degree, uom in glass_items:
+					if is_selected:
+						specs = []
+						if degree:
+							specs.append(f"{_('Degree')}: {degree}")
+						if uom:
+							specs.append(f"{_('Type')}: {uom}")
+						spec_str = f" [{', '.join(specs)}]" if specs else ""
+						film_lines.append(f"{name}{spec_str}")
 
 			loc_str = ", ".join(film_lines) if film_lines else _("Not specified")
 			summary_lines.append(f"• {_('Window Film')}: {loc_str}")
