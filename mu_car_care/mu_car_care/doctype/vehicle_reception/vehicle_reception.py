@@ -41,29 +41,29 @@ class VehicleReception(Document):
 		summary_lines = []
 
 		# 1. Window Film
-		if self.service_window_film or self.film_front_window or self.film_back_window or self.film_front_doors or self.film_back_doors or self.film_sunroof or self.film_triangle_window:
-			film_parts = []
-			if self.film_front_window:
-				film_parts.append(_("Front Window"))
-			if self.film_back_window:
-				film_parts.append(_("Back Window"))
-			if self.film_front_doors:
-				film_parts.append(_("Front Doors"))
-			if self.film_back_doors:
-				film_parts.append(_("Back Doors"))
-			if self.film_sunroof:
-				film_parts.append(_("Sunroof / Panorama"))
-			if self.film_triangle_window:
-				film_parts.append(_("Triangle Window"))
+		if self.service_window_film or self.film_front_window or self.film_back_window or self.film_triangle_window or self.film_rear_driver or self.film_rear_passenger or self.film_sunroof or self.film_panorama:
+			glass_items = [
+				(self.film_front_window, _("Front Window"), self.film_front_degree, self.film_front_uom),
+				(self.film_back_window, _("Back Window"), self.film_back_degree, self.film_back_uom),
+				(self.film_triangle_window, _("Triangle Window"), self.film_triangle_degree, self.film_triangle_uom),
+				(self.film_rear_driver, _("Behind Driver Window"), self.film_rear_driver_degree, self.film_rear_driver_uom),
+				(self.film_rear_passenger, _("Behind Passenger Window"), self.film_rear_passenger_degree, self.film_rear_passenger_uom),
+				(self.film_sunroof, _("Sunroof"), self.film_sunroof_degree, self.film_sunroof_uom),
+				(self.film_panorama, _("Panorama Roof"), self.film_panorama_degree, self.film_panorama_uom),
+			]
+			film_lines = []
+			for is_selected, name, degree, uom in glass_items:
+				if is_selected:
+					specs = []
+					if degree:
+						specs.append(f"{_('Degree')}: {degree}")
+					if uom:
+						specs.append(f"{_('Type')}: {uom}")
+					spec_str = f" [{', '.join(specs)}]" if specs else ""
+					film_lines.append(f"{name}{spec_str}")
 
-			loc_str = ", ".join([str(p) for p in film_parts]) if film_parts else _("Not specified")
-			extra = []
-			if self.film_shade_degree:
-				extra.append(f"{_('Shade')}: {self.film_shade_degree}")
-			if self.film_uom:
-				extra.append(f"{_('Type')}: {self.film_uom}")
-			extra_str = f" [{', '.join(extra)}]" if extra else ""
-			summary_lines.append(f"• {_('Window Film')}: {loc_str}{extra_str}")
+			loc_str = ", ".join(film_lines) if film_lines else _("Not specified")
+			summary_lines.append(f"• {_('Window Film')}: {loc_str}")
 
 		# 2. PPF Protection
 		if self.service_ppf_protection or self.ppf_front_bumper or self.ppf_rear_bumper or self.ppf_front_doors or self.ppf_back_doors or self.ppf_headlights or self.ppf_hood or self.ppf_fenders or self.ppf_mirrors or self.ppf_grille or self.ppf_full_body or self.ppf_front_window:
