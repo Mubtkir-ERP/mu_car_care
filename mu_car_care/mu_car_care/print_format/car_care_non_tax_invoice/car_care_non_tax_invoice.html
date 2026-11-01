@@ -1,5 +1,5 @@
 {# ============================================================================ #}
-{#  مُبتكر ERP - قالب فاتورة مبيعات بدون ضريبة والصيانة - نسخة للطباعة A4             #}
+{#  مُبتكر ERP - قالب فاتورة المبيعات والصيانة - نسخة للطباعة A4             #}
 {#  ملف مستقل: انسخه كاملًا إلى حقل HTML داخل Print Format                  #}
 {#  لا يضيف أي حقول أو يغير التطبيق                                           #}
 {# ============================================================================ #}
@@ -44,7 +44,7 @@
 {% set page_count = 1 + visit_page_count %}
 {% set paid_amount = ((doc.get('grand_total') or 0)|float - (doc.get('outstanding_amount') or 0)|float) if doc.docstatus == 1 else (doc.get('paid_amount') or 0)|float %}
 {% set paid_amount = paid_amount if paid_amount > 0 else 0 %}
-{% set invoice_title = 'فاتورة مبيعات' if doc.docstatus == 1 else 'فاتورة مسودة' %}
+{% set invoice_title = 'فاتورة مبيعات ضريبية' if doc.docstatus == 1 else 'فاتورة مسودة' %}
 
 {# الشروط: الأولوية لشروط الفاتورة، ثم مستند الشروط المحدد فيها، ثم شروط الضمان المختارة #}
 {% set terms_content = namespace(html=doc.get('terms') or '') %}
@@ -62,8 +62,19 @@
     {% endfor %}
 {% endif %}
 
-{# 4- لا يوجد رمز ضريبي للفاتورة غير الضريبية #}
+{# 4- QR من نظام الزكاة فقط، لا ننشئ رمزًا تجريبيًا مطلقًا #}
 {% set qr_image_src = None %}
+{% if doc.docstatus == 1 %}
+    {% set phase_2_data = get_phase_2_print_format_details(doc) if get_phase_2_print_format_details is defined else None %}
+    {% if phase_2_data and phase_2_data.siaf and phase_2_data.siaf.qr_image_src %}
+        {% set qr_image_src = phase_2_data.siaf.qr_image_src %}
+    {% elif get_zatca_phase_1_qr_for_invoice is defined %}
+        {% set phase_1_code = get_zatca_phase_1_qr_for_invoice(doc.name) %}
+        {% if phase_1_code %}{% set qr_image_src = 'data:image/png;base64,' ~ phase_1_code %}{% endif %}
+    {% else %}
+        {% set qr_image_src = doc.get('qr_code') or doc.get('custom_qr_code') %}
+    {% endif %}
+{% endif %}
 
 {# 5- الحسابات البنكية - اختياري: من Bank Account لنفس شركة الفاتورة #}
 {% set company_banks = frappe.get_all('Bank Account', filters={'company': doc.company, 'is_company_account': 1, 'disabled': 0}, fields=['name','bank','iban','is_default'], order_by='is_default desc, name asc', limit_page_length=20) if doc.get('company') else [] %}
@@ -591,11 +602,9 @@ tr, td, th { page-break-inside:avoid; break-inside:avoid; }
             <div class="section">
                 <div class="section-title">ملخص الحساب</div>
                 <table class="totals-table"><tbody>
-                    {% if doc.get('discount_amount') and (doc.get('discount_amount')|float) > 0 %}
-                    <tr><td class="sum-label">المجموع</td><td class="sum-value">{{ '{:,.2f}'.format((doc.get('total') or 0)|float) }}</td></tr>
-                    <tr><td class="sum-label">الخصم</td><td class="sum-value">{{ '{:,.2f}'.format((doc.get('discount_amount') or 0)|float) }}</td></tr>
-                    {% endif %}
-                    <tr class="grand"><td class="sum-label">المبلغ الإجمالي</td><td class="sum-value">{{ '{:,.2f}'.format((doc.get('grand_total') or doc.get('net_total') or doc.get('total') or 0)|float) }}</td></tr>
+                    <tr><td class="sum-label">المجموع الفرعي (قبل الضريبة)</td><td class="sum-value">{{ '{:,.2f}'.format((doc.get('net_total') or 0)|float) }}</td></tr>
+                    <tr><td class="sum-label">ضريبة القيمة المضافة</td><td class="sum-value">{{ '{:,.2f}'.format((doc.get('total_taxes_and_charges') or 0)|float) }}</td></tr>
+                    <tr class="grand"><td class="sum-label">الإجمالي شامل الضريبة</td><td class="sum-value">{{ '{:,.2f}'.format((doc.get('grand_total') or 0)|float) }}</td></tr>
                     <tr class="paid"><td class="sum-label">المبلغ المدفوع</td><td class="sum-value">{{ '{:,.2f}'.format(paid_amount|float) }}</td></tr>
                     <tr class="due"><td class="sum-label">المبلغ المتبقي</td><td class="sum-value">{{ '{:,.2f}'.format((doc.get('outstanding_amount') or 0)|float) }}</td></tr>
                 </tbody></table>

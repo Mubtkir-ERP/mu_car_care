@@ -14,9 +14,6 @@ frappe.ui.form.on("Vehicle Reception", {
 	},
 
 	refresh: function (frm) {
-		// Style inspection diagram canvas with vehicle silhouette backdrop
-		setup_diagram_background(frm);
-
 		// Add quick document creation buttons
 		if (!frm.is_new()) {
 			if (!frm.doc.sales_invoice) {
@@ -83,31 +80,12 @@ frappe.ui.form.on("Vehicle Reception", {
 			frappe.db.get_value("Customer", frm.doc.customer, ["customer_name", "mobile_no"], function (r) {
 				if (r) {
 					frm.set_value("customer_name", r.customer_name);
-					if (r.mobile_no && !frm.doc.contact_mobile) {
-						frm.set_value("contact_mobile", r.mobile_no);
-					}
+					frm.set_value("contact_mobile", r.mobile_no || "");
 				}
 			});
+		} else {
+			frm.set_value("customer_name", "");
+			frm.set_value("contact_mobile", "");
 		}
 	},
 });
-
-function setup_diagram_background(frm) {
-	if (!frm.fields_dict || !frm.fields_dict.inspection_diagram) return;
-	setTimeout(function () {
-		let $wrapper = frm.fields_dict.inspection_diagram.$wrapper;
-		if ($wrapper && $wrapper.length) {
-			let $targets = $wrapper.find(".signature-field, .signature-box, .signature-display, canvas");
-			if ($targets.length) {
-				$targets.css({
-					"background-image": "url('/assets/mu_car_care/images/car_inspection_diagram.png')",
-					"background-size": "contain",
-					"background-repeat": "no-repeat",
-					"background-position": "center center",
-					"min-height": "220px",
-					"background-color": "#ffffff",
-				});
-			}
-		}
-	}, 250);
-}

@@ -25,10 +25,13 @@ class VehicleReception(Document):
 
 	def set_customer_details(self):
 		"""Ensure customer details are populated if not already fetched."""
-		if self.customer and not self.contact_mobile:
-			mobile = frappe.db.get_value("Customer", self.customer, "mobile_no")
-			if mobile:
-				self.contact_mobile = mobile
+		if self.customer:
+			if not self.customer_name:
+				self.customer_name = frappe.db.get_value("Customer", self.customer, "customer_name")
+			if not self.contact_mobile:
+				mobile = frappe.db.get_value("Customer", self.customer, "mobile_no")
+				if mobile:
+					self.contact_mobile = mobile
 
 	def summarize_requested_services(self):
 		"""

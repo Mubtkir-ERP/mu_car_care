@@ -6,18 +6,41 @@
  "engine": "InnoDB",
  "field_order": [
   "naming_series",
+  "col_break_row1_1",
   "customer",
   "customer_name",
+  "col_break_row1_2",
   "contact_mobile",
+  "sec_break_row2",
   "posting_date",
+  "col_break_row2_1",
   "posting_time",
+  "col_break_row2_2",
   "status",
-  "col_break_1",
-  "plate_number",
+  "sec_break_vehicle",
   "vehicle_make",
+  "col_break_row3_1",
   "vehicle_model",
+  "col_break_row3_2",
+  "plate_number",
+  "col_break_row3_3",
   "vehicle_color",
+  "col_break_row3_4",
   "chassis_no",
+  "sec_break_inspection",
+  "odometer_km",
+  "col_break_insp_1",
+  "fuel_level",
+  "col_break_insp_2",
+  "price",
+  "col_break_insp_3",
+  "paid_amount",
+  "sec_break_insp_notes",
+  "personal_belongings",
+  "col_break_insp_notes_1",
+  "external_condition_notes",
+  "col_break_insp_notes_2",
+  "notes",
   "sec_break_services",
   "film_front_window",
   "film_front_doors",
@@ -39,26 +62,21 @@
   "polish_nano_ceramic",
   "nano_layers_warranty",
   "accessories",
-  "sec_break_inspection",
-  "odometer_km",
-  "fuel_level",
-  "personal_belongings",
-  "col_break_inspection",
-  "inspection_diagram",
-  "external_condition_notes",
-  "notes",
-  "sec_break_pricing_undertaking",
-  "price",
+  "sec_break_signatures",
   "in_charge_name",
-  "col_break_signatures",
-  "customer_signature",
-  "in_charge_signature",
+  "col_break_sig_row1",
   "undertaking_text",
+  "sec_break_sig_draw",
+  "in_charge_signature",
+  "col_break_sig_row2",
+  "customer_signature",
   "sec_break_billing",
   "sales_invoice",
   "sales_order",
   "quotation",
-  "requested_services"
+  "col_break_billing",
+  "requested_services",
+  "inspection_diagram"
  ],
  "fields": [
   {
@@ -72,8 +90,13 @@
    "set_only_once": 1
   },
   {
+   "fieldname": "col_break_row1_1",
+   "fieldtype": "Column Break"
+  },
+  {
    "fieldname": "customer",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Customer",
    "options": "Customer",
@@ -83,16 +106,26 @@
    "fetch_from": "customer.customer_name",
    "fieldname": "customer_name",
    "fieldtype": "Data",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Customer Name",
    "read_only": 1
+  },
+  {
+   "fieldname": "col_break_row1_2",
+   "fieldtype": "Column Break"
   },
   {
    "fetch_from": "customer.mobile_no",
    "fieldname": "contact_mobile",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Mobile No"
+   "label": "Mobile No",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sec_break_row2",
+   "fieldtype": "Section Break"
   },
   {
    "default": "Today",
@@ -104,12 +137,21 @@
    "reqd": 1
   },
   {
+   "fieldname": "col_break_row2_1",
+   "fieldtype": "Column Break"
+  },
+  {
    "default": "Now",
    "fieldname": "posting_time",
    "fieldtype": "Time",
    "label": "Posting Time"
   },
   {
+   "fieldname": "col_break_row2_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
    "default": "Received",
    "fieldname": "status",
    "fieldtype": "Select",
@@ -120,7 +162,29 @@
    "reqd": 1
   },
   {
-   "fieldname": "col_break_1",
+   "fieldname": "sec_break_vehicle",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "vehicle_make",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Vehicle Make",
+   "reqd": 0
+  },
+  {
+   "fieldname": "col_break_row3_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "vehicle_model",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Vehicle Model / Year",
+   "reqd": 0
+  },
+  {
+   "fieldname": "col_break_row3_2",
    "fieldtype": "Column Break"
   },
   {
@@ -129,29 +193,93 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Plate Number",
-   "reqd": 1
+   "reqd": 0
   },
   {
-   "fieldname": "vehicle_make",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Vehicle Make"
-  },
-  {
-   "fieldname": "vehicle_model",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Vehicle Model / Year"
+   "fieldname": "col_break_row3_3",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "vehicle_color",
    "fieldtype": "Data",
-   "label": "Vehicle Color"
+   "label": "Vehicle Color",
+   "reqd": 0
+  },
+  {
+   "fieldname": "col_break_row3_4",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "chassis_no",
    "fieldtype": "Data",
-   "label": "Chassis No (VIN)"
+   "label": "Chassis No (VIN)",
+   "reqd": 0
+  },
+  {
+   "fieldname": "sec_break_inspection",
+   "fieldtype": "Section Break",
+   "label": "Inspection & Vehicle Status"
+  },
+  {
+   "fieldname": "odometer_km",
+   "fieldtype": "Int",
+   "label": "Odometer (KM)"
+  },
+  {
+   "fieldname": "col_break_insp_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "fuel_level",
+   "fieldtype": "Select",
+   "label": "Fuel Level",
+   "options": "\nEmpty\n1/4\n1/2\n3/4\nFull"
+  },
+  {
+   "fieldname": "col_break_insp_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "price",
+   "fieldtype": "Currency",
+   "label": "Agreed Price"
+  },
+  {
+   "fieldname": "col_break_insp_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "paid_amount",
+   "fieldtype": "Currency",
+   "label": "Paid Amount"
+  },
+  {
+   "fieldname": "sec_break_insp_notes",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "personal_belongings",
+   "fieldtype": "Small Text",
+   "label": "Personal Belongings Inside Vehicle"
+  },
+  {
+   "fieldname": "col_break_insp_notes_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "external_condition_notes",
+   "fieldtype": "Small Text",
+   "label": "Pre-existing Scratches / Dents"
+  },
+  {
+   "fieldname": "col_break_insp_notes_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text",
+   "label": "Inspection & Service Notes"
   },
   {
    "fieldname": "sec_break_services",
@@ -227,6 +355,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "default": 0,
    "fieldname": "polish_inside",
    "fieldtype": "Check",
    "label": "Inside Polishing"
@@ -257,54 +386,9 @@
    "label": "Accessories"
   },
   {
-   "fieldname": "sec_break_inspection",
+   "fieldname": "sec_break_signatures",
    "fieldtype": "Section Break",
-   "label": "Inspection & Vehicle Status"
-  },
-  {
-   "fieldname": "odometer_km",
-   "fieldtype": "Int",
-   "label": "Odometer (KM)"
-  },
-  {
-   "fieldname": "fuel_level",
-   "fieldtype": "Select",
-   "label": "Fuel Level",
-   "options": "\nEmpty\n1/4\n1/2\n3/4\nFull"
-  },
-  {
-   "fieldname": "personal_belongings",
-   "fieldtype": "Small Text",
-   "label": "Personal Belongings Inside Vehicle"
-  },
-  {
-   "fieldname": "col_break_inspection",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "inspection_diagram",
-   "fieldtype": "Signature",
-   "label": "Vehicle Inspection Diagram"
-  },
-  {
-   "fieldname": "external_condition_notes",
-   "fieldtype": "Small Text",
-   "label": "Pre-existing Scratches / Dents"
-  },
-  {
-   "fieldname": "notes",
-   "fieldtype": "Small Text",
-   "label": "Inspection & Service Notes"
-  },
-  {
-   "fieldname": "sec_break_pricing_undertaking",
-   "fieldtype": "Section Break",
-   "label": "Pricing, Undertaking & Signatures"
-  },
-  {
-   "fieldname": "price",
-   "fieldtype": "Currency",
-   "label": "Agreed Price"
+   "label": "Signatures & Undertaking"
   },
   {
    "fieldname": "in_charge_name",
@@ -312,18 +396,8 @@
    "label": "In-Charge Officer"
   },
   {
-   "fieldname": "col_break_signatures",
+   "fieldname": "col_break_sig_row1",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "customer_signature",
-   "fieldtype": "Signature",
-   "label": "Customer Signature"
-  },
-  {
-   "fieldname": "in_charge_signature",
-   "fieldtype": "Signature",
-   "label": "Officer Signature"
   },
   {
    "default": "أقر بأنني استلمت السيارة بعد أن تم تنفيذ جميع خدمات الحماية المطلوبة بشكل ممتاز، وأشهد بأنني راضٍ تماماً عن الخدمة المقدمة ولا توجد لدي أي ملاحظات. ملحوظة: في حالة غسيل السيارة بأي مواد تضر الحماية (PPF) تكون السيارة خارج الضمان.",
@@ -331,6 +405,24 @@
    "fieldtype": "Small Text",
    "label": "Vehicle Delivery Undertaking",
    "read_only": 1
+  },
+  {
+   "fieldname": "sec_break_sig_draw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "in_charge_signature",
+   "fieldtype": "Signature",
+   "label": "Officer Signature"
+  },
+  {
+   "fieldname": "col_break_sig_row2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer_signature",
+   "fieldtype": "Signature",
+   "label": "Customer Signature"
   },
   {
    "collapsible": 1,
@@ -357,15 +449,25 @@
    "options": "Quotation"
   },
   {
+   "fieldname": "col_break_billing",
+   "fieldtype": "Column Break"
+  },
+  {
    "fieldname": "requested_services",
    "fieldtype": "Small Text",
    "label": "Summary of Requested Services",
    "read_only": 1
+  },
+  {
+   "fieldname": "inspection_diagram",
+   "fieldtype": "Signature",
+   "hidden": 1,
+   "label": "Vehicle Inspection Diagram"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-10-29 15:45:00.000000",
+ "modified": "2026-11-01 10:20:00.000000",
  "modified_by": "Administrator",
  "module": "Mu Car Care",
  "name": "Vehicle Reception",

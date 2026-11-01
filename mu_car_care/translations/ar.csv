@@ -13,13 +13,14 @@ Car Body,كامل البودي
 Car Care Tax Invoice,فاتورة مبيعات ضريبية وجدول الصيانة
 Car Protection,حماية السيارة
 Care & Maintenance Instructions / Terms,تعليمات العناية والصيانة والشروط
-Chassis No (VIN),رقم الهيكل (VIN)
+Chassis No (VIN),رقم الهيكل
 Completed,تمت الصيانة
 Confirm Visit Completed,تأكيد إتمام الزيارة
 Create Quotation,إنشاء عرض سعر
 Create Sales Invoice,إنشاء فاتورة مبيعات
 Create Sales Order,إنشاء طلب مبيعات
 Current Odometer (KM),قراءة العداد الحالية (كم)
+Customer,اسم العميل
 Customer Name,اسم العميل
 Customer Signature,توقيع العميل
 Deliver Vehicle,تسليم السيارة للعميل
@@ -35,7 +36,7 @@ Film Type,نوع العازل
 Front,المقدمة
 Front Doors,الأبواب الأمامية
 Front Window,الزجاج الأمامي
-Fuel Level,مستوى الوقود
+Fuel Level,حالة الوقود
 Full,ممتلئ
 General Notes,ملاحظات عامة
 Generate Schedule,توليد الجدول
@@ -46,7 +47,7 @@ In Progress,قيد التنفيذ
 In-Charge Officer,الموظف المسؤول
 Inside Polishing,تلميع داخلي
 Inspection & Service Notes,ملاحظات الفحص والخدمة
-Inspection & Vehicle Status,الفحص وحالة السيارة
+Inspection & Vehicle Status,فحص وحالة السيارة
 Leather,جلد
 Leather Mat,أرضية جلد
 Maintenance Schedule,جدول الصيانة
@@ -58,32 +59,33 @@ Maintenance Visits Schedule,جدول زيارات الصيانة
 Mark Completed,تم إنجاز العمل
 Mobile No,رقم الجوال
 Monthly,شهري
-Naming Series,تسلسل الترقيم
+Naming Series,تسلسل التسمية
 Nano Ceramic,نانو سيراميك
 Nano Layers & Warranty,طبقات النانو وفترة الضمان
 No Show,لم يحضر
 No.,مـ
 Non-Tax Sales Invoice,فاتورة مبيعات بدون ضريبة
 Notes,ملاحظات
-Odometer (KM),قراءة العداد (كم)
+Odometer (KM),قراءة العداد
 Odometer Reading (KM),قراءة العداد (كم)
 Officer Signature,توقيع الموظف المسؤول
 Outside Polishing,تلميع خارجي
+Paid Amount,المبلغ المدفوع
 Personal Belongings Inside Vehicle,المتعلقات الشخصية داخل السيارة
 Plate Number,رقم اللوحة
 Please select a valid visit from the list.,يرجى اختيار زيارة صيانة صالحة من القائمة.
 Polishing,تلميع السيارة
-Posting Date,تاريخ القيد
-Posting Time,وقت القيد
+Posting Date,تاريخ الاستلام
+Posting Time,وقت الاستلام
 Pre-existing Scratches / Dents,ملاحظات الخدوش والصدمات السابقة
-Pricing, Undertaking & Signatures,التكلفة والإقرار والتوقيعات
+Pricing,Undertaking & Signatures,التكلفة والإقرار والتوقيعات
 Quarterly,ربع سنوي
 Quotation with Maintenance,عرض سعر مع الصيانة
 Received,تم الاستلام
 Record Maintenance Visit,زيارة صيانة
-Related Documents,المستندات المرتبطة
+Related Documents,قسم المستندات المرتبطة
 Requested Services & Documents,الخدمات المطلوبة والمستندات
-Requested Services & Film Specifications,الخدمات المطلوبة ومواصفات العازل
+Requested Services & Film Specifications,قسم الخدمات المطلوبة
 Requested Services & Specifications,الخدمات والمواصفات المطلوبة
 Sales Order with Maintenance,طلب مبيعات مع الصيانة
 Schedule Configuration,إعدادات جدول الصيانة
@@ -92,6 +94,7 @@ Scheduled Visit Date,موعد الزيارة
 Select Due Visit,اختر الزيارة المستحقة
 Semi-Annual,نصف سنوي
 Service Type,نوع الخدمة
+Signatures & Undertaking,قسم التوقيع
 Start Date,تاريخ البداية
 Start Work,بدء العمل
 Status,الحالة
@@ -113,7 +116,7 @@ Vehicle Maintenance Schedule,جدول الصيانة
 Vehicle Maintenance Schedule Item,بند جدول صيانة السيارة
 Vehicle Make,نوع السيارة
 Vehicle Model,موديل السيارة
-Vehicle Model / Year,موديل وسنة الصنع
+Vehicle Model / Year,موديل السيارة
 Vehicle Reception,استلام وفحص سيارة
 Vehicle Reception Ref,مرجع استلام السيارة
 Vehicle Warranty Item,بند تفاصيل الضمان
