@@ -66,32 +66,43 @@ class VehicleReception(Document):
 			summary_lines.append(f"• {_('Window Film')}: {loc_str}")
 
 		# 2. PPF Protection
-		if self.service_ppf_protection or self.ppf_front_bumper or self.ppf_rear_bumper or self.ppf_front_doors or self.ppf_back_doors or self.ppf_headlights or self.ppf_hood or self.ppf_fenders or self.ppf_mirrors or self.ppf_grille or self.ppf_full_body or self.ppf_front_window:
-			ppf_parts = []
-			if self.ppf_full_body:
-				ppf_parts.append(_("Full Car Body"))
-			if self.ppf_front_bumper:
-				ppf_parts.append(_("Front Bumper"))
-			if self.ppf_rear_bumper:
-				ppf_parts.append(_("Rear Bumper"))
-			if self.ppf_front_doors:
-				ppf_parts.append(_("Front Doors"))
-			if self.ppf_back_doors:
-				ppf_parts.append(_("Back Doors"))
-			if self.ppf_headlights:
-				ppf_parts.append(_("Headlights / Lights"))
-			if self.ppf_hood:
-				ppf_parts.append(_("Hood"))
-			if self.ppf_fenders:
-				ppf_parts.append(_("Fenders"))
-			if self.ppf_mirrors:
-				ppf_parts.append(_("Mirrors"))
-			if self.ppf_grille:
-				ppf_parts.append(_("Grille"))
-			if self.ppf_front_window:
-				ppf_parts.append(_("Front Windshield (PPF)"))
-
-			loc_str = ", ".join([str(p) for p in ppf_parts]) if ppf_parts else _("Not specified")
+		if (
+			self.service_ppf_protection
+			or self.ppf_full_body
+			or self.ppf_front_bumper
+			or self.ppf_rear_bumper
+			or self.ppf_driver_door
+			or self.ppf_passenger_door
+			or self.ppf_rear_driver_door
+			or self.ppf_rear_passenger_door
+			or self.ppf_trunk_door
+			or self.ppf_front_headlights
+			or self.ppf_rear_lights
+			or self.ppf_hood
+			or self.ppf_fenders
+			or self.ppf_mirrors
+			or self.ppf_grille
+			or self.ppf_front_window
+		):
+			ppf_items = [
+				(self.ppf_full_body, _("Full Car Body")),
+				(self.ppf_front_bumper, _("Front Bumper")),
+				(self.ppf_rear_bumper, _("Rear Bumper")),
+				(self.ppf_driver_door, _("Driver Door")),
+				(self.ppf_passenger_door, _("Passenger Door")),
+				(self.ppf_rear_driver_door, _("Behind Driver Door")),
+				(self.ppf_rear_passenger_door, _("Behind Passenger Door")),
+				(self.ppf_trunk_door, _("Trunk Door")),
+				(self.ppf_front_headlights, _("Front Headlights")),
+				(self.ppf_rear_lights, _("Rear Tail Lights")),
+				(self.ppf_hood, _("Hood")),
+				(self.ppf_fenders, _("Fenders")),
+				(self.ppf_mirrors, _("Mirrors")),
+				(self.ppf_grille, _("Grille")),
+				(self.ppf_front_window, _("Front Windshield (PPF)")),
+			]
+			ppf_parts = [name for is_selected, name in ppf_items if is_selected]
+			loc_str = ", ".join(ppf_parts) if ppf_parts else _("Not specified")
 			summary_lines.append(f"• {_('PPF Protection')}: {loc_str}")
 
 		# 3. Polishing

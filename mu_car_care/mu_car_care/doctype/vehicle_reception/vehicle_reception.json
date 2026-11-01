@@ -87,19 +87,35 @@
   "film_panorama_uom",
   "sec_break_ppf",
   "service_ppf_protection",
-  "sec_break_ppf_sub",
+  "sec_break_ppf_row1",
   "ppf_front_bumper",
+  "col_break_ppf_r1_1",
   "ppf_rear_bumper",
-  "ppf_front_doors",
-  "ppf_back_doors",
-  "col_break_ppf_sub_1",
-  "ppf_headlights",
+  "col_break_ppf_r1_2",
+  "ppf_driver_door",
+  "col_break_ppf_r1_3",
+  "ppf_passenger_door",
+  "col_break_ppf_r1_4",
+  "ppf_rear_driver_door",
+  "sec_break_ppf_row2",
+  "ppf_rear_passenger_door",
+  "col_break_ppf_r2_1",
+  "ppf_trunk_door",
+  "col_break_ppf_r2_2",
+  "ppf_front_headlights",
+  "col_break_ppf_r2_3",
+  "ppf_rear_lights",
+  "col_break_ppf_r2_4",
   "ppf_hood",
+  "sec_break_ppf_row3",
   "ppf_fenders",
+  "col_break_ppf_r3_1",
   "ppf_mirrors",
-  "col_break_ppf_sub_2",
+  "col_break_ppf_r3_2",
   "ppf_grille",
+  "col_break_ppf_r3_3",
   "ppf_full_body",
+  "col_break_ppf_r3_4",
   "ppf_front_window",
   "sec_break_polish",
   "service_polishing",
@@ -144,7 +160,10 @@
   "film_front_doors",
   "film_back_doors",
   "film_shade_degree",
-  "film_uom"
+  "film_uom",
+  "ppf_front_doors",
+  "ppf_back_doors",
+  "ppf_headlights"
  ],
  "fields": [
   {
@@ -604,7 +623,7 @@
   },
   {
    "depends_on": "eval:doc.service_ppf_protection",
-   "fieldname": "sec_break_ppf_sub",
+   "fieldname": "sec_break_ppf_row1",
    "fieldtype": "Section Break",
    "label": "PPF Protection Specifications"
   },
@@ -615,32 +634,89 @@
    "label": "Front Bumper"
   },
   {
+   "fieldname": "col_break_ppf_r1_1",
+   "fieldtype": "Column Break"
+  },
+  {
    "default": 0,
    "fieldname": "ppf_rear_bumper",
    "fieldtype": "Check",
    "label": "Rear Bumper"
   },
   {
-   "default": 0,
-   "fieldname": "ppf_front_doors",
-   "fieldtype": "Check",
-   "label": "Front Doors"
-  },
-  {
-   "default": 0,
-   "fieldname": "ppf_back_doors",
-   "fieldtype": "Check",
-   "label": "Back Doors"
-  },
-  {
-   "fieldname": "col_break_ppf_sub_1",
+   "fieldname": "col_break_ppf_r1_2",
    "fieldtype": "Column Break"
   },
   {
    "default": 0,
-   "fieldname": "ppf_headlights",
+   "fieldname": "ppf_driver_door",
    "fieldtype": "Check",
-   "label": "Headlights / Lights"
+   "label": "Driver Door"
+  },
+  {
+   "fieldname": "col_break_ppf_r1_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": 0,
+   "fieldname": "ppf_passenger_door",
+   "fieldtype": "Check",
+   "label": "Passenger Door"
+  },
+  {
+   "fieldname": "col_break_ppf_r1_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": 0,
+   "fieldname": "ppf_rear_driver_door",
+   "fieldtype": "Check",
+   "label": "Behind Driver Door"
+  },
+  {
+   "depends_on": "eval:doc.service_ppf_protection",
+   "fieldname": "sec_break_ppf_row2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": 0,
+   "fieldname": "ppf_rear_passenger_door",
+   "fieldtype": "Check",
+   "label": "Behind Passenger Door"
+  },
+  {
+   "fieldname": "col_break_ppf_r2_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": 0,
+   "fieldname": "ppf_trunk_door",
+   "fieldtype": "Check",
+   "label": "Trunk Door"
+  },
+  {
+   "fieldname": "col_break_ppf_r2_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": 0,
+   "fieldname": "ppf_front_headlights",
+   "fieldtype": "Check",
+   "label": "Front Headlights"
+  },
+  {
+   "fieldname": "col_break_ppf_r2_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": 0,
+   "fieldname": "ppf_rear_lights",
+   "fieldtype": "Check",
+   "label": "Rear Tail Lights"
+  },
+  {
+   "fieldname": "col_break_ppf_r2_4",
+   "fieldtype": "Column Break"
   },
   {
    "default": 0,
@@ -649,10 +725,19 @@
    "label": "Hood"
   },
   {
+   "depends_on": "eval:doc.service_ppf_protection",
+   "fieldname": "sec_break_ppf_row3",
+   "fieldtype": "Section Break"
+  },
+  {
    "default": 0,
    "fieldname": "ppf_fenders",
    "fieldtype": "Check",
    "label": "Fenders"
+  },
+  {
+   "fieldname": "col_break_ppf_r3_1",
+   "fieldtype": "Column Break"
   },
   {
    "default": 0,
@@ -661,7 +746,7 @@
    "label": "Mirrors"
   },
   {
-   "fieldname": "col_break_ppf_sub_2",
+   "fieldname": "col_break_ppf_r3_2",
    "fieldtype": "Column Break"
   },
   {
@@ -671,10 +756,18 @@
    "label": "Grille"
   },
   {
+   "fieldname": "col_break_ppf_r3_3",
+   "fieldtype": "Column Break"
+  },
+  {
    "default": 0,
    "fieldname": "ppf_full_body",
    "fieldtype": "Check",
    "label": "Full Car Body"
+  },
+  {
+   "fieldname": "col_break_ppf_r3_4",
+   "fieldtype": "Column Break"
   },
   {
    "default": 0,
@@ -927,11 +1020,29 @@
    "fieldtype": "Link",
    "hidden": 1,
    "label": "film_uom (Legacy)"
+  },
+  {
+   "fieldname": "ppf_front_doors",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "ppf_front_doors (Legacy)"
+  },
+  {
+   "fieldname": "ppf_back_doors",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "ppf_back_doors (Legacy)"
+  },
+  {
+   "fieldname": "ppf_headlights",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "ppf_headlights (Legacy)"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-11-01 14:20:00.000000",
+ "modified": "2026-11-01 14:25:00.000000",
  "modified_by": "Administrator",
  "module": "Mu Car Care",
  "name": "Vehicle Reception",

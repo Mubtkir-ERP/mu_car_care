@@ -10,9 +10,11 @@ Back Doors,الأبواب الخلفية
 Back Window,الزجاج الخلفي
 Back Window Film Type,النوع
 Back Window Shade Degree,الدرجة
+Behind Driver Door,باب خلف السائق
 Behind Driver Window,زجاج خلف السائق
 Behind Driver Window Film Type,النوع
 Behind Driver Window Shade Degree,الدرجة
+Behind Passenger Door,باب خلف الراكب
 Behind Passenger Window,زجاج خلف الراكب
 Behind Passenger Window Film Type,النوع
 Behind Passenger Window Shade Degree,الدرجة
@@ -36,6 +38,7 @@ Deliver Vehicle,تسليم السيارة للعميل
 Delivered,تم التسليم
 Distribution Method,طريقة التوزيع
 Draft,مسودة
+Driver Door,باب السائق
 Duration (Months),المدة (بالأشهر)
 Duration (Years),مدة الضمان بالسنوات
 Empty,فارغ
@@ -49,6 +52,7 @@ Film Type (Unit),النوع
 Front,المقدمة
 Front Bumper,الصدام الأمامي
 Front Doors,الأبواب الأمامية
+Front Headlights,شمعات أمامية
 Front Window,الزجاج الأمامي
 Front Window Film Type,النوع
 Front Window Shade Degree,الدرجة
@@ -99,6 +103,7 @@ Paid Amount,المبلغ المدفوع
 Panorama Roof,سقف بانوراما
 Panorama Roof Film Type,النوع
 Panorama Roof Shade Degree,الدرجة
+Passenger Door,باب الراكب
 Personal Belongings Inside Vehicle,المتعلقات الشخصية داخل السيارة
 Plate Number,رقم اللوحة
 Please select a valid visit from the list.,يرجى اختيار زيارة صيانة صالحة من القائمة.
@@ -113,6 +118,7 @@ Pricing,Undertaking & Signatures,التكلفة والإقرار والتوقي�
 Quarterly,ربع سنوي
 Quotation with Maintenance,عرض سعر مع الصيانة
 Rear Bumper,الصدام الخلفي
+Rear Tail Lights,شمعات خلفية
 Received,تم الاستلام
 Record Maintenance Visit,زيارة صيانة
 Related Documents,قسم المستندات المرتبطة
@@ -148,6 +154,7 @@ Terms and Conditions,الشروط والأحكام
 Triangle Window,زجاج المثلث
 Triangle Window Film Type,النوع
 Triangle Window Shade Degree,الدرجة
+Trunk Door,باب الشنطة
 Type,النوع
 Updating maintenance record...,جاري تحديث سجل الصيانة...
 Vehicle Color,لون السيارة
