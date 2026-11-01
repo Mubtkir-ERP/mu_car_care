@@ -32,22 +32,34 @@ Duration (Years),مدة الضمان بالسنوات
 Empty,فارغ
 Enable Maintenance Schedule,تفعيل جدول الصيانة
 End Date,تاريخ النهاية
+Exterior Polishing,خارجي
+Fenders,الرفارف
+Film Shade Degree,الدرجة
 Film Type,نوع العازل
+Film Type (Unit),النوع
 Front,المقدمة
+Front Bumper,الصدام الأمامي
 Front Doors,الأبواب الأمامية
 Front Window,الزجاج الأمامي
+Front Windshield (PPF),الزجاج الأمامي
 Fuel Level,حالة الوقود
 Full,ممتلئ
+Full Car Body,كامل السيارة
 General Notes,ملاحظات عامة
 Generate Schedule,توليد الجدول
 Generated {0} maintenance visits.,تم توليد {0} زيارة صيانة بنجاح.
 Generating maintenance schedule...,جاري توليد جدول الصيانة...
+Grille,الشبك
 Headlights,الأنوار
+Headlights / Lights,الشمعات / الأنوار
+Headlights Polishing,الشمعات
+Hood,الكبوت
 In Progress,قيد التنفيذ
 In-Charge Officer,الموظف المسؤول
 Inside Polishing,تلميع داخلي
 Inspection & Service Notes,ملاحظات الفحص والخدمة
 Inspection & Vehicle Status,فحص وحالة السيارة
+Interior Polishing,داخلي
 Leather,جلد
 Leather Mat,أرضية جلد
 Maintenance Schedule,جدول الصيانة
@@ -57,11 +69,13 @@ Maintenance visit #{0} updated to Completed successfully.,تم تحديث موع
 Maintenance Visits,زيارات الصيانة
 Maintenance Visits Schedule,جدول زيارات الصيانة
 Mark Completed,تم إنجاز العمل
+Mirrors,المرايا
 Mobile No,رقم الجوال
 Monthly,شهري
 Naming Series,تسلسل التسمية
 Nano Ceramic,نانو سيراميك
 Nano Layers & Warranty,طبقات النانو وفترة الضمان
+Nano Layers Count,عدد طبقات النانو
 No Show,لم يحضر
 No.,مـ
 Non-Tax Sales Invoice,فاتورة مبيعات بدون ضريبة
@@ -74,38 +88,48 @@ Paid Amount,المبلغ المدفوع
 Personal Belongings Inside Vehicle,المتعلقات الشخصية داخل السيارة
 Plate Number,رقم اللوحة
 Please select a valid visit from the list.,يرجى اختيار زيارة صيانة صالحة من القائمة.
-Polishing,تلميع السيارة
+Polishing,التلميع
+Polishing Specifications,مواصفات التلميع
 Posting Date,تاريخ الاستلام
 Posting Time,وقت الاستلام
+PPF Protection,حماية PPF
+PPF Protection Specifications,مواصفات حماية PPF
 Pre-existing Scratches / Dents,ملاحظات الخدوش والصدمات السابقة
 Pricing,Undertaking & Signatures,التكلفة والإقرار والتوقيعات
 Quarterly,ربع سنوي
 Quotation with Maintenance,عرض سعر مع الصيانة
+Rear Bumper,الصدام الخلفي
 Received,تم الاستلام
 Record Maintenance Visit,زيارة صيانة
 Related Documents,قسم المستندات المرتبطة
 Requested Services & Documents,الخدمات المطلوبة والمستندات
 Requested Services & Film Specifications,قسم الخدمات المطلوبة
-Requested Services & Specifications,الخدمات والمواصفات المطلوبة
+Requested Services & Specifications,قسم الخدمات المطلوبة
+Rims,الجنوط
 Sales Order with Maintenance,طلب مبيعات مع الصيانة
 Schedule Configuration,إعدادات جدول الصيانة
 Scheduled,مجدولة
 Scheduled Visit Date,موعد الزيارة
+Scratch Removal,إزالة الخدوش
+Seats,المقاعد
 Select Due Visit,اختر الزيارة المستحقة
 Semi-Annual,نصف سنوي
 Service Type,نوع الخدمة
+Shade,الدرجة
 Signatures & Undertaking,قسم التوقيع
 Start Date,تاريخ البداية
 Start Work,بدء العمل
 Status,الحالة
 Summary of Requested Services,ملخص الخدمات المطلوبة
 Summary Terms,الشروط المختصرة
+Sunroof / Panorama,فتحة السقف / بانوراما
 Tax Sales Invoice,فاتورة مبيعات ضريبية
 Technician,الفني المنفذ
 Technician Name,اسم الفني المنفذ
 Terms & Conditions,الشروط والاحكام
 Terms and Conditions,الشروط والأحكام
 Triangle Window,زجاج المثلث
+Type,النوع
 Updating maintenance record...,جاري تحديث سجل الصيانة...
 Vehicle Color,لون السيارة
 Vehicle Delivery Undertaking,إقرار استلام السيارة
@@ -129,7 +153,9 @@ Warranty Duration (Years),مدة الضمان بالسنوات
 Warranty Duration in Years,مدة الضمان بالسنوات
 Warranty Period,مدة الضمان
 Warranty Terms & Conditions,الشروط والاحكام
-Wax Coat,واكس
-Window Film,العازل الحراري
+Wax Coat,طبقة شمعية
+Wax Layer,طبقة الواكس
+Window Film,عازل حراري
+Window Film Specifications,مواصفات العازل الحراري
 Work Completed,تم إنجاز العمل
 Work Executed,الأعمال المنفذة

@@ -41,61 +41,89 @@ class VehicleReception(Document):
 		summary_lines = []
 
 		# 1. Window Film
-		film_parts = []
-		if self.film_front_window:
-			film_parts.append(_("Front Window"))
-		if self.film_front_doors:
-			film_parts.append(_("Front Doors"))
-		if self.film_back_doors:
-			film_parts.append(_("Back Doors"))
-		if self.film_back_window:
-			film_parts.append(_("Back Window"))
-		if self.film_triangle_window:
-			film_parts.append(_("Triangle Window"))
+		if self.service_window_film or self.film_front_window or self.film_back_window or self.film_front_doors or self.film_back_doors or self.film_sunroof or self.film_triangle_window:
+			film_parts = []
+			if self.film_front_window:
+				film_parts.append(_("Front Window"))
+			if self.film_back_window:
+				film_parts.append(_("Back Window"))
+			if self.film_front_doors:
+				film_parts.append(_("Front Doors"))
+			if self.film_back_doors:
+				film_parts.append(_("Back Doors"))
+			if self.film_sunroof:
+				film_parts.append(_("Sunroof / Panorama"))
+			if self.film_triangle_window:
+				film_parts.append(_("Triangle Window"))
 
-		if film_parts or self.film_type:
-			details = ", ".join([str(p) for p in film_parts]) if film_parts else ""
-			if self.film_type:
-				details = f"{details} ({self.film_type})" if details else self.film_type
-			summary_lines.append(f"• {_('Window Film')}: {details}")
+			loc_str = ", ".join([str(p) for p in film_parts]) if film_parts else _("Not specified")
+			extra = []
+			if self.film_shade_degree:
+				extra.append(f"{_('Shade')}: {self.film_shade_degree}")
+			if self.film_uom:
+				extra.append(f"{_('Type')}: {self.film_uom}")
+			extra_str = f" [{', '.join(extra)}]" if extra else ""
+			summary_lines.append(f"• {_('Window Film')}: {loc_str}{extra_str}")
 
-		# 2. Protection
-		prot_parts = []
-		if self.prot_front:
-			prot_parts.append(_("Front"))
-		if self.prot_headlights:
-			prot_parts.append(_("Headlights"))
-		if self.prot_body:
-			prot_parts.append(_("Car Body"))
-		if self.prot_leather_mat:
-			prot_parts.append(_("Leather Mat"))
-		if self.prot_leather:
-			prot_parts.append(_("Leather"))
-		if self.prot_velvet:
-			prot_parts.append(_("Velvet"))
+		# 2. PPF Protection
+		if self.service_ppf_protection or self.ppf_front_bumper or self.ppf_rear_bumper or self.ppf_front_doors or self.ppf_back_doors or self.ppf_headlights or self.ppf_hood or self.ppf_fenders or self.ppf_mirrors or self.ppf_grille or self.ppf_full_body or self.ppf_front_window:
+			ppf_parts = []
+			if self.ppf_full_body:
+				ppf_parts.append(_("Full Car Body"))
+			if self.ppf_front_bumper:
+				ppf_parts.append(_("Front Bumper"))
+			if self.ppf_rear_bumper:
+				ppf_parts.append(_("Rear Bumper"))
+			if self.ppf_front_doors:
+				ppf_parts.append(_("Front Doors"))
+			if self.ppf_back_doors:
+				ppf_parts.append(_("Back Doors"))
+			if self.ppf_headlights:
+				ppf_parts.append(_("Headlights / Lights"))
+			if self.ppf_hood:
+				ppf_parts.append(_("Hood"))
+			if self.ppf_fenders:
+				ppf_parts.append(_("Fenders"))
+			if self.ppf_mirrors:
+				ppf_parts.append(_("Mirrors"))
+			if self.ppf_grille:
+				ppf_parts.append(_("Grille"))
+			if self.ppf_front_window:
+				ppf_parts.append(_("Front Windshield (PPF)"))
 
-		if prot_parts:
-			summary_lines.append(f"• {_('Car Protection')}: {', '.join([str(p) for p in prot_parts])}")
+			loc_str = ", ".join([str(p) for p in ppf_parts]) if ppf_parts else _("Not specified")
+			summary_lines.append(f"• {_('PPF Protection')}: {loc_str}")
 
 		# 3. Polishing
-		polish_parts = []
-		if self.polish_inside:
-			polish_parts.append(_("Inside Polishing"))
-		if self.polish_outside:
-			polish_parts.append(_("Outside Polishing"))
-		if self.polish_wax:
-			polish_parts.append(_("Wax Coat"))
-		if self.polish_nano_ceramic:
-			polish_parts.append(_("Nano Ceramic"))
+		if self.service_polishing or self.polish_inside or self.polish_outside or self.polish_wax_layer or self.polish_seats or self.polish_headlights or self.polish_rims or self.polish_scratch_removal or self.polish_wax_coat or self.polish_nano_ceramic:
+			polish_parts = []
+			if self.polish_inside:
+				polish_parts.append(_("Interior Polishing"))
+			if self.polish_outside:
+				polish_parts.append(_("Exterior Polishing"))
+			if self.polish_wax_layer:
+				polish_parts.append(_("Wax Layer"))
+			if self.polish_seats:
+				polish_parts.append(_("Seats"))
+			if self.polish_headlights:
+				polish_parts.append(_("Headlights Polishing"))
+			if self.polish_rims:
+				polish_parts.append(_("Rims"))
+			if self.polish_scratch_removal:
+				polish_parts.append(_("Scratch Removal"))
+			if self.polish_wax_coat:
+				polish_parts.append(_("Wax Coat"))
+			if self.polish_nano_ceramic:
+				polish_parts.append(_("Nano Ceramic"))
 
-		if polish_parts or self.nano_layers_warranty:
-			details = ", ".join([str(p) for p in polish_parts]) if polish_parts else ""
-			if self.nano_layers_warranty:
-				details = f"{details} ({self.nano_layers_warranty})" if details else self.nano_layers_warranty
-			summary_lines.append(f"• {_('Polishing')}: {details}")
+			loc_str = ", ".join([str(p) for p in polish_parts]) if polish_parts else _("Not specified")
+			extra = ""
+			if self.nano_layers_count:
+				extra = f" [{_('Nano Layers Count')}: {self.nano_layers_count}]"
+			summary_lines.append(f"• {_('Polishing')}: {loc_str}{extra}")
 
-		# 4. Accessories
-		if self.accessories:
+		# 4. Legacy accessories if present
+		if self.get("accessories"):
 			summary_lines.append(f"• {_('Accessories')}: {self.accessories.strip()}")
 
 		self.requested_services = "\n".join(summary_lines)
