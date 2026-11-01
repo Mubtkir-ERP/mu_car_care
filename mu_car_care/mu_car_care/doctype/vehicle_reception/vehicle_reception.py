@@ -18,6 +18,15 @@ class VehicleReception(Document):
 		self.set_customer_details()
 		self.summarize_requested_services()
 
+	def on_submit(self):
+		"""When submitted (تسجيل), transition to Received if Draft, locking the record."""
+		if self.status == "Draft":
+			self.db_set("status", "Received")
+
+	def on_cancel(self):
+		"""When cancelled, transition status to Cancelled."""
+		self.db_set("status", "Cancelled")
+
 	def validate_plate_number(self):
 		"""Clean and standardize plate number."""
 		if self.plate_number:

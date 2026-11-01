@@ -5,6 +5,7 @@ Accessories,إكسسوارات
 Actual Visit Date,موعد الحضور
 Agreed Price,المبلغ المتفق عليه
 All scheduled maintenance visits have been completed or none are scheduled.,تم استكمال كافة زيارات الصيانة المجدولة أو لا توجد زيارات مجدولة.
+Amended From,معدل من
 Annual,سنوي
 Back Doors,الأبواب الخلفية
 Back Window,الزجاج الخلفي
@@ -20,6 +21,7 @@ Behind Passenger Window Film Type,النوع
 Behind Passenger Window Shade Degree,الدرجة
 Cancelled,ملغاة
 Car Body,كامل البودي
+Car Care Services,خدمات العناية بالسيارات
 Car Care Tax Invoice,فاتورة مبيعات ضريبية وجدول الصيانة
 Car Protection,حماية السيارة
 Care & Maintenance Instructions / Terms,تعليمات العناية والصيانة والشروط
@@ -108,13 +110,15 @@ Personal Belongings Inside Vehicle,المتعلقات الشخصية داخل ا
 Plate Number,رقم اللوحة
 Please select a valid visit from the list.,يرجى اختيار زيارة صيانة صالحة من القائمة.
 Polishing,التلميع
+Polishing & Ceramic Service,خدمة تلميع وسيراميك
 Polishing Specifications,مواصفات التلميع
 Posting Date,تاريخ الاستلام
 Posting Time,وقت الاستلام
 PPF Protection,حماية PPF
+PPF Protection Service,خدمة حماية PPF
 PPF Protection Specifications,مواصفات حماية PPF
 Pre-existing Scratches / Dents,ملاحظات الخدوش والصدمات السابقة
-Pricing,Undertaking & Signatures,التكلفة والإقرار والتوقيعات
+Pricing,Undertaking & Signatures
 Quarterly,ربع سنوي
 Quotation with Maintenance,عرض سعر مع الصيانة
 Rear Bumper,الصدام الخلفي
@@ -182,6 +186,7 @@ Warranty Terms & Conditions,الشروط والاحكام
 Wax Coat,طبقة شمعية
 Wax Layer,طبقة الواكس
 Window Film,عازل حراري
+Window Film Service,خدمة عازل حراري
 Window Film Specifications,مواصفات العازل الحراري
 Work Completed,تم إنجاز العمل
 Work Executed,الأعمال المنفذة

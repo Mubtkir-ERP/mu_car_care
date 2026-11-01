@@ -55,22 +55,24 @@ frappe.ui.form.on("Vehicle Reception", {
 				);
 			}
 
-			// Add workflow action buttons
-			if (frm.doc.status === "Received") {
-				frm.add_custom_button(__("Start Work"), function () {
-					frm.set_value("status", "In Progress");
-					frm.save();
-				});
-			} else if (frm.doc.status === "In Progress") {
-				frm.add_custom_button(__("Mark Completed"), function () {
-					frm.set_value("status", "Work Completed");
-					frm.save();
-				});
-			} else if (frm.doc.status === "Work Completed") {
-				frm.add_custom_button(__("Deliver Vehicle"), function () {
-					frm.set_value("status", "Delivered");
-					frm.save();
-				});
+			// Add workflow action buttons (available once submitted)
+			if (frm.doc.docstatus === 1) {
+				if (frm.doc.status === "Received") {
+					frm.add_custom_button(__("Start Work"), function () {
+						frm.set_value("status", "In Progress");
+						frm.save();
+					});
+				} else if (frm.doc.status === "In Progress") {
+					frm.add_custom_button(__("Mark Completed"), function () {
+						frm.set_value("status", "Work Completed");
+						frm.save();
+					});
+				} else if (frm.doc.status === "Work Completed") {
+					frm.add_custom_button(__("Deliver Vehicle"), function () {
+						frm.set_value("status", "Delivered");
+						frm.save();
+					});
+				}
 			}
 		}
 	},

@@ -187,12 +187,285 @@ def record_maintenance_visit(doctype, docname, row_idx, actual_visit_date=None, 
 		frappe.throw(_("Failed to record maintenance visit: {0}").format(str(e)))
 
 
+def _get_or_create_service_item(default_code, candidates, default_name_ar=None, default_name_en=None):
+	"""
+	Safely locate an existing service Item in ERPNext or create it if missing.
+	Ensures item_code link validation in Sales Invoice/Order/Quotation never fails.
+	"""
+	# 1. Exact match by item code or item name
+	for candidate in candidates:
+		if candidate and frappe.db.exists("Item", candidate):
+			return candidate
+		existing = frappe.db.get_value("Item", {"item_name": candidate}, "name")
+		if existing:
+			return existing
+
+	# 2. LIKE search on active sales items
+	for candidate in candidates:
+		if candidate and len(candidate) >= 3:
+			matched = frappe.db.get_value(
+				"Item",
+				{"item_name": ["like", f"%{candidate}%"], "is_sales_item": 1},
+				"name",
+			)
+			if matched:
+				return matched
+			matched_code = frappe.db.get_value(
+				"Item",
+				{"item_code": ["like", f"%{candidate}%"], "is_sales_item": 1},
+				"name",
+			)
+			if matched_code:
+				return matched_code
+
+	# 3. Create standard non-stock service item
+	item_code = default_code
+	item_name = default_name_ar or default_name_en or default_code
+
+	item_group = "Services"
+	if not frappe.db.exists("Item Group", item_group):
+		item_group = frappe.db.get_value("Item Group", {"is_group": 0}, "name") or "All Item Groups"
+
+	stock_uom = "Nos"
+	for uom_cand in ["خدمة", "Service", "حبة", "Unit", "Nos"]:
+		if frappe.db.exists("UOM", uom_cand):
+			stock_uom = uom_cand
+			break
+
+	try:
+		new_item = frappe.get_doc({
+			"doctype": "Item",
+			"item_code": item_code,
+			"item_name": item_name,
+			"item_group": item_group,
+			"is_stock_item": 0,
+			"is_sales_item": 1,
+			"stock_uom": stock_uom,
+			"description": item_name,
+		})
+		new_item.flags.ignore_permissions = True
+		new_item.flags.ignore_mandatory = True
+		new_item.insert(ignore_permissions=True)
+		return new_item.name
+	except Exception:
+		any_item = frappe.db.get_value("Item", {"is_sales_item": 1}, "name")
+		return any_item or item_code
+
+
+def _build_film_description(source):
+	lines = []
+	glass_items = [
+		(source.get("film_front_window"), _("Front Window"), source.get("film_front_degree"), source.get("film_front_uom")),
+		(source.get("film_back_window"), _("Back Window"), source.get("film_back_degree"), source.get("film_back_uom")),
+		(source.get("film_triangle_window"), _("Triangle Window"), source.get("film_triangle_degree"), source.get("film_triangle_uom")),
+		(source.get("film_rear_driver"), _("Behind Driver Window"), source.get("film_rear_driver_degree"), source.get("film_rear_driver_uom")),
+		(source.get("film_rear_passenger"), _("Behind Passenger Window"), source.get("film_rear_passenger_degree"), source.get("film_rear_passenger_uom")),
+		(source.get("film_sunroof"), _("Sunroof"), source.get("film_sunroof_degree"), source.get("film_sunroof_uom")),
+		(source.get("film_panorama"), _("Panorama Roof"), source.get("film_panorama_degree"), source.get("film_panorama_uom")),
+	]
+	for is_sel, name, degree, uom in glass_items:
+		if is_sel:
+			specs = []
+			if degree:
+				specs.append(f"{_('Degree')}: {degree}")
+			if uom:
+				specs.append(f"{_('Type')}: {uom}")
+			spec_str = f" [{ ' - '.join(specs) }]" if specs else ""
+			lines.append(f"• {name}{spec_str}")
+
+	if not lines:
+		lines.append(f"• {_('Window Film')}")
+
+	header = _("Window Film Service")
+	return f"{header}:\n" + "\n".join(lines)
+
+
+def _build_ppf_description(source):
+	ppf_items = [
+		(source.get("ppf_full_body"), _("Full Car Body")),
+		(source.get("ppf_front_bumper"), _("Front Bumper")),
+		(source.get("ppf_rear_bumper"), _("Rear Bumper")),
+		(source.get("ppf_driver_door"), _("Driver Door")),
+		(source.get("ppf_passenger_door"), _("Passenger Door")),
+		(source.get("ppf_rear_driver_door"), _("Behind Driver Door")),
+		(source.get("ppf_rear_passenger_door"), _("Behind Passenger Door")),
+		(source.get("ppf_trunk_door"), _("Trunk Door")),
+		(source.get("ppf_front_headlights"), _("Front Headlights")),
+		(source.get("ppf_rear_lights"), _("Rear Tail Lights")),
+		(source.get("ppf_hood"), _("Hood")),
+		(source.get("ppf_fenders"), _("Fenders")),
+		(source.get("ppf_mirrors"), _("Mirrors")),
+		(source.get("ppf_grille"), _("Grille")),
+		(source.get("ppf_front_window"), _("Front Windshield (PPF)")),
+	]
+	lines = [f"• {name}" for is_sel, name in ppf_items if is_sel]
+	if not lines:
+		lines.append(f"• {_('PPF Protection')}")
+
+	header = _("PPF Protection Service")
+	return f"{header}:\n" + "\n".join(lines)
+
+
+def _build_polish_description(source):
+	polish_items = [
+		(source.get("polish_inside"), _("Interior Polishing")),
+		(source.get("polish_outside"), _("Exterior Polishing")),
+		(source.get("polish_wax_layer"), _("Wax Layer")),
+		(source.get("polish_seats"), _("Seats")),
+		(source.get("polish_headlights"), _("Headlights Polishing")),
+		(source.get("polish_rims"), _("Rims")),
+		(source.get("polish_scratch_removal"), _("Scratch Removal")),
+		(source.get("polish_wax_coat"), _("Wax Coat")),
+		(source.get("polish_nano_ceramic"), _("Nano Ceramic")),
+	]
+	lines = [f"• {name}" for is_sel, name in polish_items if is_sel]
+	if source.get("nano_layers_count"):
+		lines.append(f"• {_('Nano Layers Count')}: {source.nano_layers_count}")
+	if not lines:
+		lines.append(f"• {_('Polishing')}")
+
+	header = _("Polishing & Ceramic Service")
+	return f"{header}:\n" + "\n".join(lines)
+
+
+def _populate_transaction_items(source, target):
+	"""
+	Populate items table on Sales Invoice / Order / Quotation from Vehicle Reception services and agreed price.
+	"""
+	from frappe.utils import flt
+
+	services = []
+
+	# 1. Window Film
+	has_film = source.get("service_window_film") or any([
+		source.get("film_front_window"), source.get("film_back_window"),
+		source.get("film_triangle_window"), source.get("film_rear_driver"),
+		source.get("film_rear_passenger"), source.get("film_sunroof"),
+		source.get("film_panorama")
+	])
+	if has_film:
+		code = _get_or_create_service_item(
+			"خدمة عازل حراري",
+			["خدمة عازل حراري", "عازل حراري", "Window Film", "عازل حراري للسيارات", "تظليل"],
+			default_name_ar="خدمة عازل حراري",
+			default_name_en="Window Film Service"
+		)
+		services.append({
+			"item_code": code,
+			"description": _build_film_description(source),
+		})
+
+	# 2. PPF Protection
+	has_ppf = source.get("service_ppf_protection") or any([
+		source.get("ppf_full_body"), source.get("ppf_front_bumper"),
+		source.get("ppf_rear_bumper"), source.get("ppf_driver_door"),
+		source.get("ppf_passenger_door"), source.get("ppf_rear_driver_door"),
+		source.get("ppf_rear_passenger_door"), source.get("ppf_trunk_door"),
+		source.get("ppf_front_headlights"), source.get("ppf_rear_lights"),
+		source.get("ppf_hood"), source.get("ppf_fenders"),
+		source.get("ppf_mirrors"), source.get("ppf_grille"),
+		source.get("ppf_front_window")
+	])
+	if has_ppf:
+		code = _get_or_create_service_item(
+			"خدمة حماية PPF",
+			["خدمة حماية PPF", "حماية PPF", "خدمة حماية السيارات PPF", "PPF Protection", "حماية السيارات"],
+			default_name_ar="خدمة حماية PPF",
+			default_name_en="PPF Protection Service"
+		)
+		services.append({
+			"item_code": code,
+			"description": _build_ppf_description(source),
+		})
+
+	# 3. Polishing
+	has_polish = source.get("service_polishing") or any([
+		source.get("polish_inside"), source.get("polish_outside"),
+		source.get("polish_wax_layer"), source.get("polish_seats"),
+		source.get("polish_headlights"), source.get("polish_rims"),
+		source.get("polish_scratch_removal"), source.get("polish_wax_coat"),
+		source.get("polish_nano_ceramic")
+	])
+	if has_polish:
+		code = _get_or_create_service_item(
+			"خدمة تلميع وسيراميك",
+			["خدمة تلميع وسيراميك", "تلميع وسيراميك", "Polishing & Ceramic", "تلميع", "نانو سيراميك"],
+			default_name_ar="خدمة تلميع وسيراميك",
+			default_name_en="Polishing & Ceramic Service"
+		)
+		services.append({
+			"item_code": code,
+			"description": _build_polish_description(source),
+		})
+
+	# 4. Fallback if no specific checkboxes but price or requested_services exist
+	if not services and (source.get("price") or source.get("requested_services")):
+		code = _get_or_create_service_item(
+			"خدمات العناية بالسيارات",
+			["خدمات العناية بالسيارات", "خدمة عامة", "General Service", "Car Care Service"],
+			default_name_ar="خدمات العناية بالسيارات",
+			default_name_en="Car Care Service"
+		)
+		services.append({
+			"item_code": code,
+			"description": source.get("requested_services") or _("Car Care Services"),
+		})
+
+	# If still empty, default to Window Film
+	if not services:
+		code = _get_or_create_service_item(
+			"خدمة عازل حراري",
+			["خدمة عازل حراري", "عازل حراري", "Window Film"],
+			default_name_ar="خدمة عازل حراري",
+			default_name_en="Window Film Service"
+		)
+		services.append({
+			"item_code": code,
+			"description": _("Window Film Service"),
+		})
+
+	total_price = flt(source.get("price") or 0.0)
+	count = len(services)
+
+	for idx, srv in enumerate(services):
+		item_code = srv["item_code"]
+		item_name = frappe.db.get_value("Item", item_code, "item_name") or item_code
+		stock_uom = frappe.db.get_value("Item", item_code, "stock_uom") or "Nos"
+
+		if count == 1:
+			rate = total_price
+		else:
+			rate = round(total_price / count, 2)
+			if idx == count - 1:
+				rate = total_price - (round(total_price / count, 2) * (count - 1))
+
+		item_row = target.append("items", {})
+		item_row.item_code = item_code
+		item_row.item_name = item_name
+		item_row.description = srv["description"]
+		item_row.qty = 1.0
+		item_row.uom = stock_uom
+		item_row.stock_uom = stock_uom
+		item_row.conversion_factor = 1.0
+		item_row.rate = rate
+		item_row.amount = rate
+
+
 @frappe.whitelist()
 def make_sales_invoice_from_reception(source_name, target_doc=None):
-	"""Create a Sales Invoice pre-filled with vehicle details from Vehicle Reception."""
+	"""Create a Sales Invoice pre-filled with vehicle details and services from Vehicle Reception."""
 	def set_missing_values(source, target):
 		target.custom_has_maintenance_schedule = 1
 		target.custom_maintenance_start_date = source.posting_date
+		_populate_transaction_items(source, target)
+		try:
+			target.run_method("set_missing_values")
+		except Exception:
+			pass
+		try:
+			target.run_method("calculate_taxes_and_totals")
+		except Exception:
+			pass
 
 	doclist = get_mapped_doc(
 		"Vehicle Reception",
@@ -221,12 +494,21 @@ def make_sales_invoice_from_reception(source_name, target_doc=None):
 
 @frappe.whitelist()
 def make_sales_order_from_reception(source_name, target_doc=None):
-	"""Create a Sales Order pre-filled with vehicle details from Vehicle Reception."""
+	"""Create a Sales Order pre-filled with vehicle details and services from Vehicle Reception."""
 	def set_missing_values(source, target):
 		target.custom_has_maintenance_schedule = 1
 		target.custom_maintenance_start_date = source.posting_date
 		if not target.delivery_date:
 			target.delivery_date = source.posting_date
+		_populate_transaction_items(source, target)
+		try:
+			target.run_method("set_missing_values")
+		except Exception:
+			pass
+		try:
+			target.run_method("calculate_taxes_and_totals")
+		except Exception:
+			pass
 
 	doclist = get_mapped_doc(
 		"Vehicle Reception",
@@ -253,13 +535,21 @@ def make_sales_order_from_reception(source_name, target_doc=None):
 	return doclist
 
 
-
 @frappe.whitelist()
 def make_quotation_from_reception(source_name, target_doc=None):
-	"""Create a Quotation pre-filled with vehicle details from Vehicle Reception."""
+	"""Create a Quotation pre-filled with vehicle details and services from Vehicle Reception."""
 	def set_missing_values(source, target):
 		target.custom_has_maintenance_schedule = 1
 		target.custom_maintenance_start_date = source.posting_date
+		_populate_transaction_items(source, target)
+		try:
+			target.run_method("set_missing_values")
+		except Exception:
+			pass
+		try:
+			target.run_method("calculate_taxes_and_totals")
+		except Exception:
+			pass
 
 	doclist = get_mapped_doc(
 		"Vehicle Reception",

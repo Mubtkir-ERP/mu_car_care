@@ -4,6 +4,7 @@
  "creation": "2026-10-26 11:00:00.000000",
  "doctype": "DocType",
  "engine": "InnoDB",
+ "is_submittable": 1,
  "field_order": [
   "naming_series",
   "col_break_row1_1",
@@ -163,7 +164,8 @@
   "film_uom",
   "ppf_front_doors",
   "ppf_back_doors",
-  "ppf_headlights"
+  "ppf_headlights",
+  "amended_from"
  ],
  "fields": [
   {
@@ -239,7 +241,7 @@
   },
   {
    "allow_on_submit": 1,
-   "default": "Received",
+   "default": "Draft",
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -1038,11 +1040,21 @@
    "fieldtype": "Check",
    "hidden": 1,
    "label": "ppf_headlights (Legacy)"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Vehicle Reception",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-11-01 14:25:00.000000",
+ "modified": "2026-11-01 14:35:00.000000",
  "modified_by": "Administrator",
  "module": "Mu Car Care",
  "name": "Vehicle Reception",
@@ -1050,6 +1062,8 @@
  "owner": "Administrator",
  "permissions": [
   {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -1059,9 +1073,27 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "submit": 1,
    "write": 1
   },
   {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sales Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 0,
    "email": 1,
@@ -1071,9 +1103,12 @@
    "report": 1,
    "role": "Sales User",
    "share": 1,
+   "submit": 1,
    "write": 1
   },
   {
+   "amend": 0,
+   "cancel": 0,
    "create": 1,
    "delete": 0,
    "email": 1,
@@ -1083,6 +1118,7 @@
    "report": 1,
    "role": "Accounts User",
    "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],
