@@ -170,12 +170,12 @@
  ],
  "fields": [
   {
-   "default": "REC-.YY.-.MM.-.###",
+   "default": "REC-.YY.-.MM.-.#####",
    "fieldname": "naming_series",
    "fieldtype": "Select",
    "label": "Naming Series",
    "no_copy": 1,
-   "options": "REC-.YY.-.MM.-.###\n",
+   "options": "REC-.YY.-.MM.-.#####",
    "reqd": 1,
    "set_only_once": 1
   },
@@ -1177,5 +1177,6 @@
  "states": [],
  "title_field": "plate_number",
  "track_changes": 1,
- "search_fields": "customer,plate_number,vehicle_make,vehicle_model,status"
+ "search_fields": "customer,plate_number,vehicle_make,vehicle_model,status",
+ "default_print_format": "استلام السيارة"
 }

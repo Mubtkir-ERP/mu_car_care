@@ -13,6 +13,10 @@ class VehicleReception(Document):
 	Handles vehicle check-in, customer link, service summary, and status workflow.
 	"""
 
+	def before_naming(self):
+		"""Use a numeric five-digit suffix even for forms opened before the update."""
+		self.naming_series = "REC-.YY.-.MM.-.#####"
+
 	def validate(self):
 		self.validate_plate_number()
 		self.set_customer_details()

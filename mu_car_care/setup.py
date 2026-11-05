@@ -177,6 +177,7 @@ def sync_print_formats():
         ('عرض سعر', 'Quotation', 'car_care_quotation'),
         ('طلب مبيعات', 'Sales Order', 'car_care_sales_order'),
         ('فاتورة مبيعات ضريبية بدون جدول صيانة', 'Sales Invoice', 'car_care_tax_invoice_without_maintenance'),
+        ('استلام السيارة', 'Vehicle Reception', 'vehicle_reception_print'),
     )
     app_path = frappe.get_app_path("mu_car_care")
     for pf_name, doctype, slug in formats:
@@ -208,4 +209,19 @@ def sync_print_formats():
             pf.save(ignore_permissions=True)
         except Exception:
             frappe.log_error(frappe.get_traceback(), "Mu Car Care Print Format Sync: " + pf_name)
+    # Keep only the approved Vehicle Reception layout after synchronization.
+    if frappe.db.exists("Print Format", "استلام السيارة"):
+        from frappe.custom.doctype.property_setter.property_setter import make_property_setter
+
+        make_property_setter(
+            "Vehicle Reception", None, "default_print_format", "استلام السيارة", "Data"
+        )
+        for old_name in frappe.get_all(
+            "Print Format",
+            filters={"doc_type": "Vehicle Reception", "name": ["!=", "استلام السيارة"]},
+            pluck="name",
+        ):
+            frappe.delete_doc("Print Format", old_name, ignore_permissions=True, force=True)
+        frappe.clear_cache(doctype="Vehicle Reception")
+        frappe.clear_cache(doctype="Print Format")
     frappe.db.commit()

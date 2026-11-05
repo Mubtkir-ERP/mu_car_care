@@ -1,0 +1,574 @@
+
+{# ============================================================
+ MUBTKIR ERP - VEHICLE RECEPTION
+ Original mcr-print design
+ DocType: Vehicle Reception
+ Header and Footer: selected ERPNext Letter Head
+============================================================ #}
+
+{% set company_id = doc.get('company') or '' %}
+{% set company = frappe.db.get_value(
+    'Company', company_id,
+    ['company_name', 'default_currency'],
+    as_dict=True
+) if company_id else None %}
+
+{% set company_name = (company.get('company_name') if company else None) or company_id %}
+{% set currency = (company.get('default_currency') if company else None) or 'SAR' %}
+
+{% set customer_name = doc.get('customer_name') or
+    (frappe.db.get_value('Customer', doc.get('customer'), 'customer_name')
+    if doc.get('customer') else '') or '' %}
+
+{% set disabled_lh = (no_letterhead|string)|lower in ['1', 'true', 'yes'] %}
+{% set show_lh = letter_head and not disabled_lh %}
+{% set responsible_user = doc.get('owner') or '' %}
+{% set responsible_name = (frappe.db.get_value('User', responsible_user, 'full_name') if responsible_user else '') or responsible_user %}
+
+{% set states = {
+    'Draft':'مسودة',
+    'Received':'تم الاستلام',
+    'In Progress':'قيد التنفيذ',
+    'Work Completed':'اكتمل العمل',
+    'Delivered':'تم التسليم',
+    'Cancelled':'ملغي'
+} %}
+
+{% set fuel_labels = {
+    'Empty':'فارغ',
+    '1/4':'ربع',
+    '1/2':'نصف',
+    '3/4':'ثلاثة أرباع',
+    'Full':'ممتلئ'
+} %}
+
+{% set locations = {
+    'Front Window':'الزجاج الأمامي',
+    'Back Window':'الزجاج الخلفي',
+    'Triangle Window':'زجاج المثلث',
+    'Behind Driver Window':'خلف السائق',
+    'Behind Passenger Window':'خلف الراكب',
+    'Sunroof':'فتحة السقف',
+    'Panorama Roof':'السقف البانورامي'
+} %}
+
+{% set ppf_items = [
+    ('ppf_front_bumper','الصدام الأمامي'),
+    ('ppf_rear_bumper','الصدام الخلفي'),
+    ('ppf_driver_door','باب السائق'),
+    ('ppf_passenger_door','باب الراكب'),
+    ('ppf_rear_driver_door','الباب الخلفي للسائق'),
+    ('ppf_rear_passenger_door','الباب الخلفي للراكب'),
+    ('ppf_trunk_door','باب الشنطة'),
+    ('ppf_front_headlights','الشمعات الأمامية'),
+    ('ppf_rear_lights','الأنوار الخلفية'),
+    ('ppf_hood','الكبوت'),
+    ('ppf_fenders','الرفارف'),
+    ('ppf_mirrors','المرايات'),
+    ('ppf_grille','الشبك'),
+    ('ppf_full_body','السيارة كاملة'),
+    ('ppf_front_window','الزجاج الأمامي PPF')
+] %}
+
+{% set polish_items = [
+    ('polish_inside','تلميع داخلي'),
+    ('polish_outside','تلميع خارجي'),
+    ('polish_wax_layer','طبقة شمعية'),
+    ('polish_seats','المقاعد'),
+    ('polish_headlights','تلميع الشمعات'),
+    ('polish_rims','الجنوط'),
+    ('polish_scratch_removal','إزالة الخدوش'),
+    ('polish_wax_coat','طلاء شمعي'),
+    ('polish_nano_ceramic','نانو سيراميك')
+] %}
+
+{% set film_rows = [] %}
+{% for r in doc.get('window_film_items') or [] %}
+    {% if r.get('window_location') or r.get('shade_degree')
+          or r.get('film_type') or r.get('notes')
+          or r.get('shade_degree') == 0 %}
+        {% set _ = film_rows.append(r) %}
+    {% endif %}
+{% endfor %}
+
+{% set undertaking = doc.get('undertaking_text') or
+'أقر بأنني استلمت السيارة بعد تنفيذ جميع خدمات الحماية المطلوبة بشكل ممتاز، وأشهد بأنني راضٍ تماماً عن الخدمة المقدمة ولا توجد لدي أي ملاحظات. ملحوظة: في حالة غسيل السيارة بأي مواد تضر الحماية (PPF) تكون السيارة خارج الضمان.' %}
+
+
+
+<style>
+@page { size:A4 portrait; margin:0 !important; }
+.print-format { width:210mm !important; max-width:210mm !important; margin:0 auto !important; padding:0 !important; box-shadow:none !important; }
+.mcr-print, .mcr-print * { box-sizing:border-box; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+.mcr-print { direction:rtl; text-align:right; color:#18263b; font-family:Tahoma,Arial,sans-serif; font-size:13px; line-height:1.4; width:210mm; max-width:100%; margin:0 auto; padding:0; background:#fff; }
+.mcr-print .mcr-source { width:100%; padding:10mm; }
+.mcr-print .mcr-page { position:relative; width:210mm; height:296mm; padding:10mm 10mm 32mm; margin:0 auto; background:#fff; page-break-after:always; break-after:page; }
+.mcr-print .mcr-page:last-child { page-break-after:auto; break-after:auto; }
+.mcr-print .mcr-page-header, .mcr-print .system-header { width:100%; margin:0 0 1mm; }
+.mcr-print .system-header img { max-width:100% !important; }
+.mcr-print .mcr-page-body { width:100%; display:flow-root; }
+.mcr-print .mcr-page-footer { position:absolute !important; bottom:10mm !important; left:10mm !important; right:10mm !important; width:auto !important; height:18mm; margin:0; padding:0; background:#fff; }
+.mcr-print .system-footer { width:100% !important; margin:0 !important; padding:0 !important; line-height:normal; }
+.mcr-print .system-footer > div, .mcr-print .system-footer table { width:100% !important; max-width:100% !important; margin:0 !important; }
+.mcr-print .system-footer p { margin:0 !important; padding:0 !important; }
+.mcr-print .system-footer img { display:block !important; width:100% !important; max-width:100% !important; height:auto !important; max-height:18mm !important; margin:0 !important; object-fit:contain; }
+.mcr-print .line-box { border:1px solid #34465a; margin-bottom:1mm; page-break-inside:avoid; break-inside:avoid; }
+.mcr-print .ribbon, .mcr-print .mcr-section-title { display:table; table-layout:fixed; width:100%; margin:0; padding:1mm 2.8mm; font-size:13.5px; font-weight:800; line-height:1.4; border:0; border-radius:0; box-shadow:none; text-align:right; }
+.mcr-print .ribbon { background:#203a54 !important; color:#fff !important; }
+.mcr-print .ribbon > span, .mcr-print .mcr-section-title > span, .mcr-print .mcr-section-title > small { display:table-cell; vertical-align:middle; border:0 !important; box-shadow:none !important; }
+.mcr-print .ribbon > span:first-child, .mcr-print .mcr-section-title > span:first-child { text-align:right; }
+.mcr-print .ribbon .minor { text-align:left; font-size:11px; font-weight:500; color:#fff !important; }
+.mcr-print .ribbon *, .mcr-print .mcr-section-title.dark, .mcr-print .mcr-section-title.dark * { color:#fff !important; -webkit-text-fill-color:#fff !important; }
+.mcr-print .mcr-section-title { background:#eaf0f5 !important; color:#18263b !important; border-bottom:1px solid #9aafc1; }
+.mcr-print .mcr-section-title > span, .mcr-print .mcr-section-title > small { color:#18263b !important; -webkit-text-fill-color:#18263b !important; }
+.mcr-print .mcr-section-title.dark { background:#203a54 !important; border-bottom:0; }
+.mcr-print .mcr-section-title small { text-align:left; font-size:10.5px; font-weight:500; }
+.mcr-print .meta-table, .mcr-print .mini-table, .mcr-print .signature-table { width:100%; border-collapse:collapse; table-layout:fixed; direction:rtl; margin:0; }
+.mcr-print .meta-table td { border:1px solid #d6dfe8; padding:.8mm 2mm !important; vertical-align:top; }
+.mcr-print .meta-table tr:first-child td { border-top:0; }
+.mcr-print .meta-table tr:last-child td { border-bottom:0; }
+.mcr-print .meta-table td:first-child { border-right:0; }
+.mcr-print .meta-table td:last-child { border-left:0; }
+.mcr-print .mcr-field-label { display:block; color:#56687b !important; -webkit-text-fill-color:#56687b !important; font-size:11.5px; font-weight:700; margin:0 0 .2mm; padding:0 !important; border:0 !important; outline:0 !important; border-radius:0 !important; background:transparent !important; box-shadow:none !important; white-space:normal; text-align:right; }
+.mcr-print .mcr-field-value { display:block; min-height:3.5mm; font-size:13.5px; font-weight:700; overflow-wrap:break-word; word-wrap:break-word; border:0 !important; background:transparent !important; box-shadow:none !important; padding:0; margin:0; }
+.mcr-print .latin { direction:ltr; unicode-bidi:embed; display:inline-block; }
+.mcr-print .section-body { padding:.7mm 2.2mm; }
+.mcr-print .mcr-section-title > .service-pill { width:24%; text-align:left; font-size:11.5px; font-weight:700; color:#56687b !important; }
+.mcr-print .mcr-section-title > .service-pill.on { color:#155f4a !important; -webkit-text-fill-color:#155f4a !important; }
+.mcr-print .flag-item { display:inline-block; direction:rtl; margin:0 0 .4mm; padding:.6mm 1mm; white-space:normal; vertical-align:middle; font-size:12px; line-height:1.5; }
+.mcr-print .flag-box { display:inline-block; width:4.6mm; height:4.6mm; line-height:4.4mm; padding:0; vertical-align:middle; border:1.3px solid #64798f; border-radius:1px; margin-left:1mm; text-align:center; font-family:'Segoe UI Symbol','DejaVu Sans',Arial,sans-serif; font-weight:900; font-size:15px; overflow:visible; color:#153c50 !important; -webkit-text-fill-color:#153c50 !important; background:#fff !important; }
+.mcr-print .flag-item.on .flag-box { border:1.6px solid #153c50; background:#e6f0f4 !important; }
+.mcr-print .check-columns { font-size:0; }
+.mcr-print .check-columns .option-cell { display:inline-block; width:20%; vertical-align:top; font-size:11px; }
+.mcr-print .mini-table { font-size:12px; }
+.mcr-print .mini-table thead { display:table-header-group; }
+.mcr-print .mini-table th { background:#edf2f6 !important; color:#29415a !important; -webkit-text-fill-color:#29415a !important; font-size:12px !important; font-weight:800; padding:1.1mm 1mm !important; border:1px solid #cad4de !important; text-align:center !important; vertical-align:middle; }
+.mcr-print .mini-table td { display:table-cell !important; height:auto; font-size:12px !important; padding:1.1mm 1mm !important; border:1px solid #d5dde5 !important; text-align:center !important; vertical-align:middle !important; overflow-wrap:break-word; word-wrap:break-word; white-space:normal; color:#18263b !important; }
+.mcr-print .mini-table td .latin { display:inline; border:0 !important; background:none !important; box-shadow:none !important; }
+.mcr-print .mini-table tbody tr:nth-child(even) { background:#f7f9fb; }
+.mcr-print .mini-table tr { page-break-inside:avoid; break-inside:avoid; }
+.mcr-print .notes-table { width:100%; table-layout:fixed; border-collapse:separate; border-spacing:1mm; margin:0; }
+.mcr-print .notes-table td { vertical-align:top; width:33.333%; padding:1mm !important; border:0 !important; }
+.mcr-print .note-card { border:1px solid #d2dce5; min-height:15mm; padding:1.4mm 2mm; background:#fbfcfd; }
+.mcr-print .note-title { font-size:11.5px; font-weight:800; color:#29415a !important; border-bottom:1px solid #d7e1ea; padding-bottom:.5mm; }
+.mcr-print .note-text { font-size:12px; font-weight:500; line-height:1.55; white-space:pre-wrap; overflow-wrap:break-word; word-wrap:break-word; padding-top:1mm; }
+.mcr-print .agreement { white-space:pre-wrap; font-size:14px !important; line-height:1.65 !important; padding:1.5mm 3mm; background:#f8fafb; }
+.mcr-print .signature-table td { width:50%; height:18mm; vertical-align:top; padding:1mm 3mm 2mm !important; border:1px solid #d3dde6; }
+.mcr-print .signature-label { font-size:12px; font-weight:800; color:#203a54 !important; margin-bottom:1mm; }
+.mcr-print .mcr-responsible { margin-bottom:1.5mm; }
+.mcr-print .mcr-responsible .mcr-field-label { display:inline; margin-left:1mm; }
+.mcr-print .mcr-responsible .mcr-field-value { display:inline; font-size:12px; }
+.mcr-print .signature-img { max-width:63mm; max-height:8mm; width:auto; height:auto; object-fit:contain; display:block; margin:auto; }
+.mcr-print .signature-blank { height:8mm; border-bottom:1px dotted #bbc5d0; }
+.mcr-print .amount-figure { color:#163e5d; font-weight:800; direction:ltr; display:inline-block; }
+.mcr-print .field-padding { padding:0 2mm 1mm; }
+@media screen {
+ .print-format { width:100% !important; max-width:210mm !important; }
+ .mcr-print { width:100%; max-width:210mm; overflow-x:auto; }
+ .mcr-print .mcr-page { margin-bottom:4mm; }
+}
+@media print {
+ html, body { width:210mm !important; margin:0 !important; padding:0 !important; }
+ .print-format, .mcr-print { width:210mm !important; max-width:210mm !important; margin:0 !important; padding:0 !important; overflow:visible !important; }
+ .mcr-print .mcr-page { margin:0 !important; }
+ .mcr-print .ribbon, .mcr-print .ribbon *, .mcr-print .mcr-section-title.dark, .mcr-print .mcr-section-title.dark * { color:#fff !important; -webkit-text-fill-color:#fff !important; }
+}
+</style>
+
+<div class="mcr-print" id="mcr-reception">
+<div class="mcr-source">
+
+    {# الترويسة المختارة من النظام فقط #}
+    {% if show_lh %}
+        <div class="system-header">
+            {{ letter_head }}
+        </div>
+    {% endif %}
+
+    <div class="line-box">
+
+        <div class="ribbon">
+            <span>بيانات العميل</span>
+            <span class="minor">
+                رقم المستند:
+                <b dir="ltr">{{ doc.name or '' }}</b>
+            </span>
+        </div>
+
+        <table class="meta-table">
+            <tr>
+
+                <td style="width:48%">
+                    <span class="mcr-field-label">العميل | Customer</span>
+                    <span class="mcr-field-value">{{ customer_name }}</span>
+                </td>
+
+                <td style="width:24%">
+                    <span class="mcr-field-label">رقم الجوال | Mobile</span>
+                    <span class="mcr-field-value latin">
+                        {{ doc.get('contact_mobile') or '' }}
+                    </span>
+                </td>
+
+                <td style="width:15%">
+                    <span class="mcr-field-label">التاريخ | Date</span>
+                    <span class="mcr-field-value latin">
+                        {{ frappe.utils.formatdate(
+                            doc.get('posting_date'), 'yyyy-MM-dd'
+                        ) if doc.get('posting_date') else '' }}
+                    </span>
+                </td>
+
+                <td style="width:13%">
+                    <span class="mcr-field-label">الوقت | Time</span>
+                    <span class="mcr-field-value latin">
+                        {{ doc.get('posting_time') or '' }}
+                    </span>
+                </td>
+
+            </tr>
+        </table>
+    </div>
+
+    <div class="line-box">
+        <div class="mcr-section-title">
+            <span>بيانات المركبة</span>
+            <small>Vehicle Details</small>
+        </div>
+
+        <table class="meta-table">
+            <tr>
+                <td style="width:19%">
+                    <span class="mcr-field-label">نوع السيارة</span>
+                    <span class="mcr-field-value">{{ doc.get('vehicle_make') or '' }}</span>
+                </td>
+                <td style="width:21%">
+                    <span class="mcr-field-label">الموديل / السنة</span>
+                    <span class="mcr-field-value">{{ doc.get('vehicle_model') or '' }}</span>
+                </td>
+                <td style="width:18%">
+                    <span class="mcr-field-label">رقم اللوحة</span>
+                    <span class="mcr-field-value latin">{{ doc.get('plate_number') or '' }}</span>
+                </td>
+                <td style="width:16%">
+                    <span class="mcr-field-label">اللون</span>
+                    <span class="mcr-field-value">{{ doc.get('vehicle_color') or '' }}</span>
+                </td>
+                <td style="width:26%">
+                    <span class="mcr-field-label">رقم الهيكل VIN</span>
+                    <span class="mcr-field-value latin">{{ doc.get('chassis_no') or '' }}</span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="line-box">
+
+        <div class="mcr-section-title">
+            <span>حالة السيارة عند الاستلام</span>
+            <small>Inspection &amp; Condition</small>
+        </div>
+
+        <table class="meta-table">
+            <tr>
+                <td style="width:16%">
+                    <span class="mcr-field-label">عداد الكيلومترات</span>
+                    <span class="mcr-field-value latin">
+                        {{ doc.get('odometer_km')
+                           if doc.get('odometer_km') is not none else '' }}
+                    </span>
+                </td>
+
+                <td style="width:16%">
+                    <span class="mcr-field-label">مستوى الوقود</span>
+                    <span class="mcr-field-value">
+                        {{ fuel_labels.get(
+                            doc.get('fuel_level'),
+                            doc.get('fuel_level') or ''
+                        ) }}
+                    </span>
+                </td>
+
+                <td style="width:24%">
+                    <span class="mcr-field-label">السعر المتفق عليه</span>
+                    <span class="mcr-field-value amount-figure">
+                        {{ frappe.utils.fmt_money(
+                            doc.get('price'), currency=currency
+                        ) if doc.get('price') is not none else '' }}
+                    </span>
+                </td>
+
+                <td style="width:24%">
+                    <span class="mcr-field-label">المبلغ المدفوع</span>
+                    <span class="mcr-field-value amount-figure">
+                        {{ frappe.utils.fmt_money(
+                            doc.get('paid_amount'), currency=currency
+                        ) if doc.get('paid_amount') is not none else '' }}
+                    </span>
+                </td>
+
+
+                <td style="width:20%">
+                    <span class="mcr-field-label">الحالة | Status</span>
+                    <span class="mcr-field-value">
+                        {{ states.get(
+                            doc.get('status'), doc.get('status') or ''
+                        ) }}
+                    </span>
+                </td>
+            </tr>
+        </table>
+
+
+    </div>
+
+    <div class="line-box">
+
+        <div class="mcr-section-title dark">
+            <span>الخدمات المطلوبة ومواصفاتها</span>
+            <small>Requested Services &amp; Specifications</small>
+        </div>
+
+        <div class="mcr-section-title">
+            <span>العازل الحراري | Window Film</span>
+            <span class="service-pill {% if doc.get('service_window_film') %}on{% endif %}">
+                {{ '✓ محدد' if doc.get('service_window_film') else 'غير محدد' }}
+            </span>
+        </div>
+
+        {% if film_rows|length %}
+
+            <table class="mini-table">
+                <thead>
+                    <tr>
+                        <th style="width:7%">م</th>
+                        <th style="width:25%">موقع الزجاج</th>
+                        <th style="width:16%">الدرجة</th>
+                        <th style="width:18%">نوع الفيلم</th>
+                        <th style="width:34%">ملاحظات</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for r in film_rows %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ locations.get(
+                            r.get('window_location'),
+                            r.get('window_location') or ''
+                        ) }}</td>
+                        <td><span class="latin">{{ r.get('shade_degree') if r.get('shade_degree') is not none else '' }}</span></td>
+                        <td>{{ r.get('film_type') or '' }}</td>
+                        <td>{{ r.get('notes') or '' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+            <div class="field-padding" style="height:5mm"></div>
+        {% endif %}
+
+        <div class="mcr-section-title">
+            <span>حماية السيارة PPF</span>
+            <span class="service-pill {% if doc.get('service_ppf_protection') %}on{% endif %}">
+                {{ '✓ محدد' if doc.get('service_ppf_protection') else 'غير محدد' }}
+            </span>
+        </div>
+
+        <div class="section-body check-columns">
+            {% for field, label in ppf_items %}
+                <span class="option-cell">
+                    <span class="flag-item {% if doc.get(field) %}on{% endif %}">
+                        <span class="flag-box">{{ "✓" if doc.get(field) else "" }}</span>{{ label }}
+                    </span>
+                </span>
+            {% endfor %}
+        </div>
+
+        <div class="mcr-section-title">
+            <span>تلميع السيارة | Polishing</span>
+            <span class="service-pill {% if doc.get('service_polishing') %}on{% endif %}">
+                {{ '✓ محدد' if doc.get('service_polishing') else 'غير محدد' }}
+            </span>
+        </div>
+
+        <div class="section-body check-columns">
+            {% for field, label in polish_items %}
+                <span class="option-cell">
+                    <span class="flag-item {% if doc.get(field) %}on{% endif %}">
+                        <span class="flag-box">{{ "✓" if doc.get(field) else "" }}</span>{{ label }}
+                    </span>
+                </span>
+            {% endfor %}
+
+            <span class="option-cell" style="font-weight:800">
+                عدد طبقات النانو:
+                <span class="latin">
+                    {{ doc.get('nano_layers_count') or '' }}
+                </span>
+            </span>
+        </div>
+    </div>
+
+    <div class="line-box">
+        <div class="mcr-section-title"><span>مقتنيات السيارة وحالتها وملاحظات الفحص</span><small>Vehicle Condition &amp; Notes</small></div>
+        <table class="notes-table">
+            <tr>
+                <td>
+                    <div class="note-card">
+                        <div class="note-title">مقتنيات داخل السيارة</div>
+                        <div class="note-text">{{ doc.get('personal_belongings') or '' }}</div>
+                    </div>
+                </td>
+                <td>
+                    <div class="note-card">
+                        <div class="note-title">خدوش وصدمات سابقة</div>
+                        <div class="note-text">{{ doc.get('external_condition_notes') or '' }}</div>
+                    </div>
+                </td>
+                <td>
+                    <div class="note-card">
+                        <div class="note-title">ملاحظات الفحص والخدمة</div>
+                        <div class="note-text">{{ doc.get('notes') or '' }}</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="line-box">
+
+        <div class="mcr-section-title">
+            <span>الإقرار والتوقيعات</span>
+            <small>Undertaking &amp; Signatures</small>
+        </div>
+
+        <div class="agreement">{{ undertaking }}</div>
+
+        <table class="signature-table">
+            <tr>
+                <td>
+                    <div class="signature-label">
+                        توقيع العميل | Customer Signature
+                    </div>
+
+                    {% if doc.get('customer_signature') %}
+                        <img class="signature-img"
+                             src="{{ doc.get('customer_signature') }}"
+                             alt="توقيع العميل">
+                    {% else %}
+                        <div class="signature-blank"></div>
+                    {% endif %}
+                </td>
+
+                <td>
+                    <div class="mcr-responsible">
+                        <span class="mcr-field-label">الموظف المسؤول</span>
+                        <span class="mcr-field-value">{{ responsible_name }}</span>
+                    </div>
+                    <div class="signature-label">
+                        توقيع الموظف | Officer Signature
+                    </div>
+
+                    {% if doc.get('in_charge_signature') %}
+                        <img class="signature-img"
+                             src="{{ doc.get('in_charge_signature') }}"
+                             alt="توقيع الموظف">
+                    {% else %}
+                        <div class="signature-blank"></div>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    {# الفوتر من Letter Head، وليس صورة داخل البرنت فورمات #}
+    {% if show_lh and footer %}
+        <div class="system-footer">
+            {{ footer }}
+        </div>
+    {% endif %}
+
+</div>
+</div>
+
+<script>
+(function(){
+ 'use strict';
+ var root=document.getElementById('mcr-reception');
+ if(!root)return;
+ var source=root.querySelector('.mcr-source');
+ if(!source)return;
+ var busy=false,done=false;
+ function paginate(){
+  if(busy||done)return;
+  busy=true;
+  var header=source.querySelector('.system-header');
+  var footer=source.querySelector('.system-footer');
+  var blocks=Array.prototype.filter.call(source.children,function(el){return el.classList.contains('line-box');});
+  var page,body,pages=[];
+  function createPage(){
+   page=document.createElement('div');page.className='mcr-page';
+   var h=document.createElement('div');h.className='mcr-page-header';
+   if(header)h.appendChild(header.cloneNode(true));
+   body=document.createElement('div');body.className='mcr-page-body';
+   var f=document.createElement('div');f.className='mcr-page-footer';
+   if(footer)f.appendChild(footer.cloneNode(true));
+   page.appendChild(h);page.appendChild(body);page.appendChild(f);
+   root.appendChild(page);pages.push(page);
+  }
+  function fits(){
+   var foot=page.querySelector('.mcr-page-footer');
+   return body.getBoundingClientRect().bottom<=foot.getBoundingClientRect().top-10;
+  }
+  function place(block){
+   body.appendChild(block);
+   if(fits())return;
+   if(body.children.length>1){body.removeChild(block);createPage();body.appendChild(block);}
+   if(fits())return;
+   // Split large sections by their existing children, and large tables by rows.
+   if(block.classList.contains('line-box')&&block.children.length>1){
+    body.removeChild(block);
+    var children=Array.prototype.slice.call(block.children);
+    var title=children.shift();
+    var part=document.createElement('div');part.className=block.className;
+    part.appendChild(title.cloneNode(true));body.appendChild(part);
+    children.forEach(function(child){
+     part.appendChild(child);
+     if(fits())return;
+     if(part.children.length>2){part.removeChild(child);createPage();part=document.createElement('div');part.className=block.className;part.appendChild(title.cloneNode(true));body.appendChild(part);part.appendChild(child);}
+     if(!fits()&&child.tagName==='TABLE'&&child.tBodies.length&&child.tBodies[0].rows.length>1){
+      var rows=Array.prototype.slice.call(child.tBodies[0].rows);
+      var blank=child.cloneNode(true);blank.tBodies[0].innerHTML='';
+      child.parentNode.removeChild(child);
+      var table=blank.cloneNode(true);part.appendChild(table);
+      rows.forEach(function(row){
+       table.tBodies[0].appendChild(row);
+       if(!fits()&&table.tBodies[0].rows.length>1){
+        table.tBodies[0].removeChild(row);createPage();
+        part=document.createElement('div');part.className=block.className;part.appendChild(title.cloneNode(true));body.appendChild(part);
+        table=blank.cloneNode(true);part.appendChild(table);table.tBodies[0].appendChild(row);
+       }
+      });
+     }
+    });
+   }
+  }
+  createPage();
+  blocks.forEach(function(block){place(block.cloneNode(true));});
+  source.parentNode.removeChild(source);
+  done=true;busy=false;
+ }
+ function ready(){
+  var waiting=Array.prototype.map.call(source.querySelectorAll('img'),function(img){
+   if(img.complete)return Promise.resolve();
+   return new Promise(function(resolve){img.addEventListener('load',resolve,{once:true});img.addEventListener('error',resolve,{once:true});});
+  });
+  if(document.fonts)waiting.push(document.fonts.ready);
+  Promise.all(waiting).then(function(){requestAnimationFrame(paginate);});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ready,{once:true});else ready();
+ window.addEventListener('beforeprint',paginate);
+})();
+</script>
