@@ -472,6 +472,8 @@ def _populate_transaction_items(source, target):
 def make_sales_invoice_from_reception(source_name, target_doc=None):
 	"""Create a Sales Invoice pre-filled with vehicle details and services from Vehicle Reception."""
 	def set_missing_values(source, target):
+		# The linked transaction must belong to the reception's company.
+		target.company = source.company
 		target.custom_has_maintenance_schedule = 1
 		target.custom_maintenance_start_date = source.posting_date
 		if source.get("paid_amount"):
@@ -494,6 +496,7 @@ def make_sales_invoice_from_reception(source_name, target_doc=None):
 			"Vehicle Reception": {
 				"doctype": "Sales Invoice",
 				"field_map": {
+					"company": "company",
 					"customer": "customer",
 					"plate_number": "custom_plate_number",
 					"vehicle_make": "custom_vehicle_make",
@@ -517,6 +520,8 @@ def make_sales_invoice_from_reception(source_name, target_doc=None):
 def make_sales_order_from_reception(source_name, target_doc=None):
 	"""Create a Sales Order pre-filled with vehicle details and services from Vehicle Reception."""
 	def set_missing_values(source, target):
+		# The linked transaction must belong to the reception's company.
+		target.company = source.company
 		target.custom_has_maintenance_schedule = 1
 		target.custom_maintenance_start_date = source.posting_date
 		if not target.delivery_date:
@@ -540,6 +545,7 @@ def make_sales_order_from_reception(source_name, target_doc=None):
 			"Vehicle Reception": {
 				"doctype": "Sales Order",
 				"field_map": {
+					"company": "company",
 					"customer": "customer",
 					"plate_number": "custom_plate_number",
 					"vehicle_make": "custom_vehicle_make",
@@ -563,6 +569,8 @@ def make_sales_order_from_reception(source_name, target_doc=None):
 def make_quotation_from_reception(source_name, target_doc=None):
 	"""Create a Quotation pre-filled with vehicle details and services from Vehicle Reception."""
 	def set_missing_values(source, target):
+		# The linked transaction must belong to the reception's company.
+		target.company = source.company
 		target.custom_has_maintenance_schedule = 1
 		target.custom_maintenance_start_date = source.posting_date
 		if source.get("paid_amount"):
@@ -584,6 +592,7 @@ def make_quotation_from_reception(source_name, target_doc=None):
 			"Vehicle Reception": {
 				"doctype": "Quotation",
 				"field_map": {
+					"company": "company",
 					"customer": "party_name",
 					"plate_number": "custom_plate_number",
 					"vehicle_make": "custom_vehicle_make",
@@ -632,3 +641,10 @@ def sync_transaction_warranty(doc, method=None):
 						w_row.warranty_period = details["warranty_period"]
 					if details.get("terms") and not w_row.terms:
 						w_row.terms = details["terms"]
+
+
+@frappe.whitelist()
+def get_reception_default_company():
+	"""Default company for a new Vehicle Reception (per user, then global)."""
+	from erpnext import get_default_company
+	return get_default_company()

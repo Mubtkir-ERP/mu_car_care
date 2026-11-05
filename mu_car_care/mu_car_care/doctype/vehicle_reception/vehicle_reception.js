@@ -13,6 +13,19 @@ frappe.ui.form.on("Vehicle Reception", {
 		});
 	},
 
+	onload: function (frm) {
+		if (!frm.is_new() || frm.doc.company) return;
+		// Use the actual user default on the server; do not hardcode a company.
+		frappe.call({
+			method: "mu_car_care.api.get_reception_default_company",
+			callback: function (r) {
+				if (r.message && frm.is_new() && !frm.doc.company) {
+					frm.set_value("company", r.message);
+				}
+			}
+		});
+	},
+
 	refresh: function (frm) {
 		// Create and workflow buttons only available once the document is submitted (تسجيل / docstatus === 1)
 		if (frm.doc.docstatus === 1) {

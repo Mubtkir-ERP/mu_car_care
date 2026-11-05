@@ -176,6 +176,7 @@ def sync_print_formats():
         ("فاتورة مبيعات بدون ضريبة", "Sales Invoice", "car_care_non_tax_invoice"),
         ("طلب مبيعات مع الصيانة", "Sales Order", "car_care_sales_order"),
         ("عرض سعر مع الصيانة", "Quotation", "car_care_quotation"),
+        ("نموذج استلام السيارة", "Vehicle Reception", "car_care_vehicle_reception"),
         ("Car Care Tax Invoice", "Sales Invoice", "car_care_tax_invoice"),
     )
     app_path = frappe.get_app_path("mu_car_care")

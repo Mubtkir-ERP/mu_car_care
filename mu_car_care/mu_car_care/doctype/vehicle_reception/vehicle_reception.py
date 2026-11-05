@@ -14,6 +14,7 @@ class VehicleReception(Document):
 	"""
 
 	def validate(self):
+		self.ensure_company()
 		self.validate_plate_number()
 		self.set_customer_details()
 		self.summarize_requested_services()
@@ -26,6 +27,14 @@ class VehicleReception(Document):
 	def on_cancel(self):
 		"""When cancelled, transition status to Cancelled."""
 		self.db_set("status", "Cancelled")
+
+	def ensure_company(self):
+		"""Populate the company for imports/API records as well as Desk forms."""
+		if not self.get("company"):
+			from erpnext import get_default_company
+			self.company = get_default_company()
+		if not self.get("company"):
+			frappe.throw(_("Please select a Company for Vehicle Reception."))
 
 	def validate_plate_number(self):
 		"""Clean and standardize plate number."""
