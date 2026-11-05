@@ -172,12 +172,11 @@ def after_migrate():
 def sync_print_formats():
     """مزامنة قوالب الفاتورة وعرض السعر وطلب المبيعات مع ملفات التطبيق بعد التحديث."""
     formats = (
-        ("فاتورة مبيعات ضريبية", "Sales Invoice", "car_care_tax_invoice"),
-        ("فاتورة مبيعات بدون ضريبة", "Sales Invoice", "car_care_non_tax_invoice"),
-        ("طلب مبيعات مع الصيانة", "Sales Order", "car_care_sales_order"),
-        ("عرض سعر مع الصيانة", "Quotation", "car_care_quotation"),
-        ("نموذج استلام السيارة", "Vehicle Reception", "car_care_vehicle_reception"),
-        ("Car Care Tax Invoice", "Sales Invoice", "car_care_tax_invoice"),
+        ('فاتورة مبيعات ضريبية', 'Sales Invoice', 'car_care_tax_invoice'),
+        ('فاتورة مبيعات بدون ضريبة', 'Sales Invoice', 'car_care_non_tax_invoice'),
+        ('عرض سعر', 'Quotation', 'car_care_quotation'),
+        ('طلب مبيعات', 'Sales Order', 'car_care_sales_order'),
+        ('فاتورة مبيعات ضريبية بدون جدول صيانة', 'Sales Invoice', 'car_care_tax_invoice_without_maintenance'),
     )
     app_path = frappe.get_app_path("mu_car_care")
     for pf_name, doctype, slug in formats:

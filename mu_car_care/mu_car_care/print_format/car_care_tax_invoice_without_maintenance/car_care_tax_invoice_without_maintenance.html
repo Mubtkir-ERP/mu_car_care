@@ -1,0 +1,723 @@
+{# ============================================================================ #}
+{#  مُبتكر ERP - قالب فاتورة المبيعات والصيانة - نسخة للطباعة A4             #}
+{#  ملف مستقل: انسخه كاملًا إلى حقل HTML داخل Print Format                  #}
+{#  لا يضيف أي حقول أو يغير التطبيق                                           #}
+{# ============================================================================ #}
+
+{# 1- بيانات الشركة: لا تظهر علامة بديلة عند غياب البيانات #}
+{% set company_doc = frappe.get_doc('Company', doc.company) if doc.get('company') else None %}
+{% set company_name = (company_doc.get('company_name') if company_doc else None) or doc.get('company') or '' %}
+{% set company_logo = doc.get('company_logo') or (company_doc.get('company_logo') if company_doc else None) or '' %}
+{% set company_domain = (company_doc.get('domain') if company_doc else None) or '' %}
+{% set company_cr = ((company_doc.get('registration_details') or company_doc.get('custom_commercial_registration_number') or company_doc.get('custom_cr_number')) if company_doc else None) or '' %}
+{% set company_tax = (company_doc.get('tax_id') if company_doc else None) or '' %}
+{# جوال المؤسسة: Company.phone_no ثم رقم الهاتف في عنوان الشركة إن وجد #}
+{% set company_phone = (company_doc.get('phone_no') if company_doc else None) or (frappe.db.get_value('Address', doc.get('company_address'), 'phone') if doc.get('company_address') else None) or '' %}
+{% set company_addr = frappe.get_doc('Address', doc.get('company_address')) if doc.get('company_address') else None %}
+{% set company_location = (company_addr.get('address_line1') or '') if company_addr else '' %}
+{% if company_addr and company_addr.get('address_line2') %}{% set company_location = company_location ~ '، ' ~ company_addr.get('address_line2') %}{% endif %}
+{% if company_addr and company_addr.get('city') %}{% set company_location = company_location ~ '، ' ~ company_addr.get('city') %}{% endif %}
+{% if company_addr and company_addr.get('country') %}{% set company_location = company_location ~ '، ' ~ company_addr.get('country') %}{% endif %}
+
+{# 2- بيانات العميل والمركبة #}
+{% set customer_doc = frappe.get_doc('Customer', doc.customer) if doc.get('customer') else None %}
+{% set customer_name = doc.get('customer_name') or (customer_doc.get('customer_name') if customer_doc else None) or '' %}
+{# جوال العميل: حقل الفاتورة، ثم جهة الاتصال المحددة، ثم جهة الاتصال الأساسية، ثم سجل العميل #}
+{% set contact_name = doc.get('contact_person') or (customer_doc.get('customer_primary_contact') if customer_doc else None) %}
+{% set customer_mobile = doc.get('contact_mobile') or (frappe.db.get_value('Contact', contact_name, 'mobile_no') if contact_name else None) or (customer_doc.get('mobile_no') if customer_doc else None) or doc.get('customer_mobile') or '' %}
+{% set customer_tax = doc.get('customer_tax_id') or (customer_doc.get('tax_id') if customer_doc else None) or (customer_doc.get('custom_vat_registration_number') if customer_doc else None) or '' %}
+{% set customer_addr_name = doc.get('customer_address') or (customer_doc.get('customer_primary_address') if customer_doc else None) %}
+{% set customer_addr = frappe.get_doc('Address', customer_addr_name) if customer_addr_name else None %}
+{% set national_address = (customer_addr.get('address_line1') or '') if customer_addr else '' %}
+{% if customer_addr and customer_addr.get('address_line2') %}{% set national_address = national_address ~ '، ' ~ customer_addr.get('address_line2') %}{% endif %}
+{% if customer_addr and customer_addr.get('city') %}{% set national_address = national_address ~ '، ' ~ customer_addr.get('city') %}{% endif %}
+{% if customer_addr and customer_addr.get('country') %}{% set national_address = national_address ~ '، ' ~ customer_addr.get('country') %}{% endif %}
+
+{# 3- التاريخ، المستخدم، طريقة الدفع #}
+{% set sales_user = (frappe.db.get_value('User', doc.owner, 'full_name') if doc.get('owner') else None) or doc.get('owner') or '' %}
+{% set payment_method = (doc.payments[0].mode_of_payment if doc.get('payments') and doc.payments|length else None) or doc.get('mode_of_payment') or '' %}
+{% set warranty_rows = doc.get('custom_warranty_details') or [] %}
+{% set maintenance_rows = doc.get('custom_maintenance_schedule') or [] %}
+{# عدد الزيارات الفعلي فقط: 17 زيارة بحد أقصى لكل ورقة؛ ترك الهامش السفلي لصورة الفوتر #}
+{% set visits_per_page = 17 %}
+{% set visit_page_count = 1 if maintenance_rows|length == 0 else ((maintenance_rows|length - 1) // visits_per_page) + 1 %}
+{% set page_count = 1 %}
+{% set direct_paid = (doc.get('custom_paid_amount') or doc.get('paid_amount') or 0)|float %}
+{% set paid_amount = ((doc.get('grand_total') or 0)|float - (doc.get('outstanding_amount') or 0)|float) if (doc.docstatus == 1 and (doc.get('outstanding_amount') is not none) and ((doc.get('grand_total') or 0)|float != (doc.get('outstanding_amount') or 0)|float)) else direct_paid %}
+{% set paid_amount = paid_amount if paid_amount > 0 else 0 %}
+{% set remaining_amount = (doc.get('outstanding_amount') or 0)|float if (doc.docstatus == 1 and (doc.get('outstanding_amount') is not none) and ((doc.get('grand_total') or 0)|float != (doc.get('outstanding_amount') or 0)|float)) else (((doc.get('grand_total') or 0)|float - paid_amount) if ((doc.get('grand_total') or 0)|float - paid_amount) > 0 else 0) %}
+{% set invoice_title = 'فاتورة مبيعات ضريبية' if doc.docstatus == 1 else 'فاتورة مسودة' %}
+
+{# الشروط: الأولوية لشروط الفاتورة، ثم مستند الشروط المحدد فيها، ثم شروط الضمان المختارة #}
+{% set terms_content = namespace(html=doc.get('terms') or '') %}
+{% if not terms_content.html and doc.get('tc_name') %}
+    {% set terms_content.html = frappe.db.get_value('Terms and Conditions', doc.get('tc_name'), 'terms') or '' %}
+{% endif %}
+{% if not terms_content.html %}
+    {% for warranty in warranty_rows %}
+        {% if warranty.get('terms') %}
+            {% set warranty_text = frappe.db.get_value('Terms and Conditions', warranty.get('terms'), 'terms') or '' %}
+            {% if warranty_text %}
+                {% set terms_content.html = terms_content.html ~ warranty_text %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{# 4- QR من نظام الزكاة فقط، لا ننشئ رمزًا تجريبيًا مطلقًا #}
+{% set qr_image_src = None %}
+{% if doc.docstatus == 1 %}
+    {% set phase_2_data = get_phase_2_print_format_details(doc) if get_phase_2_print_format_details is defined else None %}
+    {% if phase_2_data and phase_2_data.siaf and phase_2_data.siaf.qr_image_src %}
+        {% set qr_image_src = phase_2_data.siaf.qr_image_src %}
+    {% elif get_zatca_phase_1_qr_for_invoice is defined %}
+        {% set phase_1_code = get_zatca_phase_1_qr_for_invoice(doc.name) %}
+        {% if phase_1_code %}{% set qr_image_src = 'data:image/png;base64,' ~ phase_1_code %}{% endif %}
+    {% else %}
+        {% set qr_image_src = doc.get('qr_code') or doc.get('custom_qr_code') %}
+    {% endif %}
+{% endif %}
+
+{# 5- الحسابات البنكية - اختياري: من Bank Account لنفس شركة الفاتورة #}
+{% set company_banks = frappe.get_all('Bank Account', filters={'company': doc.company, 'is_company_account': 1, 'disabled': 0}, fields=['name','bank','iban','is_default'], order_by='is_default desc, name asc', limit_page_length=20) if doc.get('company') else [] %}
+{% set banks = namespace(left=None, right=None) %}
+{% for account in company_banks %}
+    {% if account.bank %}
+        {% set bank_check = account.bank|lower %}
+        {% if not banks.left and ('rajhi' in bank_check or 'الراجحي' in bank_check) %}{% set banks.left = account %}{% endif %}
+        {% if not banks.right and ('ahli' in bank_check or 'الأهلي' in bank_check or 'الاهلي' in bank_check or 'snb' in bank_check) %}{% set banks.right = account %}{% endif %}
+    {% endif %}
+{% endfor %}
+{% for account in company_banks %}
+    {% if account.bank %}
+        {% if not banks.left and (not banks.right or account.name != banks.right.name) %}
+            {% set banks.left = account %}
+        {% elif not banks.right and (not banks.left or account.name != banks.left.name) %}
+            {% set banks.right = account %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<style>
+/* ==== الإعدادات الأساسية: A4 والهوامش وحجم الخط ==== */
+@page {
+    size: A4 portrait;
+    margin: 6mm 10mm 6mm 10mm;
+}
+* { box-sizing: border-box; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+html, body { margin:0 !important; padding:0 !important; direction:rtl; color:#000 !important; background:#fff; font-family:Tahoma,'Arial','Cairo',sans-serif; font-size:14px; line-height:1.5; }
+.print-format { margin:0 !important; padding:0 !important; width:100%; font-size:14px; color:#000; }
+img { max-width:100%; }
+tr, td, th { page-break-inside:avoid; break-inside:avoid; }
+
+/* ==== الترويسة: صورة على اليسار، شعار مربع على اليمين، تدرج متصل تمامًا ==== */
+.sheet-header {
+    width:100%; height:36mm; overflow:hidden; position:relative; border-bottom:2px solid #24394e;
+    /* خلفية واحدة متصلة: تدرج الرمادي يبدأ داخل صورة السيارة نفسها */
+    background-color:#f7f9fa;
+    background-image:none;
+    background-repeat:no-repeat;
+    background-size:100% 100%; /* نسبة لوحة الخلفية مطابقة لترويسة A4، والسيارة غير ممطوطة */
+    background-position:left top;
+    margin-bottom:3mm;
+}
+.header-table { width:100%; height:100%; border:0; border-collapse:collapse; table-layout:fixed; background:transparent; position:relative; }
+.header-logo-cell { width:19%; text-align:center; vertical-align:middle; border:0; padding:0 2mm 1.2mm 0; }
+.company-logo { display:block; width:26mm; height:26mm; max-height:26mm; object-fit:contain; border:0; margin:auto; }
+.logo-domain { font-weight:700; font-size:15px; line-height:1.1; margin-top:.5mm; text-align:center; color:#1a2c42; overflow-wrap:anywhere; }
+.header-center { width:51%; text-align:center; vertical-align:middle; border:0; padding:2mm; }
+.page-heading { color:#11263a; font-size:20px; font-weight:900; line-height:1.4; margin:0; }
+.page-subheading { font-size:18px; font-weight:500; color:#34465d; margin:2mm 0 0; line-height:1.45; }
+.header-car-space { width:30%; border:0; }
+
+/* ==== الجزء العلوي للفاتورة: الشركة (يمين) والفاتورة (وسط) وQR (يسار) ==== */
+.top-info-table { width:100%; border-collapse:separate; border-spacing:2mm 0; table-layout:fixed; direction:rtl; margin:0 0 2mm; }
+.top-info-table > tbody > tr > td { vertical-align:top; border:0; padding:0; }
+.company-info-cell { width:43%; }
+.invoice-info-cell { width:36%; }
+.qr-info-cell { width:21%; text-align:center; }
+.company-block { background:none; border:0; padding:2mm 2mm 0; color:#000; }
+.company-name { font-size:16px; font-weight:900; margin:0 0 2.5mm; color:#000; overflow-wrap:anywhere; }
+.data-line { width:100%; border-collapse:collapse; table-layout:fixed; direction:rtl; }
+.data-line td { font-size:14px; padding:.15mm 0; line-height:1.28; vertical-align:top; border:0; color:#000; overflow-wrap:anywhere; }
+.data-line .field-label { width:35%; font-weight:700; text-align:right; white-space:nowrap; padding-left:3.5mm; }
+.data-line .field-value { width:65%; font-weight:400; text-align:right; }
+/* نقطتان ومسافة تفصل عنوان الحقل عن قيمته دون إنشاء خطوط جدول */
+.data-line .field-label::after { content:" :"; font-weight:400; }
+.data-line .field-value.ltr-value { direction:ltr; unicode-bidi:embed; text-align:right; }
+.invoice-block { background:#eef2f6; border-radius:4mm; padding:3mm; min-height:0; }
+.invoice-block .data-line .field-label { width:48%; }
+.invoice-block .data-line .field-value { width:52%; }
+/* يُحسب عدد الصفحات من صفحات الزيارات الفعلية في Jinja بدل CSS الذي كان يظهر 0 */
+.invoice-block .data-line tr:first-child .field-value { font-size:12px !important; }
+.qr-holder { padding:0; margin:0 auto; border:0; background:none; width:100%; text-align:center; }
+.qr-img { width:34mm; height:34mm; display:block; object-fit:contain; border:0; margin:1mm auto 0; }
+
+/* ==== بيانات العميل والمركبة: عرض أكبر للعميل، ارتفاع متساوٍ ==== */
+.customer-vehicle-table { width:100%; table-layout:fixed; border-collapse:separate; border-spacing:2mm 0; margin:0 0 2mm; }
+.customer-cell { width:62%; padding:0; vertical-align:top; }
+.vehicle-cell { width:38%; padding:0; vertical-align:top; }
+.info-panel { border:1px solid #cbd5df; border-radius:2mm; overflow:hidden; height:auto; min-height:0; }
+.panel-head { background:#24394e; color:#fff !important; font-weight:900; font-size:18px; text-align:right; padding:1.2mm 3mm; }
+.panel-body { padding:2mm 3mm; }
+.info-panel .data-line .field-label { width:25%; }
+.vehicle-cell .data-line .field-label { width:38%; }
+.info-panel .data-line td { font-size:14px; padding:.12mm 0; line-height:1.3; }
+
+/* ==== جداول الخدمات والضمان والصيانة ==== */
+.section { margin:0 0 2mm; border:1px solid #cbd5df; border-radius:2mm; overflow:hidden; }
+.section-title { font-size:18px; font-weight:900; background:#24394e; padding:1.3mm 3mm; color:#fff !important; text-align:right; }
+.standard-table { border-collapse:collapse; table-layout:fixed; width:100%; direction:rtl; }
+.standard-table th { background:#24394e; color:#fff !important; text-align:center; font-size:14px; font-weight:900; padding:1.7mm 1mm; border:1px solid #b7c3d0; }
+.standard-table td { background:#fff; color:#000 !important; font-size:14px; text-align:right; padding:1.2mm 1.6mm; line-height:1.35; vertical-align:middle; border:1px solid #ced9e3; overflow-wrap:anywhere; }
+.standard-table tbody tr:nth-child(even) td { background:#f6f8fb; }
+.standard-table td.number, .standard-table td.date, .standard-table td.money { text-align:center; }
+.standard-table td.money { white-space:nowrap; }
+.service-table col.col-number { width:6%; }
+.service-table col.col-service { width:34%; }
+.service-table col.col-desc { width:30%; }
+.service-table col.col-qty { width:8%; }
+.service-table col.col-price { width:11%; }
+.service-table col.col-total { width:11%; }
+
+/* ==== الشروط والأحكام يمين، وملخص الحساب يسار، بلا تداخل ==== */
+.bottom-table { width:100%; table-layout:fixed; border-collapse:separate; border-spacing:2mm 0; margin-top:3mm; }
+.terms-cell { width:51%; vertical-align:top; padding:0; }
+.totals-cell { width:49%; vertical-align:top; padding:0; }
+.terms-inner { padding:3mm; min-height:18mm; font-size:14px; line-height:1.6; color:#000; }
+.terms-inner p { margin:0 0 1mm; }
+.terms-inner ol, .terms-inner ul { margin:0; padding-right:5mm; }
+.totals-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+.totals-table td { border-bottom:1px solid #d0dbe5; padding:1.2mm 2mm; font-size:14px; line-height:1.35; color:#000; vertical-align:middle; }
+.totals-table .sum-label { width:69%; text-align:right; font-weight:700; white-space:nowrap; font-size:13.5px; }
+.totals-table .sum-value { width:31%; text-align:center; font-weight:700; white-space:nowrap; }
+.totals-table .grand td { background:#dfe9f5; font-weight:900; }
+.totals-table .paid td { background:#eaf4ec; }
+.totals-table .due td { background:#fce9ea; color:#c81e29; font-weight:900; }
+
+/* ==== صفحة المتابعة: تقسيم حقيقي للزيارات بلا صفوف فارغة، وترويسة مكررة ==== */
+.following-content { page-break-before:always; break-before:page; margin:0; padding:0; }
+.maintenance-flow { width:100%; table-layout:fixed; border-collapse:collapse; border-spacing:0; margin:0 !important; }
+.maintenance-flow > thead { display:table-header-group; }
+.maintenance-flow > tbody { display:table-row-group; }
+.maintenance-flow > thead > tr > th { vertical-align:middle; }
+.maintenance-flow > thead > tr > th.maintenance-colhead { background:#24394e; color:#fff !important; border:1px solid #bfccd8; font-size:14px; font-weight:900; padding:1.4mm 1mm; text-align:center; }
+.maintenance-flow > tbody > tr > td { border:1px solid #cbd5e1; color:#000; padding:1mm 1mm; font-size:14px; line-height:1.3; vertical-align:middle; background:#fff; height:8.1mm; overflow-wrap:anywhere; }
+.maintenance-flow > tbody > tr:nth-child(even) > td { background:#f6f8fb; }
+.maintenance-flow .center { text-align:center; }
+.maintenance-flow col.nr { width:6%; }
+.maintenance-flow col.visit { width:20%; }
+.maintenance-flow col.arrival { width:20%; }
+.maintenance-flow col.state { width:19%; }
+.maintenance-flow col.notes { width:35%; }
+.maintenance-title { background:#24394e; color:#fff !important; font-size:18px; font-weight:900; padding:1.4mm 3mm; text-align:right; margin:0; border:1px solid #bfccd8; border-bottom:0; }
+.warranty-table col.service { width:37%; }
+.warranty-table col.period { width:15%; }
+.warranty-table col.start { width:24%; }
+.warranty-table col.finish { width:24%; }
+
+/* ==== تكرار الفوتر الأصلي أسفل كل صفحة، وحسابات البنوك على الأطراف ==== */
+.footer-fixed { position:fixed; bottom:-19mm; left:0; right:0; height:18mm; width:100%; z-index:3; }
+.footer-fixed img { width:100%; height:100%; object-fit:contain; display:block; }
+.vertical-bank { position:fixed; top:42%; writing-mode:vertical-rl; font-size:10px; font-weight:700; color:#b91c1c !important; white-space:nowrap; z-index:5; }
+.vertical-bank.left-bank { left:1mm; }
+.vertical-bank.right-bank { right:1mm; }
+
+/* ==== الهوامش والقيود اللازمة لطباعة PDF ==== */
+.page-first { page-break-after:always; break-after:page; }
+@media print {
+    .print-format { margin:0 !important; }
+    .section, .info-panel { page-break-inside:avoid; }
+    .maintenance-flow tr { page-break-inside:avoid; }
+}
+
+/* ========================================================================
+   تصحيح ترتيب الحقول: القيمة تأتي بعد العنوان مباشرة مثل: الجوال: 050...
+   لا نستخدم أعمدة بنسب ثابتة لأنها تترك فجوات كبيرة.
+   عند وجود قيمة طويلة فقط يلتف السطر تلقائيًا ولا تتمدد بقية الحقول.
+   ======================================================================== */
+.print-format .data-line {
+    display:block !important;
+    width:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    direction:rtl !important;
+}
+.print-format .data-line .field-row {
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    clear:none !important;
+    padding:0.35mm 0 !important;
+    margin:0 !important;
+    font-size:14px !important;
+    line-height:1.35 !important;
+    text-align:right !important;
+}
+.print-format .data-line .field-row:after { display:none !important; content:none !important; }
+.print-format .data-line .field-label,
+.print-format .data-line .field-value {
+    display:inline !important;
+    float:none !important;
+    width:auto !important;
+    height:auto !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    text-align:right !important;
+    font-size:14px !important;
+    line-height:1.35 !important;
+    vertical-align:baseline !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere;
+}
+.print-format .data-line .field-label { font-weight:700 !important; }
+.print-format .data-line .field-value { font-weight:400 !important; }
+.print-format .data-line .field-label:after { content: ':' !important; font-weight:400 !important; }
+/* رقم الفاتورة فقط يبقى بحجم 12 بكسل. */
+.print-format .invoice-block .data-line .field-row:first-child .field-value {
+    font-size:12px !important;
+}
+/* تقارب السطور دون تغيير شكل البطاقات أو عرضها. */
+.print-format .company-block { padding:1mm 2mm 0 !important; }
+.print-format .company-name { margin:0 0 1mm !important; }
+.print-format .invoice-block { padding:2mm 3mm !important; min-height:0 !important; }
+.print-format .panel-body { padding:1mm 3mm !important; }
+/* تكرار صورة الفوتر في منطقة الطباعة السفلية المحجوزة (لا تغطي أي صف). */
+.print-format .footer-fixed {
+    position:fixed !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:-22mm !important;
+    width:100% !important;
+    height:17mm !important;
+    z-index:3 !important;
+    display:block !important;
+}
+.print-format .footer-fixed img {
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    object-fit:contain !important;
+}
+
+/* === Spacing controls: edit these final rules, not earlier defaults. ===
+   field-row: line-height + vertical padding = field row spacing.
+   border-spacing: horizontal gap between adjacent cards.
+   margin-bottom: vertical gap between sections.
+   table cells: first padding value vertical, second horizontal.
+*/
+.print-format .data-line .field-row {
+    padding:0.10mm 0 !important;
+    line-height:1.25 !important;
+}
+.print-format .data-line .field-label,
+.print-format .data-line .field-value { line-height:1.25 !important; }
+.print-format .top-info-table,
+.print-format .customer-vehicle-table { border-spacing:2mm 0; margin-bottom:2mm; }
+.print-format .bottom-table { border-spacing:2mm 0; margin-top:3mm; }
+.print-format .section { margin-bottom:2mm; }
+/* Each existing Jinja page owns its footer; no fixed viewport coordinates.
+   A4 content height = 297 - 6 - 6 = 285mm.
+   284mm avoids fractional rounding creating an extra page.
+   22mm reserves 17mm image height + 5mm separation.
+   If content grows, the footer follows it instead of covering rows.
+*/
+.print-format .page-first,
+.print-format .following-content {
+    position:relative;
+    min-height:284mm;
+    padding:0 0 22mm !important;
+    margin:0;
+}
+.print-format .footer-fixed {
+    position:absolute !important;
+    top:auto !important;
+    bottom:0 !important;
+    left:0 !important;
+    right:0 !important;
+    height:17mm !important;
+    width:100% !important;
+    z-index:1 !important;
+}
+
+
+/* === A4 revision: full-width artwork, aligned content, balanced top row === */
+@page { size:A4 portrait; margin:0; }
+.print-format .header-table { height:36mm; }
+.print-format .header-table > tbody > tr { height:36mm; }
+.print-format .page-first,
+.print-format .following-content {
+    min-height:296.5mm;
+    padding:0 0 24mm !important;
+}
+.print-format .footer-fixed {
+    bottom:0 !important;
+    height:auto !important;
+    line-height:0;
+}
+.print-format .footer-fixed img {
+    width:100% !important;
+    height:auto !important;
+    max-width:none;
+    object-fit:initial !important;
+}
+/* Table spacing adds 2mm to each outer edge: 4 + 2 = 6mm. */
+.print-format .customer-vehicle-table,
+.print-format .bottom-table {
+    width:calc(100% - 8mm);
+    margin-left:4mm;
+    margin-right:4mm;
+    border-spacing:2mm 0;
+}
+.print-format .page-first > .section,
+.print-format .following-content > .section {
+    width:calc(100% - 12mm);
+    margin-left:6mm;
+    margin-right:6mm;
+}
+.print-format .maintenance-title,
+.print-format .maintenance-flow {
+    width:calc(100% - 12mm);
+    margin-left:6mm !important;
+    margin-right:6mm !important;
+}
+.print-format .top-info-table {
+    width:calc(100% - 12mm);
+    margin:0 6mm 1.5mm;
+    border-spacing:0;
+}
+.print-format .company-info-cell { width:43%; padding-left:2mm; }
+.print-format .invoice-info-cell { width:40%; padding-left:2mm; }
+.print-format .qr-info-cell { width:17%; vertical-align:top; }
+.print-format .company-block { padding:1.5mm 0 0 !important; }
+.print-format .company-name { margin-bottom:1mm !important; }
+.print-format .invoice-block {
+    background:#eef2f6;
+    border-radius:4mm;
+    padding:1.5mm 2mm !important;
+    min-height:30mm !important;
+}
+.print-format .top-info-table .data-line .field-row {
+    padding:0.1mm 0 !important;
+    line-height:1.35 !important;
+}
+.print-format .top-info-table .data-line .field-label,
+.print-format .top-info-table .data-line .field-value { line-height:1.35 !important; }
+.print-format .qr-holder { margin:0; padding:0; line-height:0; }
+.print-format .qr-img {
+    width:30mm;
+    height:30mm;
+    max-width:100%;
+    margin:0 auto;
+    object-fit:contain;
+}
+
+
+/* Bank labels belong to each explicit page; rotation supports older PDF engines. */
+.print-format .vertical-bank {
+    position:absolute !important;
+    top:160mm !important;
+    bottom:auto !important;
+    width:80mm;
+    height:3mm;
+    line-height:3mm;
+    padding:0 !important;
+    margin:0 !important;
+    writing-mode:horizontal-tb !important;
+    direction:rtl;
+    text-align:center;
+    font-family:Tahoma,Arial,sans-serif;
+    font-size:10px;
+    white-space:nowrap;
+    overflow:visible;
+    z-index:10;
+}
+.print-format .vertical-bank.left-bank {
+    left:1mm !important;
+    right:auto !important;
+    -webkit-transform-origin:left top;
+    transform-origin:left top;
+    -webkit-transform:rotate(-90deg);
+    transform:rotate(-90deg);
+}
+.print-format .vertical-bank.right-bank {
+    right:1mm !important;
+    left:auto !important;
+    -webkit-transform-origin:right top;
+    transform-origin:right top;
+    -webkit-transform:rotate(90deg);
+    transform:rotate(90deg);
+}
+
+
+@page { size:A4 portrait; margin:0; }
+.print-format { width:210mm !important; max-width:210mm !important; }
+.print-format .pdf-sheet {
+    width:100% !important; height:296.5mm !important;
+    min-height:0 !important; max-height:296.5mm !important;
+    margin:0 !important; padding:0 0 24mm !important;
+    position:relative !important;
+    page-break-before:auto !important; break-before:auto !important;
+    page-break-after:always !important; break-after:page !important;
+}
+.print-format .pdf-sheet:last-child { page-break-after:auto !important; break-after:auto !important; }
+.print-format .pdf-sheet .footer-fixed {
+    position:absolute !important; top:auto !important; bottom:0 !important;
+    height:auto !important; left:0 !important; right:0 !important;
+}
+.print-format .pdf-sheet .vertical-bank { position:absolute !important; }
+.print-format .pdf-sheet > .section { width:calc(100% - 12mm); margin-left:6mm; margin-right:6mm; }
+.print-format .pdf-sheet > .maintenance-flow,
+.print-format .pdf-sheet > .maintenance-title { width:calc(100% - 12mm); margin-left:6mm !important; margin-right:6mm !important; }
+.print-format .pdf-sheet .standard-table p { margin-top:0; margin-bottom:1mm; }
+
+/* استدعاء ترويسة وفوتر النظام مع الحفاظ على آلية تقسيم الصفحات الأصلية. */
+.print-format .sheet-header.system-letter-head {
+    height:auto !important;
+    min-height:0 !important;
+    overflow:visible !important;
+    background:none !important;
+    border:0 !important;
+}
+.print-format .sheet-header.header-empty {
+    display:none !important;
+    margin:0 !important;
+    padding:0 !important;
+}
+.print-format .footer-fixed.system-letter-footer {
+    line-height:normal !important;
+}
+</style>
+</head>
+<body>
+<div class="print-format">
+
+{# الفوتر والبنوك ثابتة وتظهر في جميع صفحات PDF #}
+
+
+
+
+{# شريط الترويسة موحد بين الفاتورة وكل صفحات الصيانة #}
+{% macro make_header(title, subtitle) %}
+<div class="sheet-header system-letter-head{% if not letter_head or no_letterhead %} header-empty{% endif %}">
+    {% if letter_head and not no_letterhead %}
+        {{ letter_head
+            | replace('فاتورة مبيعات ضريبية', title)
+            | replace('فاتورة مسودة', title)
+            | replace('خدمات حماية الطلاء (PPF) والعزل الحراري للسيارات', subtitle)
+            | replace('خدمات تركيب العازل الحراري وحماية السيارات', subtitle)
+        }}
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro make_footer() %}
+    {% if footer and not no_letterhead %}
+        <div class="footer-fixed system-letter-footer">{{ footer }}</div>
+    {% endif %}
+{% endmacro %}
+
+{# الصفحة الأولى: الفاتورة #}
+<div class="page-first">
+{% if banks.left %}<div class="vertical-bank left-bank">حسابنا في {{ banks.left.bank }}{% if banks.left.iban %} : <span dir="ltr">{{ banks.left.iban }}</span>{% endif %}</div>{% endif %}
+{% if banks.right %}<div class="vertical-bank right-bank">حسابنا في {{ banks.right.bank }}{% if banks.right.iban %} : <span dir="ltr">{{ banks.right.iban }}</span>{% endif %}</div>{% endif %}
+    {{ make_footer() }}
+    {{ make_header(invoice_title, 'خدمات تركيب العازل الحراري وحماية السيارات') }}
+
+    <table class="top-info-table"><tr>
+        <td class="company-info-cell">
+            <div class="company-block">
+                <div class="company-name">{{ company_name }}</div>
+                <div class="data-line">
+    <div class="field-row"><span class="field-label">السجل التجاري</span>&nbsp;<span class="field-value">{{ company_cr }}</span></div>
+    <div class="field-row"><span class="field-label">الرقم الضريبي</span>&nbsp;<span class="field-value">{{ company_tax }}</span></div>
+    <div class="field-row"><span class="field-label">رقم الجوال</span>&nbsp;<span class="field-value">{{ company_phone }}</span></div>
+    <div class="field-row"><span class="field-label">العنوان</span>&nbsp;<span class="field-value">{{ company_location }}</span></div>
+</div>
+            </div>
+        </td>
+        <td class="invoice-info-cell">
+            <div class="invoice-block">
+                <div class="data-line">
+    <div class="field-row"><span class="field-label">رقم الفاتورة</span>&nbsp;<span class="field-value">{{ doc.name }}</span></div>
+    <div class="field-row"><span class="field-label">تاريخ الفاتورة</span>&nbsp;<span class="field-value">{{ frappe.utils.formatdate(doc.posting_date, 'yyyy/MM/dd') if doc.get('posting_date') else '' }}</span></div>
+    <div class="field-row"><span class="field-label">مندوب المبيعات</span>&nbsp;<span class="field-value">{{ sales_user }}</span></div>
+    <div class="field-row"><span class="field-label">طريقة الدفع</span>&nbsp;<span class="field-value">{{ payment_method }}</span></div>
+    <div class="field-row"><span class="field-label">عدد الصفحات</span>&nbsp;<span class="field-value">{{ page_count }}</span></div>
+</div>
+            </div>
+        </td>
+        <td class="qr-info-cell">
+            <div class="qr-holder">{% if qr_image_src %}<img src="{{ qr_image_src }}" class="qr-img" alt="QR الزكاة">{% endif %}</div>
+        </td>
+    </tr></table>
+
+    <table class="customer-vehicle-table"><tr>
+        <td class="customer-cell">
+            <div class="info-panel">
+                <div class="panel-head">بيانات العميل</div>
+                <div class="panel-body"><div class="data-line">
+    <div class="field-row"><span class="field-label">الاسم</span>&nbsp;<span class="field-value">{{ customer_name }}</span></div>
+    <div class="field-row"><span class="field-label">رقم الجوال</span>&nbsp;<span class="field-value">{{ customer_mobile }}</span></div>
+    <div class="field-row"><span class="field-label">الرقم الضريبي</span>&nbsp;<span class="field-value">{{ customer_tax }}</span></div>
+    <div class="field-row"><span class="field-label">العنوان الوطني</span>&nbsp;<span class="field-value">{{ national_address }}</span></div>
+</div></div>
+            </div>
+        </td>
+        <td class="vehicle-cell">
+            <div class="info-panel">
+                <div class="panel-head">بيانات المركبة</div>
+                <div class="panel-body"><div class="data-line">
+    <div class="field-row"><span class="field-label">النوع</span>&nbsp;<span class="field-value">{{ doc.get('custom_vehicle_make') or '' }}</span></div>
+    <div class="field-row"><span class="field-label">الموديل</span>&nbsp;<span class="field-value">{{ doc.get('custom_vehicle_model') or '' }}</span></div>
+    <div class="field-row"><span class="field-label">اللون</span>&nbsp;<span class="field-value">{{ doc.get('custom_vehicle_color') or '' }}</span></div>
+    <div class="field-row"><span class="field-label">رقم اللوحة</span>&nbsp;<span class="field-value">{{ doc.get('custom_plate_number') or '' }}</span></div>
+</div></div>
+            </div>
+        </td>
+    </tr></table>
+
+    <div class="section">
+        <div class="section-title">فاتورة المبيعات</div>
+        <table class="standard-table service-table">
+            <colgroup><col class="col-number"><col class="col-service"><col class="col-desc"><col class="col-qty"><col class="col-price"><col class="col-total"></colgroup>
+            <thead><tr><th>م</th><th>الخدمة</th><th>وصف الخدمة</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead>
+            <tbody>
+            {% for item in doc.get('items') or [] %}
+                <tr>
+                    <td class="number">{{ loop.index }}</td>
+                    <td>{{ item.get('item_name') or item.get('item_code') or '' }}</td>
+                    <td>{{ item.get('description') or '' }}</td>
+                    <td class="number">{{ item.get('qty') if item.get('qty') is not none else '' }}</td>
+                    <td class="money">{{ '{:,.2f}'.format((item.get('rate') or 0)|float) }}</td>
+                    <td class="money">{{ '{:,.2f}'.format((item.get('amount') or 0)|float) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <table class="bottom-table"><tr>
+        <td class="terms-cell">
+            <div class="section">
+                <div class="section-title">الشروط والأحكام</div>
+                <div class="terms-inner">{{ terms_content.html | safe }}</div>
+            </div>
+        </td>
+        <td class="totals-cell">
+            <div class="section">
+                <div class="section-title">ملخص الحساب</div>
+                <table class="totals-table"><tbody>
+                    <tr><td class="sum-label">المجموع الفرعي (قبل الضريبة)</td><td class="sum-value">{{ '{:,.2f}'.format((doc.get('net_total') or 0)|float) }}</td></tr>
+                    <tr><td class="sum-label">ضريبة القيمة المضافة</td><td class="sum-value">{{ '{:,.2f}'.format((doc.get('total_taxes_and_charges') or 0)|float) }}</td></tr>
+                    <tr class="grand"><td class="sum-label">الإجمالي شامل الضريبة</td><td class="sum-value">{{ '{:,.2f}'.format((doc.get('grand_total') or 0)|float) }}</td></tr>
+                    <tr class="paid"><td class="sum-label">المبلغ المدفوع</td><td class="sum-value">{{ '{:,.2f}'.format(paid_amount|float) }}</td></tr>
+                    <tr class="due"><td class="sum-label">المبلغ المتبقي</td><td class="sum-value">{{ '{:,.2f}'.format(remaining_amount|float) }}</td></tr>
+                </tbody></table>
+            </div>
+        </td>
+    </tr></table>
+</div>
+
+</div>
+
+<script>
+(function(){
+ 'use strict';
+ let busy=false, done=false;
+ function paginate(){
+  if(busy||done) return;
+  const root=Array.from(document.querySelectorAll('.print-format')).find(r=>Array.from(r.children).some(e=>e.matches('.page-first')));
+  if(!root) return;
+  const sources=Array.from(root.children).filter(e=>e.matches('.page-first,.following-content'));
+  if(!sources.length) return;
+  busy=true;
+  const mm=document.createElement('div');
+  mm.style.cssText='position:absolute;width:1mm;height:1mm;visibility:hidden';root.append(mm);
+  const unit=mm.getBoundingClientRect().height;mm.remove();
+  const sheets=[];
+  let sheet, header, furniture;
+  function create(){
+   sheet=document.createElement('div');sheet.className='pdf-sheet page-first';
+   sheet.append(header.cloneNode(true));
+   furniture.forEach(e=>sheet.append(e.cloneNode(true)));
+   root.append(sheet);sheets.push(sheet);return sheet;
+  }
+  function fits(e){
+   return e.getBoundingClientRect().bottom<=sheet.getBoundingClientRect().top+272*unit+0.5;
+  }
+  function placeAtomic(e){
+   sheet.append(e);
+   if(!fits(e)&&Array.from(sheet.children).filter(x=>!x.matches('.sheet-header,.footer-fixed,.vertical-bank')).length>1){
+    e.remove();create().append(e);
+   }
+  }
+  function splitTable(block, prefix){
+   const table=block.matches('table')?block:block.querySelector('table');
+   const rows=table&&table.tBodies[0]?Array.from(table.tBodies[0].rows):[];
+   if(!rows.length){if(prefix)placeAtomic(prefix);placeAtomic(block);return;}
+   const blank=block.cloneNode(true);
+   const bt=blank.matches('table')?blank:blank.querySelector('table');
+   Array.from(bt.tBodies).forEach(tb=>tb.replaceChildren());
+   let part,body,pre;
+   function start(){
+    if(prefix){pre=prefix.cloneNode(true);sheet.append(pre);}
+    part=blank.cloneNode(true);sheet.append(part);
+    const pt=part.matches('table')?part:part.querySelector('table');
+    body=pt.tBodies[0]||pt.createTBody();
+   }
+   start();
+   for(const row of rows){
+    body.append(row);
+    if(!fits(part)){
+     row.remove();
+     if(!body.rows.length){part.remove();if(pre)pre.remove();}
+     create();start();body.append(row);
+    }
+   }
+  }
+  for(const src of sources){
+   header=src.querySelector(':scope > .sheet-header');
+   furniture=Array.from(src.children).filter(e=>e.matches('.footer-fixed,.vertical-bank'));
+   if(!header)continue;
+   const blocks=Array.from(src.children).filter(e=>!e.matches('.sheet-header,.footer-fixed,.vertical-bank'));
+   // Removing the source keeps images and computed widths stable in the new sheets.
+   src.remove();create();
+   for(let i=0;i<blocks.length;i++){
+    const b=blocks[i];
+    if(b.matches('.maintenance-title')&&blocks[i+1]&&blocks[i+1].matches('.maintenance-flow')){
+     splitTable(blocks[++i],b);
+    }else if(b.matches('.section')&&b.querySelector('.standard-table')){
+     splitTable(b,null);
+    }else placeAtomic(b);
+   }
+  }
+  // The old count represented logical sections; now use the measured sheet count.
+  root.querySelectorAll('.field-row').forEach(r=>{
+   if(r.querySelector('.field-label')?.textContent.trim()==='عدد الصفحات')r.querySelector('.field-value').textContent=String(sheets.length);
+  });
+  sheets.forEach((p,i)=>{
+   const n=document.createElement('div');n.textContent=(i+1)+' / '+sheets.length;
+   n.style.cssText='position:absolute;bottom:20mm;left:0;right:0;text-align:center;font:8px Arial;direction:ltr';p.append(n);
+  });
+  done=true;busy=false;document.documentElement.dataset.a4Ready='true';
+ }
+ function ready(){
+  const imgs=Array.from(document.images).map(im=>im.complete?Promise.resolve():new Promise(ok=>{im.addEventListener('load',ok,{once:true});im.addEventListener('error',ok,{once:true});}));
+  Promise.all([document.fonts?document.fonts.ready:Promise.resolve(),...imgs]).then(()=>requestAnimationFrame(paginate));
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ready,{once:true});else ready();
+ window.addEventListener('beforeprint',paginate);
+})();
+</script>
+
+</body>
+</html>
+
