@@ -17,10 +17,25 @@ class VehicleReception(Document):
 		"""Use a numeric five-digit suffix even for forms opened before the update."""
 		self.naming_series = "REC-.YY.-.MM.-.#####"
 
+	def before_validate(self):
+		self.cleanup_window_film_items()
+
 	def validate(self):
+		self.cleanup_window_film_items()
 		self.validate_plate_number()
 		self.set_customer_details()
 		self.summarize_requested_services()
+
+	def cleanup_window_film_items(self):
+		"""Ensure no lingering empty rows in window_film_items when disabled or unselected."""
+		if not self.service_window_film:
+			self.set("window_film_items", [])
+		else:
+			valid_rows = [
+				r for r in self.get("window_film_items", [])
+				if r.get("window_location") or r.get("shade_degree") or r.get("film_type") or r.get("notes")
+			]
+			self.set("window_film_items", valid_rows)
 
 	def on_submit(self):
 		"""When submitted (تسجيل), transition to Received if Draft, locking the record."""
@@ -54,7 +69,7 @@ class VehicleReception(Document):
 		summary_lines = []
 
 		# 1. Window Film
-		if self.service_window_film or self.get("window_film_items") or self.film_front_window or self.film_back_window:
+		if self.service_window_film:
 			film_lines = []
 			if self.get("window_film_items"):
 				for row in self.window_film_items:

@@ -77,17 +77,42 @@ frappe.ui.form.on("Vehicle Reception", {
 		// Ensure notes boxes have equal height
 		frm.trigger("set_notes_equal_height");
 
-		// Ensure window film table has a default blank row if active on draft
-		if (frm.doc.docstatus === 0 && frm.doc.service_window_film && (!frm.doc.window_film_items || frm.doc.window_film_items.length === 0)) {
-			frm.add_child("window_film_items");
+		// Ensure window film table is cleared if service is not enabled, or has a default row if active
+		if (frm.doc.docstatus === 0) {
+			if (!frm.doc.service_window_film && frm.doc.window_film_items && frm.doc.window_film_items.length > 0) {
+				frm.clear_table("window_film_items");
+				frm.refresh_field("window_film_items");
+			} else if (frm.doc.service_window_film && (!frm.doc.window_film_items || frm.doc.window_film_items.length === 0)) {
+				frm.add_child("window_film_items");
+				frm.refresh_field("window_film_items");
+			}
+		}
+	},
+
+	validate: function (frm) {
+		if (!frm.doc.service_window_film) {
+			frm.clear_table("window_film_items");
 			frm.refresh_field("window_film_items");
+		} else if (frm.doc.window_film_items) {
+			// Remove rows where all fields are blank
+			const valid_rows = (frm.doc.window_film_items || []).filter(function (r) {
+				return r.window_location || r.shade_degree || r.film_type || r.notes;
+			});
+			if (valid_rows.length !== frm.doc.window_film_items.length) {
+				frm.doc.window_film_items = valid_rows;
+				frm.refresh_field("window_film_items");
+			}
 		}
 	},
 
 	service_window_film: function (frm) {
-		// Auto-create a blank row when window film checkbox is enabled
-		if (frm.doc.service_window_film && (!frm.doc.window_film_items || frm.doc.window_film_items.length === 0)) {
-			frm.add_child("window_film_items");
+		if (frm.doc.service_window_film) {
+			if (!frm.doc.window_film_items || frm.doc.window_film_items.length === 0) {
+				frm.add_child("window_film_items");
+				frm.refresh_field("window_film_items");
+			}
+		} else {
+			frm.clear_table("window_film_items");
 			frm.refresh_field("window_film_items");
 		}
 	},
