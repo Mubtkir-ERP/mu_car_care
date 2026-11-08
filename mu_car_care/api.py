@@ -413,8 +413,8 @@ def _populate_transaction_items(source, target):
 			"description": _build_polish_description(source),
 		})
 
-	# 4. Fallback if no specific checkboxes but price or requested_services exist
-	if not services and (source.get("price") or source.get("requested_services")):
+	# 4. Fallback if no specific checkboxes but requested_services exist
+	if not services and source.get("requested_services"):
 		code = _get_or_create_service_item(
 			"خدمات العناية بالسيارات",
 			["خدمات العناية بالسيارات", "خدمة عامة", "General Service", "Car Care Service"],
@@ -439,20 +439,10 @@ def _populate_transaction_items(source, target):
 			"description": _("Window Film Service"),
 		})
 
-	total_price = flt(source.get("price") or 0.0)
-	count = len(services)
-
-	for idx, srv in enumerate(services):
+	for srv in services:
 		item_code = srv["item_code"]
 		item_name = frappe.db.get_value("Item", item_code, "item_name") or item_code
 		stock_uom = frappe.db.get_value("Item", item_code, "stock_uom") or "Nos"
-
-		if count == 1:
-			rate = total_price
-		else:
-			rate = round(total_price / count, 2)
-			if idx == count - 1:
-				rate = total_price - (round(total_price / count, 2) * (count - 1))
 
 		item_row = target.append("items", {})
 		item_row.item_code = item_code
@@ -462,8 +452,8 @@ def _populate_transaction_items(source, target):
 		item_row.uom = stock_uom
 		item_row.stock_uom = stock_uom
 		item_row.conversion_factor = 1.0
-		item_row.rate = rate
-		item_row.amount = rate
+		item_row.rate = 0.0
+		item_row.amount = 0.0
 
 
 @frappe.whitelist()
@@ -472,9 +462,6 @@ def make_sales_invoice_from_reception(source_name, target_doc=None):
 	def set_missing_values(source, target):
 		target.custom_has_maintenance_schedule = 1
 		target.custom_maintenance_start_date = source.posting_date
-		if source.get("paid_amount"):
-			target.custom_paid_amount = flt(source.paid_amount)
-			target.paid_amount = flt(source.paid_amount)
 		_populate_transaction_items(source, target)
 		try:
 			target.run_method("set_missing_values")
@@ -500,7 +487,6 @@ def make_sales_invoice_from_reception(source_name, target_doc=None):
 					"odometer_km": "custom_odometer_reading",
 					"chassis_no": "custom_chassis_no",
 					"name": "custom_vehicle_reception_ref",
-					"paid_amount": "custom_paid_amount",
 				},
 			}
 		},
@@ -519,8 +505,6 @@ def make_sales_order_from_reception(source_name, target_doc=None):
 		target.custom_maintenance_start_date = source.posting_date
 		if not target.delivery_date:
 			target.delivery_date = source.posting_date
-		if source.get("paid_amount"):
-			target.custom_paid_amount = flt(source.paid_amount)
 		_populate_transaction_items(source, target)
 		try:
 			target.run_method("set_missing_values")
@@ -546,7 +530,6 @@ def make_sales_order_from_reception(source_name, target_doc=None):
 					"odometer_km": "custom_odometer_reading",
 					"chassis_no": "custom_chassis_no",
 					"name": "custom_vehicle_reception_ref",
-					"paid_amount": "custom_paid_amount",
 				},
 			}
 		},
@@ -563,8 +546,6 @@ def make_quotation_from_reception(source_name, target_doc=None):
 	def set_missing_values(source, target):
 		target.custom_has_maintenance_schedule = 1
 		target.custom_maintenance_start_date = source.posting_date
-		if source.get("paid_amount"):
-			target.custom_paid_amount = flt(source.paid_amount)
 		_populate_transaction_items(source, target)
 		try:
 			target.run_method("set_missing_values")
@@ -590,7 +571,6 @@ def make_quotation_from_reception(source_name, target_doc=None):
 					"odometer_km": "custom_odometer_reading",
 					"chassis_no": "custom_chassis_no",
 					"name": "custom_vehicle_reception_ref",
-					"paid_amount": "custom_paid_amount",
 				},
 			}
 		},
