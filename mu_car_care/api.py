@@ -5,7 +5,7 @@
 import frappe
 from frappe import _
 from frappe.model.mapper import get_mapped_doc
-from frappe.utils import add_months, cint, getdate, nowdate
+from frappe.utils import add_months, cint, flt, getdate, nowdate
 
 
 @frappe.whitelist()
@@ -349,8 +349,6 @@ def _populate_transaction_items(source, target):
 	"""
 	Populate items table on Sales Invoice / Order / Quotation from Vehicle Reception services and agreed price.
 	"""
-	from frappe.utils import flt
-
 	services = []
 
 	# 1. Window Film
